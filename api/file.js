@@ -16,7 +16,7 @@ function postNewFile(req, res, next){
         (result) => {
             file_controller.add_file_to_table(file.name.split('.')[0]).then(
                 (result) => {
-                    runPythonScript('./uploads/' + file.name, './processed/' + file.name.split('.')[0] + '.csv', res, file)            
+                    runPythonScript('./uploads/' + file.name, res, file)            
 
                 },
                 (error) => {
@@ -31,9 +31,8 @@ function postNewFile(req, res, next){
     )
 }
 
-function runPythonScript(sourceFile, destinationFile, res, file){
-    console.log(sourceFile, destinationFile)
-    const python = spawn('python', ['../filereader.py', sourceFile, destinationFile]);
+function runPythonScript(sourceFile, res, file){
+    const python = spawn('python', ['filereader.py', sourceFile]);
 
     absorptions = []
     python.stdout.on('data', function (data) {
