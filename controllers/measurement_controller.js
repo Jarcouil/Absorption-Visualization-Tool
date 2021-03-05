@@ -7,19 +7,19 @@ module.exports = {
 }
 
 function get_all_scans(){
-    sql = "SELECT * FROM measurements;"
+    var sql = "SELECT * FROM measurements;"
 
     return db_controller.execute_sql(sql);
 }
 
 function get_measurement(name){
-    sql = "SELECT * FROM ??;";
+    var sql = "SELECT * FROM ??;";
 
     return db_controller.execute_sql(sql, [name]);
 }
 
 function get_column_of_measurement(name, column){
-    sql = "SELECT ?? FROM ??;";
+    var sql = "SELECT ?? FROM ??;";
 
     return db_controller.execute_sql(sql, [column, name]);
 }

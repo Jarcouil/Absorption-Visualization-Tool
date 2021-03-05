@@ -34,10 +34,8 @@ function postNewFile(req, res, next){
 function runPythonScript(sourceFile, res, file){
     const python = spawn('python', ['filereader.py', sourceFile]);
 
-    absorptions = []
     python.stdout.on('data', function (data) {
         console.log('Pipe data from python script ...');
-        absorptions.push(data)
 });
 
     python.on('close', (code) => {

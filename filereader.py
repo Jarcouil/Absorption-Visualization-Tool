@@ -27,9 +27,9 @@ c1 = 0.000000250000000000135
 c2 = 6.400E-05
 c3 = 0.016
 
-wavelengthOffset = 200
+wavelength_offset = 200
 
-def connectToDB():
+def connect_to_db():
     try:    
         return mysql.connector.connect(
                 host="localhost",
@@ -40,8 +40,8 @@ def connectToDB():
     except mysql.connector.Error as e:
         print(e)
 
-def returnSQLString(columns, tablename, wavelength):
-    sql = "INSERT INTO `" + tablename + "` (" 
+def return_sql_string(columns, table_name, wavelength):
+    sql = "INSERT INTO `" + table_name + "` (" 
     for i in range(columns):
         sql += "`" + str(i+wavelength) + "`, "
     sql = sql[:-2] 
@@ -49,20 +49,11 @@ def returnSQLString(columns, tablename, wavelength):
 
     return sql
 
-def getAbsorbtion(longInt):
-    return c0 + c1 * longInt
+def get_absorption(long_int):
+    return c0 + c1 * long_int
 
-def printRow(row):
-    print(  str(row[0]) + " -> "
-        + str(row[1]) + ", "  
-        + str(row[2]) + ", " 
-        + str(row[3]) + ", " 
-        + str(row[4]) + ", " 
-        + str(row[5])+ " -> " 
-        + str(row[6]))
-
-def getListOfFile(filename):
-    with open(filename, "rb") as file:
+def get_listed_file(file_name):
+    with open(file_name, "rb") as file:
         byte = file.read(1)
         letters = []
 
@@ -73,27 +64,27 @@ def getListOfFile(filename):
     file.close()
     return(letters) 
 
-def getHeaderSize(filename):
-    listOfFile = getListOfFile(filename)
+def get_header_size(file_name):
+    listed_file = get_listed_file(file_name)
 
-    for i in range(len(listOfFile)):
-        if listOfFile[i] == 'B' and listOfFile[i+1] == 'o' and listOfFile[i+2] == 'u' and listOfFile[i+3] == 'n' and listOfFile[i+4] == 'd' and listOfFile[i+5] == 'a' and listOfFile[i+6] == 'r' and listOfFile[i+7] == 'y':
+    for i in range(len(listed_file)):
+        if listed_file[i] == 'B' and listed_file[i+1] == 'o' and listed_file[i+2] == 'u' and listed_file[i+3] == 'n' and listed_file[i+4] == 'd' and listed_file[i+5] == 'a' and listed_file[i+6] == 'r' and listed_file[i+7] == 'y':
             return i + 16
 
     return 0
 
-def getIntFromBytes(byte):
+def get_int_from_byte(byte):
     return int.from_bytes(byte, byteorder='little')
 
-def insertChromatogramToDatabase(sourceFile):
-    with open(sourceFile, "rb") as file:
-        mydb = connectToDB()
+def insert_chromatogram_to_db(source_file):
+    with open(source_file, "rb") as file:
+        mydb = connect_to_db()
         mycursor = mydb.cursor()
-        byte = file.read(getHeaderSize(sourceFile)) # read header of dad file
-        tablename = sourceFile.split(".")[-2].split("/")[-1]
+        byte = file.read(get_header_size(source_file)) # read header of dad file
+        table_name = source_file.split(".")[-2].split("/")[-1]
 
-        wavelength = wavelengthOffset
-        sql = returnSQLString(601, tablename, wavelength)
+        wavelength = wavelength_offset
+        sql = return_sql_string(601, table_name, wavelength)
         values = ()
 
         while byte:
@@ -101,7 +92,7 @@ def insertChromatogramToDatabase(sourceFile):
             if len(byte) != 3:
                 break
 
-            absorption = getAbsorbtion(getIntFromBytes(byte))
+            absorption = get_absorption(get_int_from_byte(byte))
             sql += "%s, "            
             values += (str(absorption),)
 
@@ -109,24 +100,24 @@ def insertChromatogramToDatabase(sourceFile):
                 sql= sql[:-2] + ")"
                 mycursor.execute(sql, values)
                 mydb.commit()
-                wavelength = wavelengthOffset
-                sql = returnSQLString(601, tablename, wavelength)
+                wavelength = wavelength_offset
+                sql = return_sql_string(601, table_name, wavelength)
                 values = ()
 
             else:
                 wavelength += 1
 
 
-def writeChromatogramToCSV(sourceFile, destinationFile):
-    absorptionList = []
-    with open(destinationFile, 'w', newline='') as writeFile:
+def write_chromatogram_to_csv(source_file, destination_file):
+    absorption_list = []
+    with open(destination_file, 'w', newline='') as writeFile:
         writer = csv.writer(writeFile, delimiter = ';')
         writer.writerow(range(200,801))
 
-        with open(sourceFile, "rb") as file:
-            byte = file.read(getHeaderSize(sourceFile)) # read header of dad file
+        with open(source_file, "rb") as file:
+            byte = file.read(get_header_size(source_file)) # read header of dad file
             absorptions  = []
-            wavelength = wavelengthOffset
+            wavelength = wavelength_offset
            
             while byte:
                 byte = file.read(3)
@@ -134,13 +125,13 @@ def writeChromatogramToCSV(sourceFile, destinationFile):
                 if len(byte) != 3:
                     break
                 
-                absorption = getAbsorbtion(int.from_bytes(byte, byteorder='little'))
+                absorption = get_absorption(int.from_bytes(byte, byteorder='little'))
                 absorptions.append(absorption)
 
                 # reset wavelength after 601 wavelengths
                 if wavelength%800 == 0:    
-                    wavelength = wavelengthOffset
-                    absorptionList.append([absorptions])
+                    wavelength = wavelength_offset
+                    absorption_list.append([absorptions])
                     writer.writerow(absorptions)
                     absorptions = []
                 else:
@@ -150,32 +141,30 @@ def writeChromatogramToCSV(sourceFile, destinationFile):
     writeFile.close()
 
 
-def writeResultsOfWavenlength(sourceFile, destinationFile, wavelengthLimit):
-    with open(destinationFile, 'w', newline='') as writeFile:
+def wirte_absorption_of_wavelength(source_file, destination_file, wavelength_limit):
+    with open(destination_file, 'w', newline='') as writeFile:
         writer = csv.writer(writeFile, delimiter = ';')
         writer.writerow(["Wavelength", "Absorption"]) 
 
-        with open(sourceFile, "rb") as file:
-            byte = file.read(getHeaderSize(sourceFile)) # read header of dad file
-            bytesRead = 0
-            wavelength = wavelengthOffset
+        with open(source_file, "rb") as file:
+            byte = file.read(get_header_size(source_file)) # read header of dad file
+            wavelength = wavelength_offset
 
             while byte:
-                bytesRead +=3
                 byte = file.read(3)
 
                 if len(byte) != 3:
                     break
                 
-                absorption = getAbsorbtion(int.from_bytes(byte, byteorder='little'))
+                absorption = get_absorption(int.from_bytes(byte, byteorder='little'))
 
-                if wavelength == wavelengthLimit: 
+                if wavelength == wavelength_limit: 
                     row = [wavelength, absorption]
                     writer.writerow(row)
 
                 # reset wavelength after 601 wavelengths
                 if wavelength%800 == 0:
-                    wavelength = wavelengthOffset
+                    wavelength = wavelength_offset
 
                 else:
                     wavelength += 1
@@ -183,11 +172,5 @@ def writeResultsOfWavenlength(sourceFile, destinationFile, wavelengthLimit):
     file.close()
     writeFile.close()
 
-# writeChromatogramToCSV("00000001big.dad", "chromatogram big2.csv")
-# writeChromatogramToCSV("00000001small.dad", "chromatogram small.csv")
-# writeResultsOfWavenlength("00000001small.dad", "289nm alle tijdstippen small.csv", 289)
-# writeResultsOfWavenlength("00000001small.dad", "303nm alle tijdstippen small.csv", 303)
-# writeResultsOfWavenlength("00000001big.dad", "239nm alle tijdstippen big.csv", 303)
-
-# writeChromatogramToCSV(sys.argv[1], sys.argv[2])
-insertChromatogramToDatabase(sys.argv[1])
+# write_chromatogram_to_csv(sys.argv[1], sys.argv[2])
+insert_chromatogram_to_db(sys.argv[1])

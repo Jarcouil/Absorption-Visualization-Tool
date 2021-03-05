@@ -6,12 +6,9 @@ module.exports = {
 }
 
 function add_new_file(file){
-    sql = "\
-    CREATE TABLE IF NOT EXISTS ?? ( \
-        id INT AUTO_INCREMENT PRIMARY KEY\
-    );"
+    var sql = "CREATE TABLE IF NOT EXISTS ?? (id INT AUTO_INCREMENT PRIMARY KEY);"
 
-    data =  [file.name.split('.')[0]]
+    var data =  [file.name.split('.')[0]]
     
     var i;
     for(i=200; i < 801; i++){
@@ -22,7 +19,7 @@ function add_new_file(file){
 }
 
 function add_file_to_table(name){
-    sql = "INSERT INTO `measurements` (name) VALUES ('??');"
+    var sql = "INSERT INTO `measurements` (name) VALUES ('??');"
 
     return db_controller.execute_sql(sql, [name])
 }

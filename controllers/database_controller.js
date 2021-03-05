@@ -85,10 +85,10 @@ function insert_file_sql(sql, data){
 }
 
 function getInsertdataSQL(data){
-    sql = "INSERT INTO `" + data.shift() + "` VALUES "
+    var sql = "INSERT INTO `" + data.shift() + "` VALUES "
 
     data.forEach(element => {
-        row = ""
+        var row = ""
         element.forEach(element2 => {
             row = row + ", `" + element2.toString() + "` "
         })
@@ -98,7 +98,7 @@ function getInsertdataSQL(data){
 }
 
 function getAlterTableSQL(data){
-    sql = "ALTER TABLE `" + data.shift() + "`"
+    var sql = "ALTER TABLE `" + data.shift() + "`"
     data.forEach(element => {
         sql = sql + " ADD COLUMN `" + element.toString() + "` FLOAT,"                      
     });
