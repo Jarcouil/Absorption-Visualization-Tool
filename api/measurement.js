@@ -3,7 +3,7 @@ const measurement_controller = require("../controllers/measurement_controller");
 
 router.get('/', getAllScans);
 router.get('/:name', getMeasurement);
-router.get('/:name/:column', getColumnOfMeasurement);
+router.get('/:name/:columns', getColumnsOfMeasurements);
 
 function getAllScans(req, res, next){
     measurement_controller.get_all_scans().then(
@@ -27,8 +27,8 @@ function getMeasurement(req, res, next){
     )
 }
 
-function getColumnOfMeasurement(req, res, next){
-    measurement_controller.get_column_of_measurement(req.params.name, req.params.column).then(
+function getColumnsOfMeasurements(req, res, next){
+    measurement_controller.get_columns_of_measurement(req.params.name, req.query.c).then(
         (result) => {
             return res.status(200).json(normalizeResults(result));
         },
