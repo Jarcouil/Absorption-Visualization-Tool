@@ -4,6 +4,7 @@ const measurement_controller = require("../controllers/measurement_controller");
 router.get('/', getAllScans);
 router.get('/:name', getMeasurement);
 router.get('/:name/:columns', getColumnsOfMeasurements);
+router.get('/:name/id/:id', getWavelengthOfId);
 
 function getAllScans(req, res, next){
     measurement_controller.get_all_scans().then(
@@ -19,7 +20,7 @@ function getAllScans(req, res, next){
 function getMeasurement(req, res, next){
     measurement_controller.get_measurement(req.params.name).then(
         (result) => {
-            return res.status(200).json(normalizeResults(result));
+            return res.status(200).json(result);
         },
         (error) => {
             return res.status(500).json({ message: error });
@@ -29,6 +30,17 @@ function getMeasurement(req, res, next){
 
 function getColumnsOfMeasurements(req, res, next){
     measurement_controller.get_columns_of_measurement(req.params.name, req.query.c).then(
+        (result) => {
+            return res.status(200).json(normalizeResults(result));
+        },
+        (error) => {
+            return res.status(500).json({ message: error });
+        }
+    )
+}
+
+function getWavelengthOfId(req, res, next){
+    measurement_controller.get_wavelengths_of_id(req.params.name, req.params.id).then(
         (result) => {
             return res.status(200).json(normalizeResults(result));
         },
