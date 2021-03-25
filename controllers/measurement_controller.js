@@ -13,10 +13,10 @@ function get_all_scans(){
     return db_controller.execute_sql(sql);
 }
 
-function get_measurement(name){
-    var sql = "SELECT * FROM ??;";
+function get_measurement(id){
+    var sql = "SELECT * FROM measurements WHERE id = ?;"
 
-    return db_controller.execute_sql(sql, [name]);
+    return db_controller.execute_sql(sql, [id]);
 }
 
 function get_columns_of_measurement(name, columns){
