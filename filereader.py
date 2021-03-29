@@ -76,15 +76,14 @@ def get_header_size(file_name):
 def get_int_from_byte(byte):
     return int.from_bytes(byte, byteorder='little')
 
-def insert_chromatogram_to_db(source_file):
+def insert_chromatogram_to_db(source_file, table_name, wavelengths):
     with open(source_file, "rb") as file:
         mydb = connect_to_db()
         mycursor = mydb.cursor()
         byte = file.read(get_header_size(source_file)) # read header of dad file
-        table_name = source_file.split(".")[-2].split("/")[-1]
 
         wavelength = wavelength_offset
-        sql = return_sql_string(601, table_name, wavelength)
+        sql = return_sql_string(wavelengths, table_name, wavelength)
         values = ()
 
         while byte:
@@ -101,7 +100,7 @@ def insert_chromatogram_to_db(source_file):
                 mycursor.execute(sql, values)
                 mydb.commit()
                 wavelength = wavelength_offset
-                sql = return_sql_string(601, table_name, wavelength)
+                sql = return_sql_string(wavelengths, table_name, wavelength)
                 values = ()
 
             else:
@@ -172,5 +171,4 @@ def wirte_absorption_of_wavelength(source_file, destination_file, wavelength_lim
     file.close()
     writeFile.close()
 
-# write_chromatogram_to_csv(sys.argv[1], sys.argv[2])
-insert_chromatogram_to_db(sys.argv[1])
+insert_chromatogram_to_db(sys.argv[1], sys.argv[2], int(sys.argv[3]))

@@ -7,22 +7,18 @@ router.post('/upload-file', postNewFile);
 
 
 function postNewFile(req, res, next){
-    
     let file = req.files.file;
     file.mv('./uploads/' + file.name)
-
-
-    file_controller.add_new_file(file).then(
+    file_controller.add_new_file(req.body.name, +req.body.minWaveLength, +req.body.maxWaveLength).then(
         (result) => {
-            file_controller.add_file_to_table(file.name.split('.')[0]).then(
+            file_controller.add_file_to_table(req.body.name, req.body.description).then(
                 (result) => {
-                    runPythonScript('./uploads/' + file.name, res, file)            
-
+                    let wavelengths = req.body.maxWaveLength - req.body.minWaveLength + 1
+                    runPythonScript('./uploads/' + file.name, res, file, req.body.name, wavelengths)
                 },
                 (error) => {
                     return res.status(500).send(error)
                 }
-
             )
         },
         (error) => {
@@ -31,8 +27,8 @@ function postNewFile(req, res, next){
     )
 }
 
-function runPythonScript(sourceFile, res, file){
-    const python = spawn('python', ['filereader.py', sourceFile]);
+function runPythonScript(sourceFile, res, file, tablename, wavelengths){
+    const python = spawn('python', ['filereader.py', sourceFile, tablename, wavelengths]);
 
     python.stdout.on('data', function (data) {
         console.log('Pipe data from python script ...');
