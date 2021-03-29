@@ -20,7 +20,7 @@ function add_new_file(name, minWaveLength, maxWaveLength){
 }
 
 function add_file_to_table(name, description){
-    var sql = "INSERT INTO `measurements` (name, description) VALUES ('??', '??');"
+    var sql = "INSERT INTO `measurements` (name, description) VALUES (?, ?);"
 
     return db_controller.execute_sql(sql, [name, description])
 }
