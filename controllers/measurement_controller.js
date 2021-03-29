@@ -4,13 +4,20 @@ module.exports = {
     get_all_scans,
     get_measurement,
     get_columns_of_measurement,
-    get_wavelengths_of_id
+    get_wavelengths_of_id,
+    delete_scan
 }
 
 function get_all_scans(){
     var sql = "SELECT * FROM measurements;"
 
     return db_controller.execute_sql(sql);
+}
+
+function delete_scan(id){
+    var sql = "DELETE FROM measurements WHERE id = ?;"
+
+    return db_controller.execute_sql(sql, [id]);
 }
 
 function get_measurement(id){

@@ -2,9 +2,21 @@ const router = require('express').Router({mergeParams: true});
 const measurement_controller = require("../controllers/measurement_controller");
 
 router.get('/', getAllScans);
+router.delete('/:id', deleteScan);
 router.get('/:name', getMeasurement);
 router.get('/:name/:columns', getColumnsOfMeasurements);
 router.get('/:name/id/:id', getWavelengthOfId);
+
+function deleteScan(req, res, next){
+    measurement_controller.delete_scan(req.params.id).then(
+        (result) => {
+            return res.status(200).json(result);
+        },
+        (error) => {
+            return res.status(500).json({ message: error });
+        }
+    )
+}
 
 function getAllScans(req, res, next){
     measurement_controller.get_all_scans().then(
