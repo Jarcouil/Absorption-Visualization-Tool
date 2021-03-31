@@ -1,12 +1,12 @@
-const {spawn} = require('child_process');
+const { spawn } = require('child_process');
 const _ = require('lodash');
-const router = require('express').Router({mergeParams: true});
+const router = require('express').Router({ mergeParams: true });
 const file_controller = require('./../controllers/file_controller');
 
 router.post('/upload-file', postNewFile);
 
 
-function postNewFile(req, res, next){
+function postNewFile(req, res, next) {
     let file = req.files.file;
     file.mv('./uploads/' + file.name)
     file_controller.add_new_file(req.body.name, +req.body.minWaveLength, +req.body.maxWaveLength).then(
@@ -27,12 +27,12 @@ function postNewFile(req, res, next){
     )
 }
 
-function runPythonScript(sourceFile, res, file, tablename, wavelengths){
+function runPythonScript(sourceFile, res, file, tablename, wavelengths) {
     const python = spawn('python', ['filereader.py', sourceFile, tablename, wavelengths]);
 
     python.stdout.on('data', function (data) {
         console.log('Pipe data from python script ...');
-});
+    });
 
     python.on('close', (code) => {
         console.log(`child process close all stdio with code ${code}`);

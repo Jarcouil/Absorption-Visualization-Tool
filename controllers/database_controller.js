@@ -6,19 +6,19 @@ module.exports = {
     insert_data,
 }
 
-function execute_sql(sql, data = null){
+function execute_sql(sql, data = null) {
     // Return new promise 
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
         sql_connection.query(
             sql,
             data,
-            function(error, result, fields) { 
-                if (error) 
+            function (error, result, fields) {
+                if (error)
                     reject(error);
 
-                if(result){
+                if (result) {
                     resolve(result);
-                }else{
+                } else {
                     reject();
                 }
             }
@@ -26,32 +26,32 @@ function execute_sql(sql, data = null){
     })
 }
 
-function insert_data(sql, data){
+function insert_data(sql, data) {
     sql = getInsertdataSQL(data)
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
         if (err) { rejct(err); }
 
-        sql_connection.query(sql, data, function(err, result) { 
-            if (err) { 
-                sql_connection.rollback(function() {
+        sql_connection.query(sql, data, function (err, result) {
+            if (err) {
+                sql_connection.rollback(function () {
                     reject(err);
                     return;
                 });
             }
         })
-        
+
     })
 }
 
-function insert_file_sql(sql, data){
-    return new Promise(function(resolve, reject) {
-        sql_connection.beginTransaction(function(err) {
+function insert_file_sql(sql, data) {
+    return new Promise(function (resolve, reject) {
+        sql_connection.beginTransaction(function (err) {
             if (err) { rejct(err); }
 
             // Create table
-            sql_connection.query(sql, data, function(err, result) { 
-                if (err) { 
-                    sql_connection.rollback(function() {
+            sql_connection.query(sql, data, function (err, result) {
+                if (err) {
+                    sql_connection.rollback(function () {
                         reject(err);
                         return;
                     });
@@ -61,18 +61,18 @@ function insert_file_sql(sql, data){
             sql = getAlterTableSQL(data)
 
             // Add Columns
-            sql_connection.query(sql, data, function(err, result) {
-                if(err) {
-                    sql_connection.rollback(function() {
+            sql_connection.query(sql, data, function (err, result) {
+                if (err) {
+                    sql_connection.rollback(function () {
                         reject(err)
                         return
                     });
                 }
             })
-            
-            sql_connection.commit(function(err) {
+
+            sql_connection.commit(function (err) {
                 if (err) {
-                    sql_connection.rollback(function() {
+                    sql_connection.rollback(function () {
                         reject(err);
                         return
                     });
@@ -84,7 +84,7 @@ function insert_file_sql(sql, data){
     })
 }
 
-function getInsertdataSQL(data){
+function getInsertdataSQL(data) {
     var sql = "INSERT INTO `" + data.shift() + "` VALUES "
 
     data.forEach(element => {
@@ -92,16 +92,16 @@ function getInsertdataSQL(data){
         element.forEach(element2 => {
             row = row + ", `" + element2.toString() + "` "
         })
-        sql = sql + "(" + row + ")," 
+        sql = sql + "(" + row + "),"
     })
-    return sql.slice(0,-1) + ";"
+    return sql.slice(0, -1) + ";"
 }
 
-function getAlterTableSQL(data){
+function getAlterTableSQL(data) {
     var sql = "ALTER TABLE `" + data.shift() + "`"
     data.forEach(element => {
-        sql = sql + " ADD COLUMN `" + element.toString() + "` FLOAT,"                      
+        sql = sql + " ADD COLUMN `" + element.toString() + "` FLOAT,"
     });
-    return sql.slice(0,-1) + ";"
+    return sql.slice(0, -1) + ";"
 }
 
