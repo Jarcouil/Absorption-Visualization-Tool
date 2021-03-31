@@ -5,7 +5,9 @@ module.exports = {
     get_measurement,
     get_columns_of_measurement,
     get_wavelengths_of_id,
-    delete_scan
+    delete_scan,
+    get_all_columns_of_measurement,
+    get_all_ids_of_measurement
 }
 
 function get_all_scans() {
@@ -40,8 +42,19 @@ function get_columns_of_measurement(name, columns) {
 function get_wavelengths_of_id(name, id) {
     var sql = "SELECT * FROM ?? WHERE (id = ?);"
     var data = [name, id]
-
     return db_controller.execute_sql(sql, data);
+}
+
+function get_all_columns_of_measurement(id) {
+    var sql = "SELECT COLUMN_NAME AS columns FROM information_schema.columns WHERE table_name = ?;";
+    
+    return db_controller.execute_sql(sql, [id]);
+}
+
+function get_all_ids_of_measurement(id) {
+    var sql = "SELECT id FROM ??;";
+    
+    return db_controller.execute_sql(sql, [id]);
 }
 
 function get_columns_sql(columns) {
