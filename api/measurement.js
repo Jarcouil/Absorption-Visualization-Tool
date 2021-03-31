@@ -67,7 +67,7 @@ function getWavelengthOfId(req, res, next) {
 function getAllColumns(req, res, next) {
     measurement_controller.get_all_columns_of_measurement(req.params.id).then(
         (result) => {
-            return res.status(200).json(normalizeResults(result));
+            return res.status(200).json(removeIdFromColumns(normalizeResults(result)['columns']));
         },
         (error) => {
             return res.status(500).json({ message: error });
@@ -78,7 +78,7 @@ function getAllColumns(req, res, next) {
 function getAllIds(req, res, next) {
     measurement_controller.get_all_ids_of_measurement(req.params.id).then(
         (result) => {
-            return res.status(200).json(normalizeResults(result));
+            return res.status(200).json(normalizeResults(result)['id']);
         },
         (error) => {
             return res.status(500).json({ message: error });
@@ -95,6 +95,11 @@ function normalizeResults(results) {
             else r[k] = r[k].concat(e[k])
         }), r
     }, {})
+}
+
+function removeIdFromColumns(columns) {
+    columns.shift();
+    return columns;
 }
 
 module.exports = router;
