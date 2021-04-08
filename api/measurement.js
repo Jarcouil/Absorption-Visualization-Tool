@@ -98,7 +98,10 @@ function normalizeResults(results) {
 }
 
 function removeIdFromColumns(columns) {
-    columns.shift();
+    const index = columns.indexOf('id');
+    if (index > -1) {
+        columns.splice(index, 1);
+    }
     return columns;
 }
 

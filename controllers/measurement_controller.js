@@ -58,13 +58,13 @@ function get_all_ids_of_measurement(id) {
 }
 
 function get_columns_sql(columns) {
-    var sql = "SELECT ";
+    var sql = "SELECT id, ";
     var i = 0;
     for (i; i < columns.length; i++) {
         if (i == columns.length - 1) {
-            sql = sql + "?? ";
+            sql = sql + "?? as 'column' ";
         } else {
-            sql = sql + "??, ";
+            sql = sql + "?? as 'column', ";
         }
     }
 

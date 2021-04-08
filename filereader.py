@@ -103,7 +103,7 @@ def insert_chromatogram_to_db(source_file, table_name, wavelengths):
             sql += "%s, "
             values += (str(absorption),)
 
-            if wavelength % 800 == 0:
+            if wavelength % (wavelengths+wavelength_offset -1) == 0:
                 sql = sql[:-2] + ")"
                 mycursor.execute(sql, values)
                 mydb.commit()
