@@ -3,8 +3,8 @@ var db_controller = require('./database_controller');
 module.exports = {
     get_all_scans,
     get_measurement,
-    get_columns_of_measurement,
-    get_wavelengths_of_id,
+    get_all_id_of_wavelength,
+    get_all_wavelengths_of_id,
     delete_scan,
     get_all_columns_of_measurement,
     get_all_ids_of_measurement
@@ -28,7 +28,7 @@ function get_measurement(id) {
     return db_controller.execute_sql(sql, [id]);
 }
 
-function get_columns_of_measurement(name, columns) {
+function get_all_id_of_wavelength(name, columns) {
     if (typeof (columns) != "object") {
         columns = [columns]
     }
@@ -39,7 +39,7 @@ function get_columns_of_measurement(name, columns) {
 
 }
 
-function get_wavelengths_of_id(name, id) {
+function get_all_wavelengths_of_id(name, id) {
     var sql = "SELECT * FROM ?? WHERE (id = ?);"
     var data = [name, id]
     return db_controller.execute_sql(sql, data);

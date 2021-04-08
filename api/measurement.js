@@ -3,11 +3,11 @@ const measurement_controller = require("../controllers/measurement_controller");
 
 router.get('/', getAllScans);
 router.delete('/:id', deleteScan);
-router.get('/columns/:id', getAllColumns);
+router.get('/columns/:id', getAllWavelengths);
 router.get('/id/:id', getAllIds);
 router.get('/:name', getMeasurement);
-router.get('/:name/columns', getColumnsOfMeasurements);
-router.get('/:name/:id', getWavelengthOfId);
+router.get('/:name/columns', getAllIdOfWavelength);
+router.get('/:name/:id', getAllWavelengthsOfId);
 
 function deleteScan(req, res, next) {
     measurement_controller.delete_scan(req.params.id).then(
@@ -42,10 +42,10 @@ function getMeasurement(req, res, next) {
     )
 }
 
-function getColumnsOfMeasurements(req, res, next) {
-    measurement_controller.get_columns_of_measurement(req.params.name, req.query.c).then(
+function getAllIdOfWavelength(req, res, next) {
+    measurement_controller.get_all_id_of_wavelength(req.params.name, req.query.c).then(
         (result) => {
-            return res.status(200).json(normalizeResults(result));
+            return res.status(200).json(result);
         },
         (error) => {
             return res.status(500).json({ message: error });
@@ -53,10 +53,10 @@ function getColumnsOfMeasurements(req, res, next) {
     )
 }
 
-function getWavelengthOfId(req, res, next) {
-    measurement_controller.get_wavelengths_of_id(req.params.name, req.params.id).then(
+function getAllWavelengthsOfId(req, res, next) {
+    measurement_controller.get_all_wavelengths_of_id(req.params.name, req.params.id).then(
         (result) => {
-            return res.status(200).json(normalizeResults(result));
+            return res.status(200).json(removeIdFromAllWavelengths(normalizeResultsSingle(result)));
         },
         (error) => {
             return res.status(500).json({ message: error });
@@ -64,10 +64,12 @@ function getWavelengthOfId(req, res, next) {
     )
 }
 
-function getAllColumns(req, res, next) {
+
+
+function getAllWavelengths(req, res, next) {
     measurement_controller.get_all_columns_of_measurement(req.params.id).then(
         (result) => {
-            return res.status(200).json(removeIdFromColumns(normalizeResults(result)['columns']));
+            return res.status(200).json(removeIdFromWavelengths(normalizeResultsArray(result)['columns']));
         },
         (error) => {
             return res.status(500).json({ message: error });
@@ -78,7 +80,7 @@ function getAllColumns(req, res, next) {
 function getAllIds(req, res, next) {
     measurement_controller.get_all_ids_of_measurement(req.params.id).then(
         (result) => {
-            return res.status(200).json(normalizeResults(result)['id']);
+            return res.status(200).json(normalizeResultsArray(result)['id']);
         },
         (error) => {
             return res.status(500).json({ message: error });
@@ -86,9 +88,8 @@ function getAllIds(req, res, next) {
     )
 }
 
-function normalizeResults(results) {
+function normalizeResultsArray(results) {
     var normalResults = results.map(v => Object.assign({}, v));
-
     return normalResults.reduce(function (r, e) {
         return Object.keys(e).forEach(function (k) {
             if (!r[k]) r[k] = [].concat(e[k])
@@ -97,12 +98,27 @@ function normalizeResults(results) {
     }, {})
 }
 
-function removeIdFromColumns(columns) {
+function normalizeResultsSingle(results) {
+    var normalResults = results.map(v => Object.assign({}, v));
+    return normalResults.reduce(function (r, e) {
+        return Object.keys(e).forEach(function (k) {
+            if (!r[k]) r[k] = e[k]
+            else r[k] = r[k].concat(e[k])
+        }), r
+    }, {})
+}
+
+function removeIdFromWavelengths(columns) {
     const index = columns.indexOf('id');
     if (index > -1) {
         columns.splice(index, 1);
     }
     return columns;
+}
+
+function removeIdFromAllWavelengths(result) {
+    delete result['id'];
+    return result;
 }
 
 module.exports = router;
