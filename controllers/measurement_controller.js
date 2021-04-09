@@ -47,13 +47,13 @@ function get_all_wavelengths_of_id(name, id) {
 
 function get_all_columns_of_measurement(id) {
     var sql = "SELECT COLUMN_NAME AS columns FROM information_schema.columns WHERE table_name = ?;";
-    
+
     return db_controller.execute_sql(sql, [id]);
 }
 
 function get_all_ids_of_measurement(id) {
     var sql = "SELECT id FROM ??;";
-    
+
     return db_controller.execute_sql(sql, [id]);
 }
 
@@ -62,9 +62,9 @@ function get_columns_sql(columns) {
     var i = 0;
     for (i; i < columns.length; i++) {
         if (i == columns.length - 1) {
-            sql = sql + "?? as 'column' ";
+            sql = sql + "?? as 'wavelength' ";
         } else {
-            sql = sql + "?? as 'column', ";
+            sql = sql + "?? as 'wavelength', ";
         }
     }
 

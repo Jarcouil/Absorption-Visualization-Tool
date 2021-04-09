@@ -64,8 +64,6 @@ function getAllWavelengthsOfId(req, res, next) {
     )
 }
 
-
-
 function getAllWavelengths(req, res, next) {
     measurement_controller.get_all_columns_of_measurement(req.params.id).then(
         (result) => {
