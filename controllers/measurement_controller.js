@@ -7,7 +7,8 @@ module.exports = {
     get_all_wavelengths_of_id,
     delete_scan,
     get_all_columns_of_measurement,
-    get_all_ids_of_measurement
+    get_all_ids_of_measurement,
+    get_measurement_data
 }
 
 function get_all_scans() {
@@ -55,6 +56,12 @@ function get_all_ids_of_measurement(id) {
     var sql = "SELECT id FROM ??;";
 
     return db_controller.execute_sql(sql, [id]);
+}
+
+function get_measurement_data(id) {
+    var sql = "SELECT * FROM ?? LIMIT 500;";
+
+    return db_controller.execute_sql(sql, [id])
 }
 
 function get_columns_sql(columns) {

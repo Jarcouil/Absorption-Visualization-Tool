@@ -4,6 +4,7 @@ const measurement_controller = require("../controllers/measurement_controller");
 router.get('/', getAllScans);
 router.delete('/:id', deleteScan);
 router.get('/columns/:id', getAllWavelengths);
+router.get('/data/:name', getMeasurementData);
 router.get('/id/:id', getAllIds);
 router.get('/:name', getMeasurement);
 router.get('/:name/columns', getAllIdOfWavelength);
@@ -35,6 +36,17 @@ function getMeasurement(req, res, next) {
     measurement_controller.get_measurement(req.params.name).then(
         (result) => {
             return res.status(200).json(result);
+        },
+        (error) => {
+            return res.status(500).json({ message: error });
+        }
+    )
+}
+
+function getMeasurementData(req, res, next) {
+    measurement_controller.get_measurement_data(req.params.name).then(
+        (result) => {
+            return res.status(200).json(removeIdFromAllData(result));
         },
         (error) => {
             return res.status(500).json({ message: error });
@@ -116,6 +128,13 @@ function removeIdFromWavelengths(columns) {
 
 function removeIdFromAllWavelengths(result) {
     delete result['id'];
+    return result;
+}
+
+function removeIdFromAllData(result) {
+    result.map(element => {
+        delete element['id'];
+    })
     return result;
 }
 
