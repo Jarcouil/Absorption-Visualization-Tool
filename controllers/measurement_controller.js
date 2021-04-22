@@ -59,7 +59,7 @@ function get_all_ids_of_measurement(id) {
 }
 
 function get_measurement_data(id) {
-    var sql = "SELECT * FROM ?? LIMIT 500;";
+    var sql = "SELECT * FROM ??;";
 
     return db_controller.execute_sql(sql, [id])
 }
