@@ -12,7 +12,6 @@ router.post(
     register);
 
 function login(req, res, next) {
-    console.log('logging in')
     return auth_controller.login(req, res)
 }
 

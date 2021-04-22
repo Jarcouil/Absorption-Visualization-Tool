@@ -1,7 +1,6 @@
 const router = require('express').Router({ mergeParams: true });
 const file = require('./file');
 const measurement = require('./measurement');
-const login = require('./login');
 const auth = require('./auth');
 const user = require('./user');
 
