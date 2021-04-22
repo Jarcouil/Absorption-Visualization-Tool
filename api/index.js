@@ -8,7 +8,6 @@ router.get('/', noContent)
 
 router.use('/file', file)
 router.use('/measurement', measurement)
-router.use('/login', login)
 router.use('/auth', auth)
 router.use('/user', user)
 
