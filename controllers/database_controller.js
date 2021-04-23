@@ -29,7 +29,7 @@ function execute_sql(sql, data = null) {
 function insert_data(sql, data) {
     sql = getInsertdataSQL(data)
     return new Promise(function (resolve, reject) {
-        if (err) { rejct(err); }
+        if (err) { reject(err); }
 
         sql_connection.query(sql, data, function (err, result) {
             if (err) {
@@ -46,7 +46,7 @@ function insert_data(sql, data) {
 function insert_file_sql(sql, data) {
     return new Promise(function (resolve, reject) {
         sql_connection.beginTransaction(function (err) {
-            if (err) { rejct(err); }
+            if (err) { reject(err); }
 
             // Create table
             sql_connection.query(sql, data, function (err, result) {
