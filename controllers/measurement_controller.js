@@ -1,4 +1,4 @@
-var db_controller = require('./database_controller');
+const db_controller = require('./database_controller');
 
 module.exports = {
     get_all_scans,

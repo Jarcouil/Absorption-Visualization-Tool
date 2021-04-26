@@ -1,4 +1,4 @@
-const db_controller = require('../controllers/database_controller');
+const db_controller = require('./database_controller');
 
 module.exports = {
     add_new_file,
@@ -7,11 +7,8 @@ module.exports = {
 
 function add_new_file(name, minWaveLength, maxWaveLength) {
     var sql = "CREATE TABLE IF NOT EXISTS ?? (id INT AUTO_INCREMENT PRIMARY KEY);"
-
     var data = [name]
-
     var i;
-
     for (i = minWaveLength; i < maxWaveLength + 1; i++) {
         data.push(i)
     }

@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const config = require("../config/auth.config.js");
-const db = require("../models");
-const User = db.user;
+const db_controller = require('../controllers/database_controller');
+const roleEnum = require('./roleEnum')
 
 const verifyToken = (req, res, next) => {
   let token = req.headers["x-access-token"];
@@ -24,66 +24,27 @@ const verifyToken = (req, res, next) => {
 };
 
 const isAdmin = (req, res, next) => {
-  User.findByPk(req.userId).then(user => {
-    user.getRoles().then(roles => {
-      for (let i = 0; i < roles.length; i++) {
-        if (roles[i].name === "admin") {
-          next();
-          return;
-        }
+  const sql = "SELECT * FROM users WHERE id = ?;"
+
+  db_controller.execute_sql(sql, [req.userId]).then(users => {
+    if (users.length > 0) {
+      const user = users[0];
+
+      if (user.isAdmin == roleEnum.admin) {
+        next();
+        return;
       }
+    }
 
-      res.status(403).send({
-        message: "Require Admin Role!"
-      });
-      return;
+    res.status(403).send({
+      message: "Require Admin Role!"
     });
-  });
-};
-
-const isModerator = (req, res, next) => {
-  User.findByPk(req.userId).then(user => {
-    user.getRoles().then(roles => {
-      for (let i = 0; i < roles.length; i++) {
-        if (roles[i].name === "moderator") {
-          next();
-          return;
-        }
-      }
-
-      res.status(403).send({
-        message: "Require Moderator Role!"
-      });
-    });
-  });
-};
-
-const isModeratorOrAdmin = (req, res, next) => {
-  User.findByPk(req.userId).then(user => {
-    user.getRoles().then(roles => {
-      for (let i = 0; i < roles.length; i++) {
-        if (roles[i].name === "moderator") {
-          next();
-          return;
-        }
-
-        if (roles[i].name === "admin") {
-          next();
-          return;
-        }
-      }
-
-      res.status(403).send({
-        message: "Require Moderator or Admin Role!"
-      });
-    });
+    return;
   });
 };
 
 const authJwt = {
   verifyToken: verifyToken,
-  isAdmin: isAdmin,
-  isModerator: isModerator,
-  isModeratorOrAdmin: isModeratorOrAdmin
+  isAdmin: isAdmin
 };
 module.exports = authJwt;

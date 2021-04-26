@@ -8,11 +8,7 @@ router.get(
     [authJwt.verifyToken],
     user_controller.userBoard
 );
-router.get(
-    "/mod",
-    [authJwt.verifyToken, authJwt.isModerator],
-    user_controller.moderatorBoard
-);
+
 router.get(
     "/admin",
     [authJwt.verifyToken, authJwt.isAdmin],

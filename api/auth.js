@@ -1,5 +1,5 @@
 const router = require('express').Router({ mergeParams: true });
-const auth_controller = require("../controllers/auth.controller");
+const auth_controller = require("../controllers/auth_controller");
 const { verifySignUp } = require("../middleware");
 
 router.post('/login', login);
