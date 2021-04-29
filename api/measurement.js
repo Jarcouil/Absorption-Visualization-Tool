@@ -35,7 +35,7 @@ function getAllScans(req, res, next) {
 function getMeasurement(req, res, next) {
     measurement_controller.get_measurement(req.params.name).then(
         (result) => {
-            return res.status(200).json(result);
+            return res.status(200).json(result[0]);
         },
         (error) => {
             return res.status(500).json({ message: error });
