@@ -5,7 +5,6 @@ const file_controller = require('./../controllers/file_controller');
 
 router.post('/upload-file', postNewFile);
 
-
 function postNewFile(req, res, next) {
     let file = req.files.file;
     file.mv('./uploads/' + file.name)
