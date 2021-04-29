@@ -9,7 +9,7 @@ router.get('/', noContent)
 router.use('/file', file)
 router.use('/measurement', measurement)
 router.use('/auth', auth)
-router.use('/user', user)
+router.use('/users', user)
 
 function noContent(req, res, next) {
     return res.send('No content for /');
