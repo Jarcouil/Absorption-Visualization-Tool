@@ -12,8 +12,16 @@ function postNewFile(req, res, next) {
         (result) => {
             file_controller.add_file_to_table(req.body.name, req.body.description).then(
                 (result) => {
-                    let wavelengths = req.body.maxWaveLength - req.body.minWaveLength + 1
-                    runPythonScript('./uploads/' + file.name, res, file, req.body.name, wavelengths)
+                    const new_table_name = result.insertId.toString() + '_' + req.body.name
+                    file_controller.rename_measurement_table(req.body.name, new_table_name).then(
+                        (result) => {
+                            let wavelengths = req.body.maxWaveLength - req.body.minWaveLength + 1
+                            runPythonScript('./uploads/' + file.name, res, file, new_table_name, wavelengths)
+                        },
+                        (error) => {
+                            return res.status(500).send(error)
+                        }
+                    )
                 },
                 (error) => {
                     return res.status(500).send(error)

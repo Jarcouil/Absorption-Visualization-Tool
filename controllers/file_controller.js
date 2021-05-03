@@ -3,6 +3,7 @@ const db_controller = require('./database_controller');
 module.exports = {
     add_new_file,
     add_file_to_table,
+    rename_measurement_table,
 }
 
 function add_new_file(name, minWaveLength, maxWaveLength) {
@@ -20,4 +21,10 @@ function add_file_to_table(name, description) {
     var sql = "INSERT INTO `measurements` (name, description) VALUES (?, ?);"
 
     return db_controller.execute_sql(sql, [name, description])
+}
+
+function rename_measurement_table(table_name, new_table_name) {
+    var sql = "ALTER TABLE ?? RENAME ??;"
+
+    return db_controller.execute_sql(sql, [table_name, new_table_name])
 }
