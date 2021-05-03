@@ -1,9 +1,9 @@
 const db_controller = require('./database_controller');
 
 module.exports = {
-  get_users,
+  delete_user,
   get_user,
-  delete_user
+  get_users
 }
 
 function get_users() {

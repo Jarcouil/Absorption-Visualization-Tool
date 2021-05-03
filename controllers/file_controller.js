@@ -1,8 +1,8 @@
 const db_controller = require('./database_controller');
 
 module.exports = {
-    add_new_file,
     add_file_to_table,
+    add_new_file,
     rename_measurement_table,
 }
 

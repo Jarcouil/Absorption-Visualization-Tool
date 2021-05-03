@@ -2,8 +2,8 @@ var sql_connection = require('../database_connect');
 
 module.exports = {
     execute_sql,
-    insert_file_sql,
     insert_data,
+    insert_file_sql,
 }
 
 function execute_sql(sql, data = null) {

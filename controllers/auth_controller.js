@@ -5,8 +5,8 @@ var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 
 module.exports = {
-    register,
     login,
+    register,
 }
 
 function register(req, res) {

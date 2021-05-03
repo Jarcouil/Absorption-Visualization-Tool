@@ -1,8 +1,13 @@
 const router = require('express').Router({ mergeParams: true });
 const measurement_controller = require("../controllers/measurement_controller");
+const { authJwt } = require("../middleware");
 
 router.get('/', getAllScans);
-router.delete('/:id', deleteScan);
+router.delete(
+    '/:id',
+    [authJwt.verifyToken, authJwt.isAdmin],
+    deleteScan
+);
 router.get('/columns/:id', getAllWavelengths);
 router.get('/data/:name', getMeasurementData);
 router.get('/id/:id', getAllIds);
@@ -11,10 +16,26 @@ router.get('/:name/columns', getAllIdOfWavelength);
 router.get('/:name/:id', getAllWavelengthsOfId);
 
 function deleteScan(req, res, next) {
-    measurement_controller.delete_scan(req.params.id).then(
+    measurement_controller.get_table_name_of_id(req.params.id).then(
         (result) => {
-            return res.status(200).json(result);
-        },
+            if (result.length < 1) {
+                return res.status(404).json({ message: "Measurement not found" });
+            }
+            measurement_controller.delete_scan_data_table(req.params.id.toString() + '_' + result[0].name).then(
+                (result) => {
+                    measurement_controller.delete_scan_from_measurements(req.params.id).then(
+                        (result) => {
+                            return res.status(200).json(result);
+                        },
+                        (error) => {
+                            return res.status(500).json({ message: error });
+                        } 
+                    )
+                },
+                (error) => {
+                    return res.status(500).json({ message: error });
+                }
+            )},
         (error) => {
             return res.status(500).json({ message: error });
         }

@@ -1,14 +1,16 @@
 const db_controller = require('./database_controller');
 
 module.exports = {
-    get_all_scans,
-    get_measurement,
-    get_all_id_of_wavelength,
-    get_all_wavelengths_of_id,
-    delete_scan,
+    delete_scan_data_table,
+    delete_scan_from_measurements,
     get_all_columns_of_measurement,
+    get_all_id_of_wavelength,
     get_all_ids_of_measurement,
-    get_measurement_data
+    get_all_scans,
+    get_all_wavelengths_of_id,
+    get_measurement,
+    get_measurement_data,
+    get_table_name_of_id
 }
 
 function get_all_scans() {
@@ -17,10 +19,22 @@ function get_all_scans() {
     return db_controller.execute_sql(sql);
 }
 
-function delete_scan(id) {
+function get_table_name_of_id(id) {
+    var sql = "SELECT name FROM measurements WHERE id = ?;"
+
+    return db_controller.execute_sql(sql, [id]);
+}
+
+function delete_scan_from_measurements(id) {
     var sql = "DELETE FROM measurements WHERE id = ?;"
 
     return db_controller.execute_sql(sql, [id]);
+}
+
+function delete_scan_data_table(tablename) {
+    var sql = "DROP TABLE IF EXISTS ??;"
+    console.log(tablename)
+    return db_controller.execute_sql(sql, [tablename]);
 }
 
 function get_measurement(id) {
