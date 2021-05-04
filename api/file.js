@@ -11,15 +11,15 @@ function postNewFile(req, res, next) {
     file_controller.add_new_file(req.body.name, +req.body.minWaveLength, +req.body.maxWaveLength).then(
         (result) => {
             file_controller.add_file_to_table(req.body.name, req.body.description).then(
-                (result) => {
-                    const new_table_name = result.insertId.toString() + '_' + req.body.name
+                (result2) => {
+                    const new_table_name = result2.insertId.toString() + '_' + req.body.name
                     file_controller.rename_measurement_table(req.body.name, new_table_name).then(
                         (result) => {
                             let wavelengths = req.body.maxWaveLength - req.body.minWaveLength + 1
-                            runPythonScript('./uploads/' + file.name, res, file, new_table_name, wavelengths)
+                            runPythonScript('./uploads/' + file.name, res, file, new_table_name, wavelengths, result2.insertId.toString())
                         },
                         (error) => {
-                            return res.status(500).send(error)
+                            return res.status(500).send(result)
                         }
                     )
                 },
@@ -34,7 +34,7 @@ function postNewFile(req, res, next) {
     )
 }
 
-function runPythonScript(sourceFile, res, file, tablename, wavelengths) {
+function runPythonScript(sourceFile, res, file, tablename, wavelengths, insertId) {
     const python = spawn('python', ['filereader.py', sourceFile, tablename, wavelengths]);
 
     python.stdout.on('data', function (data) {
@@ -45,6 +45,7 @@ function runPythonScript(sourceFile, res, file, tablename, wavelengths) {
         console.log(`child process close all stdio with code ${code}`);
 
         res.send({
+            id: insertId,
             status: true,
             message: 'File is uploaded',
             data: {
