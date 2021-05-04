@@ -58,7 +58,7 @@ function login(req, res) {
             username: user.username,
             email: user.email,
             isAdmin: user.isAdmin,
-            createdAt: user.createdAt,
+            created_at: user.created_at,
             accessToken: token
         });
     });
