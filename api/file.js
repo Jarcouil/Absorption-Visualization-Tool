@@ -37,23 +37,23 @@ function postNewFile(req, res, next) {
 function runPythonScript(sourceFile, res, file, tablename, wavelengths, insertId) {
     const python = spawn('python', ['filereader.py', sourceFile, tablename, wavelengths]);
 
-    python.stdout.on('data', function (data) {
-        console.log('Pipe data from python script ...');
-    });
-
     python.on('close', (code) => {
         console.log(`child process close all stdio with code ${code}`);
-
-        res.send({
-            id: insertId,
-            status: true,
-            message: 'File is uploaded',
-            data: {
-                name: file.name,
-                mimetype: file.mimetype,
-                size: file.size
-            }
-        });
+        if (code === 0) {
+            res.send({
+                id: insertId,
+                status: true,
+                message: 'File is uploaded',
+                data: {
+                    name: file.name,
+                    mimetype: file.mimetype,
+                    size: file.size
+                }
+            });
+        } else {
+            return res.status(500).json("An error occured while processing the file")
+        }
+        
     });
 }
 
