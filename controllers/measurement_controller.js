@@ -33,7 +33,7 @@ function delete_scan_from_measurements(id) {
 
 function delete_scan_data_table(tablename) {
     var sql = "DROP TABLE IF EXISTS ??;"
-    console.log(tablename)
+
     return db_controller.execute_sql(sql, [tablename]);
 }
 
