@@ -1,6 +1,7 @@
 const router = require('express').Router({ mergeParams: true });
 const measurement_controller = require("../controllers/measurement_controller");
 const { authJwt } = require("../middleware");
+const fs = require('fs');
 
 router.get('/', getAllScans);
 router.delete(
@@ -21,6 +22,7 @@ function deleteScan(req, res, next) {
             if (result.length < 1) {
                 return res.status(404).json({ message: "Measurement not found" });
             }
+            delete_file('./uploads/' + req.params.id.toString() + '_' + result[0].name);
             measurement_controller.delete_scan_data_table(req.params.id.toString() + '_' + result[0].name).then(
                 (result) => {
                     measurement_controller.delete_scan_from_measurements(req.params.id).then(
@@ -56,7 +58,11 @@ function getAllScans(req, res, next) {
 function getMeasurement(req, res, next) {
     measurement_controller.get_measurement(req.params.name).then(
         (result) => {
-            return res.status(200).json(result[0]);
+            if (result.length > 0) {
+                return res.status(200).json(result[0]);
+            } else {
+                return res.status(404).json({ message: 'Kon de meting niet vinden' })
+            }
         },
         (error) => {
             return res.status(500).json({ message: error });
@@ -157,6 +163,14 @@ function removeIdFromAllData(result) {
         delete element['id'];
     })
     return result;
+}
+
+function delete_file(folderName) {
+    try { 
+        fs.rmSync(folderName, { recursive: true }) 
+    } catch (err) { 
+        console.log("err", err); 
+    }
 }
 
 module.exports = router;
