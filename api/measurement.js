@@ -20,7 +20,7 @@ function deleteScan(req, res, next) {
     measurement_controller.get_table_name_of_id(req.params.id).then(
         (result) => {
             if (result.length < 1) {
-                return res.status(404).json({ message: "Measurement not found" });
+                return res.status(404).json({ message: "Meting niet gevonden" });
             }
             delete_file('./uploads/' + req.params.id.toString() + '_' + result[0].name);
             measurement_controller.delete_scan_data_table(req.params.id.toString() + '_' + result[0].name).then(

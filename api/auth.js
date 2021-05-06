@@ -1,13 +1,16 @@
 const router = require('express').Router({ mergeParams: true });
 const auth_controller = require("../controllers/auth_controller");
 const { verifySignUp } = require("../middleware");
+const { authJwt } = require("../middleware");
 
 router.post('/login', login);
 router.post(
     '/register',
     [
         verifySignUp.checkDuplicateUsernameOrEmail,
-        verifySignUp.checkRolesExisted
+        verifySignUp.checkRolesExisted,
+        authJwt.verifyToken, 
+        authJwt.isAdmin,
     ],
     register);
 
