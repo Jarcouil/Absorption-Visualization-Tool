@@ -5,10 +5,11 @@ const file_controller = require('./../controllers/file_controller');
 const measurement_controller = require("../controllers/measurement_controller");
 const fs = require('fs');
 const path = require('path');
-
+const Json2csvParser = require("json2csv").Parser;
 router.post('/upload-file', postNewFile);
 router.get('/download-file/:id', downloadDadFile);
 router.get('/file-name/:id', getFileName);
+router.get('/csv/:id', getCSV);
 
 function getFileName(req, res, next) {
     measurement_controller.get_table_name_of_id(req.params.id).then(
@@ -22,7 +23,36 @@ function getFileName(req, res, next) {
                 return res.status(404).json({ message: 'Kon het bestand niet vinden' });
 
             }
-            return res.status(200).json({fileName: file});
+            return res.status(200).json({ fileName: file });
+        },
+        (error) => {
+            return res.status(500).json({ message: error });
+        }
+    )
+}
+
+function getCSV(req, res, next) {
+    measurement_controller.get_table_name_of_id(req.params.id).then(
+        (result) => {
+            if (result.length < 1) {
+                return res.status(404).json({ message: "Meting niet gevonden" });
+            }
+            const table_name = req.params.id.toString() + '_' + result[0].name
+            file_controller.get_csv_data(table_name, req.query.minWavelength, req.query.maxWavelength, req.query.minTimestamp, req.query.maxTimestamp).then(
+                (result) => {
+                    const jsonData = JSON.parse(JSON.stringify(result));
+                    const json2csvParser = new Json2csvParser({ header: true });
+                    const csv = json2csvParser.parse(jsonData);
+
+                    fs.writeFile(`${table_name}.csv`, csv, function (error) {
+                        if (error) throw error;
+                        return res.download(`${table_name}.csv`);
+                    });
+                },
+                (error) => {
+                    return res.status(500).json({ message: error });
+                }
+            )
         },
         (error) => {
             return res.status(500).json({ message: error });
@@ -37,6 +67,7 @@ function downloadDadFile(req, res, next) {
                 return res.status(404).json({ message: "Meting niet gevonden" });
             }
             const file_location = './uploads/' + req.params.id.toString() + '_' + result[0].name;
+            console.log(file_location + '/' + getFile(file_location))
             return res.download(file_location + '/' + getFile(file_location));
         },
         (error) => {
@@ -60,7 +91,7 @@ function postNewFile(req, res, next) {
                     file_controller.rename_measurement_table(req.body.name, new_table_name).then(
                         (result) => {
                             let wavelengths = req.body.maxWaveLength - req.body.minWaveLength + 1
-                            runPythonScript(file_location  + '/' + file.name, res, file, new_table_name, wavelengths, result2.insertId.toString())
+                            runPythonScript(file_location + '/' + file.name, res, file, new_table_name, wavelengths, result2.insertId.toString())
                         },
                         (error) => {
                             return res.status(500).send(result)
@@ -87,15 +118,15 @@ function makeDirectory(directoryPath) {
 }
 
 function getFile(directoryPath) {
-    try { 
+    try {
         const files = fs.readdirSync(directoryPath)
         if (files.length > 0) {
             return files[0]
         } else {
             return null
         }
-    } catch (err) { 
-        console.log("err", err); 
+    } catch (err) {
+        console.log("err", err);
         return null
     }
 }

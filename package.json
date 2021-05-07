@@ -17,8 +17,9 @@
     "express-fileupload": "^1.2.1",
     "express-jwt": "^6.0.0",
     "express-session": "^1.17.1",
+    "json2csv": "^5.0.6",
     "jsonwebtoken": "^8.5.1",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "morgan": "^1.10.0",
     "mysql": "^2.18.1"
   }
