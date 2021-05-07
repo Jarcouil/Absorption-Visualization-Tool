@@ -44,9 +44,15 @@ function getCSV(req, res, next) {
                     const json2csvParser = new Json2csvParser({ header: true });
                     const csv = json2csvParser.parse(jsonData);
 
-                    fs.writeFile(`${table_name}.csv`, csv, function (error) {
+                    fs.writeFile('file.csv', csv, function (error) {
                         if (error) throw error;
-                        return res.download(`${table_name}.csv`);
+                        return res.download('file.csv', function(err) {
+                            try {
+                                fs.rmSync('file.csv')
+                            } catch (e) {
+                                console.error(err);
+                            }
+                        });
                     });
                 },
                 (error) => {
