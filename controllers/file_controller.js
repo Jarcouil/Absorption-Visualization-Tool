@@ -18,10 +18,10 @@ function add_new_file(name, minWaveLength, maxWaveLength) {
     return db_controller.insert_file_sql(sql, data);
 }
 
-function add_file_to_table(name, description) {
-    var sql = "INSERT INTO `measurements` (name, description) VALUES (?, ?);"
+function add_file_to_table(name, description, createdBy) {
+    var sql = "INSERT INTO `measurements` (name, description, createdBy) VALUES (?, ?, ?);"
 
-    return db_controller.execute_sql(sql, [name, description])
+    return db_controller.execute_sql(sql, [name, description, createdBy])
 }
 
 function rename_measurement_table(table_name, new_table_name) {

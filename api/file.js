@@ -63,7 +63,6 @@ function downloadDadFile(req, res, next) {
                 return res.status(404).json({ message: "Meting niet gevonden" });
             }
             const file_location = './uploads/' + req.params.id.toString() + '_' + result[0].name;
-            console.log(file_location + '/' + getFile(file_location))
             return res.download(file_location + '/' + getFile(file_location));
         },
         (error) => {
@@ -77,7 +76,7 @@ function postNewFile(req, res, next) {
 
     file_controller.add_new_file(req.body.name, +req.body.minWaveLength, +req.body.maxWaveLength).then(
         (result) => {
-            file_controller.add_file_to_table(req.body.name, req.body.description).then(
+            file_controller.add_file_to_table(req.body.name, req.body.description, req.userId).then(
                 (result2) => {
                     const new_table_name = result2.insertId.toString() + '_' + req.body.name;
                     const file_location = './uploads/' + new_table_name
@@ -136,7 +135,7 @@ function runPythonScript(sourceFile, res, file, tablename, wavelengths, insertId
             res.send({
                 id: insertId,
                 status: true,
-                message: 'File is uploaded',
+                message: 'Meting is succesvol opgeslagen!',
                 data: {
                     name: file.name,
                     mimetype: file.mimetype,

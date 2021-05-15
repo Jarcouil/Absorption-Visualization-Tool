@@ -10,13 +10,20 @@ module.exports = {
     get_all_wavelengths_of_id,
     get_measurement,
     get_measurement_data,
-    get_table_name_of_id
+    get_table_name_of_id,
+    get_all_scans_of_user,
 }
 
 function get_all_scans() {
-    var sql = "SELECT * FROM measurements;"
+    var sql = "SELECT u.username, m.* FROM measurements m inner join users u on m.createdBy = u.id;"
 
     return db_controller.execute_sql(sql);
+}
+
+function get_all_scans_of_user(userId) {
+    var sql = "SELECT u.username, m.* FROM measurements m inner join users u on m.createdBy = u.id WHERE u.id = ?;"
+
+    return db_controller.execute_sql(sql, [userId]);
 }
 
 function get_table_name_of_id(id) {
@@ -37,10 +44,10 @@ function delete_scan_data_table(tablename) {
     return db_controller.execute_sql(sql, [tablename]);
 }
 
-function get_measurement(id) {
-    var sql = "SELECT * FROM measurements WHERE id = ?;"
+function get_measurement(id, userId) {
+    var sql = "SELECT * FROM measurements WHERE id = ? and createdBy = ?;"
 
-    return db_controller.execute_sql(sql, [id]);
+    return db_controller.execute_sql(sql, [id, userId]);
 }
 
 function get_all_id_of_wavelength(name, columns) {
@@ -55,7 +62,7 @@ function get_all_id_of_wavelength(name, columns) {
 }
 
 function get_all_wavelengths_of_id(name, id) {
-    var sql = "SELECT * FROM ?? WHERE (id = ?);"
+    var sql = "SELECT * FROM ??  WHERE (id = ?) ;"
     var data = [name, id]
     return db_controller.execute_sql(sql, data);
 }

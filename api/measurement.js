@@ -3,10 +3,15 @@ const measurement_controller = require("../controllers/measurement_controller");
 const { authJwt } = require("../middleware");
 const fs = require('fs');
 
-router.get('/', getAllScans);
+router.get('/', getAllScansOfUser);
+router.get(
+    '/all', 
+    [authJwt.verifyToken, authJwt.isAdmin],
+    getAllScans
+);
 router.delete(
     '/:id',
-    [authJwt.verifyToken, authJwt.isAdmin],
+    [authJwt.verifyToken],
     deleteScan
 );
 router.get('/columns/:id', getAllWavelengths);
@@ -17,7 +22,7 @@ router.get('/:name/columns', getAllIdOfWavelength);
 router.get('/:name/:id', getAllWavelengthsOfId);
 
 function deleteScan(req, res, next) {
-    measurement_controller.get_table_name_of_id(req.params.id).then(
+    measurement_controller.get_measurement(req.params.id, req.userId).then(
         (result) => {
             if (result.length < 1) {
                 return res.status(404).json({ message: "Meting niet gevonden" });
@@ -44,6 +49,17 @@ function deleteScan(req, res, next) {
     )
 }
 
+function getAllScansOfUser(req, res, next) {
+    measurement_controller.get_all_scans_of_user(req.userId).then(
+        (result) => {
+            return res.status(200).json(result);
+        },
+        (error) => {
+            return res.status(500).json({ message: error });
+        }
+    )
+}
+
 function getAllScans(req, res, next) {
     measurement_controller.get_all_scans().then(
         (result) => {
@@ -56,7 +72,7 @@ function getAllScans(req, res, next) {
 }
 
 function getMeasurement(req, res, next) {
-    measurement_controller.get_measurement(req.params.name).then(
+    measurement_controller.get_measurement(req.params.name, req.userId).then(
         (result) => {
             if (result.length > 0) {
                 return res.status(200).json(result[0]);
