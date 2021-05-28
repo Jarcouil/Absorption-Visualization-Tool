@@ -9,8 +9,6 @@ router.post(
     [
         verifySignUp.checkDuplicateUsernameOrEmail,
         verifySignUp.checkRolesExisted,
-        authJwt.verifyToken, 
-        authJwt.isAdmin,
     ],
     register);
 

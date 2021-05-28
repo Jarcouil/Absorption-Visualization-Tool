@@ -15,7 +15,7 @@ function register(req, res) {
         req.body.username,
         req.body.email,
         bcrypt.hashSync(req.body.password, 8),
-        req.body.isAdmin
+        0
     ];
 
     db_controller.execute_sql(sql, data).then(user => {
