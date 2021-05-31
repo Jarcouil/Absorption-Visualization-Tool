@@ -2,6 +2,12 @@ const router = require('express').Router({ mergeParams: true });
 const user_controller = require("../controllers/user_controller");
 const { authJwt } = require("../middleware");
 
+router.post(
+    "/:id",
+    [authJwt.verifyToken, authJwt.isAdmin],
+    toggleAdmin
+)
+
 router.get(
     "/",
     [authJwt.verifyToken, authJwt.isAdmin],
@@ -48,6 +54,17 @@ function get_user(req, res, next) {
             if (result.length < 1) {
                 return res.status(404).json({ message: "User not found" });
             }
+            return res.status(200).json(result[0]);
+        },
+        (error) => {
+            return res.status(500).json({ message: error });
+        }
+    )
+}
+
+function toggleAdmin(req, res, next) {
+    user_controller.toggle_admin(req.params.id).then(
+        (result) => {
             return res.status(200).json(result[0]);
         },
         (error) => {
