@@ -1,7 +1,8 @@
 const config = require("../config/auth.config");
 const db_controller = require('./database_controller');
 const nodemailer = require("nodemailer");
-
+const mailTemplate = require("../config/mail.template");
+const configFile = require("../config/config.json");
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 
@@ -17,10 +18,10 @@ module.exports = {
 const transporter = nodemailer.createTransport({
     service: 'Gmail',
     port: 465,
-    secure: true, // true for 465, false for other ports
+    secure: true,
     auth: {
-        user: "absorptionvisulazationtool@gmail.com",
-        pass: "Avtool2021",
+        user: configFile["email-addres"],
+        pass: configFile["password"],
     },
 });
 
@@ -104,13 +105,9 @@ function login(req, res) {
 function requestResetPassword(username, email, resetToken) {
     const mailOptions = {
         from: '"AVT Support" <absorptionvisulazationtool@gmail.com>', // sender address
-        to: email, // list of receivers
+        to: email, 
         subject: "Wachtwoord vergeten", // Subject line
-        text: "Beste " + username + ", \n\n " + // plain text body
-            'Je ontvangt deze mail omdat jij (of iemand anders) heeft aangevraagd om je wachtwoord te resetten voor je account. \n\n' +
-            'Klik alstublieft om onderstaande link of plak deze in je browser om dit proces af te ronden.\n\n' +
-            'http://localhost:4200/reset/' + resetToken + '\n\n' +
-            'Als je dit niet aangevraagd heb kun je deze mail negeren en wordt je wachtwoord niet gewijzigd.'
+        html: mailTemplate.getMail(username, resetToken)
     };
 
     return new Promise(function (resolve, reject) {
