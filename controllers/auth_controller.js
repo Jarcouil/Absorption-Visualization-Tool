@@ -1,5 +1,6 @@
 const config = require("../config/auth.config");
 const db_controller = require('./database_controller');
+const nodemailer = require("nodemailer");
 
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
@@ -7,7 +8,21 @@ var bcrypt = require("bcryptjs");
 module.exports = {
     login,
     register,
+    addResetToken,
+    requestResetPassword,
+    findUser,
+    updatePassword,
 }
+
+const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    port: 465,
+    secure: true, // true for 465, false for other ports
+    auth: {
+        user: "absorptionvisulazationtool@gmail.com",
+        pass: "Avtool2021",
+    },
+});
 
 function register(req, res) {
     const sql = "INSERT INTO users (username, email, password, isAdmin) VALUES (?,?,?,?);"
@@ -24,6 +39,28 @@ function register(req, res) {
         console.error(err);
         res.status(500).send({ message: err.message });
     });
+}
+
+function addResetToken(userId, resettoken) {
+    const sql = "INSERT INTO resettoken (userId, resettoken) VALUES (?,?);"
+
+    return db_controller.execute_sql(sql, [userId, resettoken])
+}
+
+function findUser(resettoken) {
+    const sql = "SELECT u.id, u.username, u.email FROM resettoken r inner join users u on r.userId = u.id WHERE r.resettoken = ?;"
+
+    return db_controller.execute_sql(sql, [resettoken])
+}
+
+function updatePassword(id, password) {
+    const sql = "UPDATE users SET password = ? WHERE id = ?;";
+    const data = [
+        bcrypt.hashSync(password, 8),
+        id
+    ];
+
+    return db_controller.execute_sql(sql, data)
 }
 
 function login(req, res) {
@@ -62,4 +99,25 @@ function login(req, res) {
             accessToken: token
         });
     });
+}
+
+function requestResetPassword(username, email, resetToken) {
+    const mailOptions = {
+        from: '"AVT Support" <absorptionvisulazationtool@gmail.com>', // sender address
+        to: email, // list of receivers
+        subject: "Wachtwoord vergeten", // Subject line
+        text: "Beste " + username + ", \n\n " + // plain text body
+            'Je ontvangt deze mail omdat jij (of iemand anders) heeft aangevraagd om je wachtwoord te resetten voor je account. \n\n' +
+            'Klik alstublieft om onderstaande link of plak deze in je browser om dit proces af te ronden.\n\n' +
+            'http://localhost:4200/reset/' + resetToken + '\n\n' +
+            'Als je dit niet aangevraagd heb kun je deze mail negeren en wordt je wachtwoord niet gewijzigd.'
+    };
+
+    return new Promise(function (resolve, reject) {
+        transporter.sendMail(mailOptions, (err, info) => {
+            if (err) { reject(err); }
+            resolve();
+        })
+    })
+
 }
