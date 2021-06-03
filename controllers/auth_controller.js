@@ -68,9 +68,9 @@ function login(req, res) {
 
     db_controller.execute_sql(sql, [req.body.username]).then(users => {
         if (users.length == 0) {
-            return res.status(404).send({ message: "User Not found." });
+            return res.status(404).send({ message: "De combinatie van gebruikersnaam en wachtwoord is niet correct!" });
         } else if (users.length > 1) {
-            return res.status(500).send({ message: "There has been an error." });
+            return res.status(500).send({ message: "Er is een probleem opgetreden." });
         }
 
         const user = users[0]
@@ -82,7 +82,7 @@ function login(req, res) {
         if (!passwordIsValid) {
             return res.status(401).send({
                 accessToken: null,
-                message: "Invalid Password!"
+                message: "De combinatie van gebruikersnaam en wachtwoord is niet correct!"
             });
         }
 
