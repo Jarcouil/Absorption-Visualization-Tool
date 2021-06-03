@@ -143,7 +143,7 @@ function runPythonScript(sourceFile, res, file, tablename, wavelengths, insertId
                 }
             });
         } else {
-            return res.status(500).json("An error occured while processing the file")
+            return res.status(500).json("Er heeft zich een probleem voorgedaan met het verwerken van het bestand.")
         }
     });
 }

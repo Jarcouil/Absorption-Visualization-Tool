@@ -52,7 +52,7 @@ function get_user(req, res, next) {
     user_controller.get_user(req.params.id).then(
         (result) => {
             if (result.length < 1) {
-                return res.status(404).json({ message: "User not found" });
+                return res.status(404).json({ message: "Gebruiker is niet gevonden" });
             }
             return res.status(200).json(result[0]);
         },

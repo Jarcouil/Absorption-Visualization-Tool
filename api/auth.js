@@ -58,7 +58,14 @@ function newPassword(req, res, next) {
             // console.log(result)
             auth_controller.updatePassword(user.id, req.body.password).then(
                 (result) => {
-                    return res.status(200).json({ message: "Wachtwoord succesvol gewijzigd" })
+                    auth_controller.deleteResetToken(req.body.resetToken).then(
+                        (result) => {
+                            return res.status(200).json({ message: "Wachtwoord succesvol gewijzigd" })
+                        },
+                        (error) => {
+                            return res.status(500).json({ message: error });
+
+                        });
                 },
                 (error) => {
                     return res.status(500).json({ message: error });

@@ -2,7 +2,7 @@ const config = require("../config/auth.config");
 const db_controller = require('./database_controller');
 const nodemailer = require("nodemailer");
 const mailTemplate = require("../config/mail.template");
-const configFile = require("../config/config.json");
+const mailConfig = require("../config/config.json");
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 
@@ -13,6 +13,7 @@ module.exports = {
     requestResetPassword,
     findUser,
     updatePassword,
+    deleteResetToken
 }
 
 const transporter = nodemailer.createTransport({
@@ -20,8 +21,8 @@ const transporter = nodemailer.createTransport({
     port: 465,
     secure: true,
     auth: {
-        user: configFile["email-addres"],
-        pass: configFile["password"],
+        user: mailConfig["email-addres"],
+        pass: mailConfig["password"],
     },
 });
 
@@ -46,6 +47,12 @@ function addResetToken(userId, resettoken) {
     const sql = "INSERT INTO resettoken (userId, resettoken) VALUES (?,?);"
 
     return db_controller.execute_sql(sql, [userId, resettoken])
+}
+
+function deleteResetToken(token) {
+    const sql = "DELETE FROM resettoken WHERE resettoken = ?;"
+
+    return db_controller.execute_sql(sql, [token])
 }
 
 function findUser(resettoken) {
