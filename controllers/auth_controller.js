@@ -1,9 +1,7 @@
-const config = require("../config/auth.config");
 const db_controller = require('./database_controller');
 const nodemailer = require("nodemailer");
 const mailTemplate = require("../config/mail.template");
 const mailConfig = require("../config/config.json");
-var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 
 module.exports = {
@@ -26,21 +24,11 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-function register(req, res) {
-    const sql = "INSERT INTO users (username, email, password, isAdmin) VALUES (?,?,?,?);"
-    const data = [
-        req.body.username,
-        req.body.email,
-        bcrypt.hashSync(req.body.password, 8),
-        0
-    ];
+function register(username, email, password) {
+    const sql = "INSERT INTO users (username, email, password) VALUES (?,?,?);"
+    const data = [username, email, bcrypt.hashSync(password, 8)];
 
-    db_controller.execute_sql(sql, data).then(user => {
-        res.send({ message: "User was registered successfully!" });
-    }).catch(err => {
-        console.error(err);
-        res.status(500).send({ message: err.message });
-    });
+    return db_controller.execute_sql(sql, data);
 }
 
 function addResetToken(userId, resettoken) {
@@ -68,51 +56,23 @@ function updatePassword(id, password) {
         id
     ];
 
+    console.log(sql)
+    console.log(data)
     return db_controller.execute_sql(sql, data)
 }
 
-function login(req, res) {
+function login(username) {
     const sql = "SELECT * from users WHERE username = ?;"
 
-    db_controller.execute_sql(sql, [req.body.username]).then(users => {
-        if (users.length == 0) {
-            return res.status(404).send({ message: "De combinatie van gebruikersnaam en wachtwoord is niet correct!" });
-        } else if (users.length > 1) {
-            return res.status(500).send({ message: "Er is een probleem opgetreden." });
-        }
+    console.log("type of username = " + typeof username)
 
-        const user = users[0]
-        var passwordIsValid = bcrypt.compareSync(
-            req.body.password,
-            user.password
-        );
-
-        if (!passwordIsValid) {
-            return res.status(401).send({
-                accessToken: null,
-                message: "De combinatie van gebruikersnaam en wachtwoord is niet correct!"
-            });
-        }
-
-        var token = jwt.sign({ id: user.id }, config.secret, {
-            expiresIn: 86400 // 24 hours
-        });
-
-        res.status(200).send({
-            id: user.id,
-            username: user.username,
-            email: user.email,
-            isAdmin: user.isAdmin,
-            createdAt: user.createdAt,
-            accessToken: token
-        });
-    });
+    return db_controller.execute_sql(sql, [username]);
 }
 
 function requestResetPassword(username, email, resetToken) {
     const mailOptions = {
         from: '"AVT Support" <absorptionvisulazationtool@gmail.com>', // sender address
-        to: email, 
+        to: email,
         subject: "Wachtwoord vergeten", // Subject line
         html: mailTemplate.getMail(username, resetToken)
     };

@@ -7,7 +7,7 @@ const checkDuplicateUsernameOrEmail = (req, res, next) => {
   db_controller.execute_sql(sql, [req.body.username]).then(users => {
     if (users.length > 0) {
       res.status(400).send({
-        message: "Failed! Username is already in use!"
+        message: "Helaas! Deze gebruikersnaam is helaas al in gebruik"
       });
       return;
     }
@@ -16,7 +16,7 @@ const checkDuplicateUsernameOrEmail = (req, res, next) => {
     db_controller.execute_sql(sql, [req.body.email]).then(users => {
       if (users.length > 0) {
         res.status(400).send({
-          message: "Failed! Email is already in use!"
+          message: "Helaas! Dit emailadres is helaas al in gebruik!"
         });
         return;
       }
