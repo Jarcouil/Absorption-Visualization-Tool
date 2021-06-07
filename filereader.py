@@ -1,7 +1,4 @@
-import csv
 import sys
-import os
-import time
 from getpass import getpass
 import mysql.connector
 
@@ -105,69 +102,5 @@ def insert_chromatogram_to_db(source_file, table_name, wavelengths):
 
             else:
                 wavelength += 1
-
-def write_chromatogram_to_csv(source_file, destination_file):
-    absorption_list = []
-    with open(destination_file, 'w', newline='') as writeFile:
-        writer = csv.writer(writeFile, delimiter=';')
-        writer.writerow(range(200, 801))
-
-        with open(source_file, "rb") as file:
-            byte = file.read(get_header_size(source_file))  # read header of dad file
-            absorptions = []
-            wavelength = wavelength_offset
-
-            while byte:
-                byte = file.read(3)
-
-                if len(byte) != 3:
-                    break
-
-                absorption = get_absorption(
-                    int.from_bytes(byte, byteorder='little'))
-                absorptions.append(absorption)
-
-                # reset wavelength after 601 wavelengths
-                if wavelength % 800 == 0:
-                    wavelength = wavelength_offset
-                    absorption_list.append([absorptions])
-                    writer.writerow(absorptions)
-                    absorptions = []
-                else:
-                    wavelength += 1
-
-    file.close()
-    writeFile.close()
-
-def wirte_absorption_of_wavelength(source_file, destination_file, wavelength_limit):
-    with open(destination_file, 'w', newline='') as writeFile:
-        writer = csv.writer(writeFile, delimiter=';')
-        writer.writerow(["Wavelength", "Absorption"])
-
-        with open(source_file, "rb") as file:
-            byte = file.read(get_header_size(source_file))  # read header of dad file
-            wavelength = wavelength_offset
-
-            while byte:
-                byte = file.read(3)
-
-                if len(byte) != 3:
-                    break
-
-                absorption = get_absorption(int.from_bytes(byte, byteorder='little'))
-
-                if wavelength == wavelength_limit:
-                    row = [wavelength, absorption]
-                    writer.writerow(row)
-
-                # reset wavelength after 601 wavelengths
-                if wavelength % 800 == 0:
-                    wavelength = wavelength_offset
-
-                else:
-                    wavelength += 1
-
-    file.close()
-    writeFile.close()
 
 insert_chromatogram_to_db(sys.argv[1], sys.argv[2], int(sys.argv[3]))
