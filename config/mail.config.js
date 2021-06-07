@@ -1,5 +1,21 @@
+const config = require("../config/config.json");
+const nodemailer = require("nodemailer");
+
 module.exports = {
-    getMail
+    getMail,
+    getTransporter
+}
+
+function getTransporter() {
+    return nodemailer.createTransport({
+        service: 'Gmail',
+        port: 465,
+        secure: true,
+        auth: {
+            user: config["email-addres"],
+            pass: config["password"],
+        },
+    });
 }
 
 function getMail(username, resetToken) {

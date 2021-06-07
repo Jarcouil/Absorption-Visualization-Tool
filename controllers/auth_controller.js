@@ -1,7 +1,5 @@
 const db_controller = require('./database_controller');
-const nodemailer = require("nodemailer");
-const mailTemplate = require("../config/mail.template");
-const mailConfig = require("../config/config.json");
+const mail_config = require("../config/mail.config");
 var bcrypt = require("bcryptjs");
 
 module.exports = {
@@ -13,16 +11,6 @@ module.exports = {
     updatePassword,
     deleteResetToken
 }
-
-const transporter = nodemailer.createTransport({
-    service: 'Gmail',
-    port: 465,
-    secure: true,
-    auth: {
-        user: mailConfig["email-addres"],
-        pass: mailConfig["password"],
-    },
-});
 
 function register(username, email, password) {
     const sql = "INSERT INTO users (username, email, password) VALUES (?,?,?);"
@@ -64,17 +52,17 @@ function updatePassword(id, password) {
 function login(username) {
     const sql = "SELECT * from users WHERE username = ?;"
 
-    console.log("type of username = " + typeof username)
-
     return db_controller.execute_sql(sql, [username]);
 }
 
 function requestResetPassword(username, email, resetToken) {
+    const transporter = mail_config.getTransporter();
+
     const mailOptions = {
         from: '"AVT Support" <absorptionvisulazationtool@gmail.com>', // sender address
         to: email,
         subject: "Wachtwoord vergeten", // Subject line
-        html: mailTemplate.getMail(username, resetToken)
+        html: mail_config.getMail(username, resetToken)
     };
 
     return new Promise(function (resolve, reject) {
