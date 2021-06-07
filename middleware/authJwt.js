@@ -4,7 +4,7 @@ const db_controller = require('../controllers/database_controller');
 const roleEnum = require('./roleEnum')
 
 const verifyToken = (req, res, next) => {
-  let token = req.headers["x-access-token"];
+  const token = req.headers["x-access-token"];
 
   if (!token) {
     return res.status(403).send({

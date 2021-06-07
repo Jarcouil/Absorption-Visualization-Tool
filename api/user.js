@@ -31,9 +31,7 @@ function get_users(req, res, next) {
         (result) => {
             return res.status(200).json(result);
         },
-        (error) => {
-            return res.status(500).json({ message: error });
-        }
+        (error) => { return res.status(500).send(error) }
     )
 }
 
@@ -42,9 +40,7 @@ function delete_user(req, res, next) {
         (result) => {
             return res.status(200).json(result);
         },
-        (error) => {
-            return res.status(500).json({ message: error });
-        }
+        (error) => { return res.status(500).send(error) }
     )
 }
 
@@ -56,9 +52,7 @@ function get_user(req, res, next) {
             }
             return res.status(200).json(result[0]);
         },
-        (error) => {
-            return res.status(500).json({ message: error });
-        }
+        (error) => { return res.status(500).send(error) }
     )
 }
 
@@ -67,9 +61,7 @@ function toggleAdmin(req, res, next) {
         (result) => {
             return res.status(200).json(result[0]);
         },
-        (error) => {
-            return res.status(500).json({ message: error });
-        }
+        (error) => { return res.status(500).send(error) }
     )
 }
 

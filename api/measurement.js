@@ -43,9 +43,7 @@ function deleteScan(req, res, next) {
                     return res.status(500).json({ message: error });
                 }
             )},
-        (error) => {
-            return res.status(500).json({ message: error });
-        }
+        (error) => { return res.status(500).send(error) }
     )
 }
 
@@ -54,9 +52,7 @@ function getAllScansOfUser(req, res, next) {
         (result) => {
             return res.status(200).json(result);
         },
-        (error) => {
-            return res.status(500).json({ message: error });
-        }
+        (error) => { return res.status(500).send(error) }
     )
 }
 
@@ -65,9 +61,7 @@ function getAllScans(req, res, next) {
         (result) => {
             return res.status(200).json(result);
         },
-        (error) => {
-            return res.status(500).json({ message: error });
-        }
+        (error) => { return res.status(500).send(error) }
     )
 }
 
@@ -80,9 +74,7 @@ function getMeasurement(req, res, next) {
                 return res.status(404).json({ message: 'Kon de meting niet vinden' })
             }
         },
-        (error) => {
-            return res.status(500).json({ message: error });
-        }
+        (error) => { return res.status(500).send(error) }
     )
 }
 
@@ -91,9 +83,7 @@ function getMeasurementData(req, res, next) {
         (result) => {
             return res.status(200).json(removeIdFromAllData(result));
         },
-        (error) => {
-            return res.status(500).json({ message: error });
-        }
+        (error) => { return res.status(500).send(error) }
     )
 }
 
@@ -102,9 +92,7 @@ function getAllIdOfWavelength(req, res, next) {
         (result) => {
             return res.status(200).json(result);
         },
-        (error) => {
-            return res.status(500).json({ message: error });
-        }
+        (error) => { return res.status(500).send(error) }
     )
 }
 
@@ -113,9 +101,7 @@ function getAllWavelengthsOfId(req, res, next) {
         (result) => {
             return res.status(200).json(removeIdFromAllWavelengths(normalizeResultsSingle(result)));
         },
-        (error) => {
-            return res.status(500).json({ message: error });
-        }
+        (error) => { return res.status(500).send(error) }
     )
 }
 
@@ -124,9 +110,7 @@ function getAllWavelengths(req, res, next) {
         (result) => {
             return res.status(200).json(removeIdFromWavelengths(normalizeResultsArray(result)['columns']));
         },
-        (error) => {
-            return res.status(500).json({ message: error });
-        }
+        (error) => { return res.status(500).send(error) }
     )
 }
 
@@ -135,9 +119,7 @@ function getAllIds(req, res, next) {
         (result) => {
             return res.status(200).json(normalizeResultsArray(result)['id']);
         },
-        (error) => {
-            return res.status(500).json({ message: error });
-        }
+        (error) => { return res.status(500).send(error) }
     )
 }
 

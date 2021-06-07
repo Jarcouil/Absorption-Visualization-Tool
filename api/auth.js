@@ -86,9 +86,7 @@ function validResetPassword(req, res, next) {
             }
             return res.status(200).json({ message: "Token is geldig." })
         },
-        (error) => {
-            return res.status(500).json({ message: error });
-        }
+        (error) => { return res.status(500).send(error) }
     )
 }
 
@@ -120,9 +118,7 @@ function newPassword(req, res, next) {
                 }
             )
         },
-        (error) => {
-            return res.status(500).json({ message: error });
-        }
+        (error) => { return res.status(500).send(error) }
     )
 }
 
@@ -157,9 +153,7 @@ function requestResetPassword(req, res, next) {
                     }
                 )
         },
-        (error) => {
-            return res.status(500).json({ message: error });
-        }
+        (error) => { return res.status(500).send(error) }
     )
 }
 

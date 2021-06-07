@@ -25,9 +25,7 @@ function getFileName(req, res, next) {
             }
             return res.status(200).json({ fileName: file });
         },
-        (error) => {
-            return res.status(500).json({ message: error });
-        }
+        (error) => { return res.status(500).send(error) }
     )
 }
 
@@ -50,9 +48,7 @@ function getCSV(req, res, next) {
                 }
             )
         },
-        (error) => {
-            return res.status(500).json({ message: error });
-        }
+        (error) => { return res.status(500).send(error) }
     )
 }
 
@@ -65,14 +61,12 @@ function downloadDadFile(req, res, next) {
             const file_location = './uploads/' + req.params.id.toString() + '_' + result[0].name;
             return res.download(file_location + '/' + getFile(file_location));
         },
-        (error) => {
-            return res.status(500).json({ message: error });
-        }
+        (error) => { return res.status(500).send(error) }
     )
 }
 
 function postNewFile(req, res, next) {
-    let file = req.files.file;
+    const file = req.files.file;
 
     file_controller.add_new_file(req.body.name, +req.body.minWaveLength, +req.body.maxWaveLength).then(
         (result) => {
@@ -85,22 +79,16 @@ function postNewFile(req, res, next) {
 
                     file_controller.rename_measurement_table(req.body.name, new_table_name).then(
                         (result) => {
-                            let wavelengths = req.body.maxWaveLength - req.body.minWaveLength + 1
+                            const wavelengths = req.body.maxWaveLength - req.body.minWaveLength + 1
                             runPythonScript(file_location + '/' + file.name, res, file, new_table_name, wavelengths, result2.insertId.toString())
                         },
-                        (error) => {
-                            return res.status(500).send(result)
-                        }
+                        (error) => { return res.status(500).send(error) }
                     )
                 },
-                (error) => {
-                    return res.status(500).send(error)
-                }
+                (error) => { return res.status(500).send(error) }
             )
         },
-        (error) => {
-            return res.status(500).send(error)
-        }
+        (error) => { return res.status(500).send(error) }
     )
 }
 
