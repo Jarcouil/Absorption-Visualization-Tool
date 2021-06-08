@@ -1,7 +1,6 @@
 const router = require('express').Router({ mergeParams: true });
 const auth_controller = require("../controllers/auth_controller");
 const { verifySignUp } = require("../middleware");
-const { authJwt } = require("../middleware");
 const user_controller = require("../controllers/user_controller");
 const crypto = require('crypto');
 const config = require("../config/auth.config");
@@ -15,14 +14,15 @@ router.post('/reset-valid', validResetPassword)
 router.post(
     '/register',
     [
+        verifySignUp.checkValidEmail,
         verifySignUp.checkDuplicateUsernameOrEmail,
         verifySignUp.checkRolesExisted,
+        verifySignUp.checkPasswordLength
     ],
     register);
 
 function login(req, res, next) {
     const username = req.body.username
-    console.log(username)
     auth_controller.login(username).then(
         (result) => {
             if (result.length < 1) {
@@ -64,6 +64,9 @@ function login(req, res, next) {
 }
 
 function register(req, res, next) {
+    if (!req.body.username){
+        return res.status(400).json({ message: "Gebruikersnaam is verplicht!" });
+    }
     auth_controller.register(req.body.username, req.body.email, req.body.password).then(
         (result) => {
             return res.send({ message: "Account is succesvol geregistreerd!" });
@@ -124,7 +127,7 @@ function newPassword(req, res, next) {
 
 function requestResetPassword(req, res, next) {
     if (!req.body.email) {
-        return res.status(400).json({ error: 'Email is verplicht' });
+        return res.status(400).json({ message: 'Email is verplicht!' });
     }
 
     user_controller.get_user_by_email(req.body.email).then(

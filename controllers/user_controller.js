@@ -5,35 +5,42 @@ module.exports = {
   get_user,
   get_users,
   toggle_admin,
-  get_user_by_email
+  get_user_by_email,
+  delete_all_users
 }
 
 function get_users() {
-  var sql = "SELECT id, username, email, isAdmin, createdAt FROM users;"
+  const sql = "SELECT id, username, email, isAdmin, createdAt FROM users;"
 
   return db_controller.execute_sql(sql);
 }
 
 function get_user(id) {
-  var sql = "SELECT id, username, email, isAdmin, createdAt FROM users WHERE id = ?;"
+  const sql = "SELECT id, username, email, isAdmin, createdAt FROM users WHERE id = ?;"
 
   return db_controller.execute_sql(sql, [id]);
 }
 
 function delete_user(id) {
-  var sql = "DELETE FROM users WHERE id = ?;"
+  const sql = "DELETE FROM users WHERE id = ?;"
 
   return db_controller.execute_sql(sql, [id]);
 }
 
 function toggle_admin(id) {
-  var sql = "UPDATE users SET isAdmin = !isAdmin WHERE id =  ?;";
+  const sql = "UPDATE users SET isAdmin = !isAdmin WHERE id =  ?;";
 
   return db_controller.execute_sql(sql, [id]);
 }
 
 function get_user_by_email(email) {
-  var sql = "SELECT id, username, email FROM users WHERE email = ?;"
+  const sql = "SELECT id, username, email FROM users WHERE email = ?;"
 
   return db_controller.execute_sql(sql, [email]);
+}
+
+function delete_all_users() {
+  const sql = "DELETE FROM users;";
+
+  return db_controller.execute_sql(sql);
 }
