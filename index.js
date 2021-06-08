@@ -4,9 +4,10 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 var session = require('express-session');
+const config = require("./config/config");
 
 const app = express()
-const port = 3000
+const port = config.port
 const api = require('./api')
 
 var corsOptions = {
@@ -30,3 +31,6 @@ app.use(morgan('dev'));
 app.use('/v1', api)
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+
+module.exports = app
+

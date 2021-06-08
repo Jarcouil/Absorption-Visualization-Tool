@@ -26,7 +26,7 @@ function login(req, res, next) {
     auth_controller.login(username).then(
         (result) => {
             if (result.length < 1) {
-                return res.status(404).send({ message: "De combinatie van gebruikersnaam en wachtwoord is niet correct!" });
+                return res.status(401).send({ message: "De combinatie van gebruikersnaam en wachtwoord is niet correct!" });
             } else if (result.length > 1) {
                 return res.status(500).send({ message: "Er is een probleem opgetreden." });
             }

@@ -105,3 +105,4 @@ dist
 
 uploads/
 config.json
+*.env

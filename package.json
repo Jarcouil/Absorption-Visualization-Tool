@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "start": "SET NODE_ENV=dev&& node index.js",
+    "test": "mocha"
   },
   "author": "",
   "license": "ISC",
@@ -12,7 +13,10 @@
     "@auth0/angular-jwt": "^5.0.2",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
+    "chai": "^4.3.4",
+    "chai-http": "^4.3.0",
     "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "express-fileupload": "^1.2.1",
     "express-jwt": "^6.0.0",
@@ -20,6 +24,7 @@
     "json2csv": "^5.0.6",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
+    "mocha": "^8.4.0",
     "morgan": "^1.10.0",
     "mysql": "^2.18.1",
     "nodemailer": "^6.6.1"
