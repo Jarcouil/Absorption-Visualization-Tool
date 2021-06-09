@@ -57,9 +57,7 @@ function login(req, res, next) {
                 });
             }
         },
-        (error) => {
-            res.status(500).send({ message: error.message });
-        }
+        (error) => { res.status(500).send({ message: error.message }); }
     )
 }
 
@@ -71,9 +69,7 @@ function register(req, res, next) {
         (result) => {
             return res.send({ message: "Account is succesvol geregistreerd!" });
         },
-        (error) => {
-            res.status(500).send({ message: error.message });
-        }
+        (error) => { res.status(500).send({ message: error.message }); }
     )
 }
 
@@ -110,22 +106,17 @@ function newPassword(req, res, next) {
                         (result) => {
                             return res.status(200).json({ message: "Wachtwoord succesvol gewijzigd" })
                         },
-                        (error) => {
-                            return res.status(500).json({ message: error });
-
-                        });
+                        (error) => { return res.status(500).json({ message: error }); 
+                    });
                 },
-                (error) => {
-                    return res.status(500).json({ message: error });
-
-                }
+                (error) => { return res.status(500).json({ message: error }); }
             )
         },
         (error) => { return res.status(500).send(error) }
     )
 }
 
-function requestResetPassword(req, res, next) {
+async function requestResetPassword(req, res, next) {
     if (!req.body.email) {
         return res.status(400).json({ message: 'Email is verplicht!' });
     }
@@ -133,7 +124,7 @@ function requestResetPassword(req, res, next) {
     user_controller.get_user_by_email(req.body.email).then(
         (result) => {
             if (result.length < 1) {
-                return res.status(404).json({ message: "Email niet gevonden" });
+                return res.status(404).json({ message: "Email niet gevonden!" });
             }
             const user = result[0];
             const resetToken = crypto.randomBytes(16).toString('hex');
@@ -145,15 +136,10 @@ function requestResetPassword(req, res, next) {
                             (result) => {
                                 return res.status(200).json({ message: "Wachtwoord reset succesvol aangevraagd." })
                             },
-                            (error) => {
-                                return res.status(500).json({ message: error });
-                            }
+                            (error) => { return res.status(500).json({ message: error }); }
                         )
-
                     },
-                    (error) => {
-                        return res.status(500).json({ message: error });
-                    }
+                    (error) => { return res.status(500).json({ message: error }); }
                 )
         },
         (error) => { return res.status(500).send(error) }

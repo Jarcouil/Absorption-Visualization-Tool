@@ -190,13 +190,39 @@ describe('Reset password Auth API', () => {
         removeAllUsers().then(done())
     });
 
-    describe("it should POST without a email", () => {
+    describe("it should POST without an email", () => {
         it("It should give an error", (done) => {
             chai.request(server)
                 .post("/v1/auth/reset")
                 .end((err, res) => {
                     res.should.have.status(400);
                     res.body.message.should.be.equal("Email is verplicht!");
+                    done();
+                });
+        });
+    })
+
+    describe("it should POST with a unknown email", () => {
+        it("It should give an error", (done) => {
+            chai.request(server)
+                .post("/v1/auth/reset")
+                .send({email: faker.internet.email()})
+                .end((err, res) => {
+                    res.should.have.status(404);
+                    res.body.message.should.be.equal("Email niet gevonden!");
+                    done();
+                });
+        });
+    })
+
+    describe("it should POST with the correct email", () => {
+        it("It should send an email", (done) => {
+            chai.request(server)
+                .post("/v1/auth/reset")
+                .send({email: user.email})
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.message.should.be.equal("Wachtwoord reset succesvol aangevraagd.");
                     done();
                 });
         });

@@ -4,12 +4,11 @@ const nodemailer = require("nodemailer");
 
 module.exports = {
     getMail,
-    getTransporter
+    getTransporter,
+    getTestTransporter
 }
 
-function getTransporter() {
-    console.log(config.email_address)
-    console.log(config.password)
+async function getTransporter() {
     return nodemailer.createTransport({
         service: 'Gmail',
         port: 465,
@@ -18,6 +17,19 @@ function getTransporter() {
             user: config.email_address,
             pass: config.password,
         },
+    });
+}
+
+async function getTestTransporter() {
+    const testAccount = await nodemailer.createTestAccount();
+    return nodemailer.createTransport({
+        host: 'smtp.ethereal.email',
+        port: 587,
+        secure: false, // true for 465, false for other ports
+        auth: {
+            user: testAccount.user, // generated ethereal user
+            pass: testAccount.pass  // generated ethereal password
+        }
     });
 }
 

@@ -1,5 +1,6 @@
 const db_controller = require('./database_controller');
 const mail_config = require("../config/mail.config");
+const nodemailer = require("nodemailer");
 var bcrypt = require("bcryptjs");
 
 module.exports = {
@@ -44,8 +45,6 @@ function updatePassword(id, password) {
         id
     ];
 
-    console.log(sql)
-    console.log(data)
     return db_controller.execute_sql(sql, data)
 }
 
@@ -55,9 +54,8 @@ function login(username) {
     return db_controller.execute_sql(sql, [username]);
 }
 
-function requestResetPassword(username, email, resetToken) {
-    const transporter = mail_config.getTransporter();
-
+async function requestResetPassword(username, email, resetToken) {
+    const transporter = await getTransporter();
     const mailOptions = {
         from: '"AVT Support" <absorptionvisulazationtool@gmail.com>', // sender address
         to: email,
@@ -68,8 +66,18 @@ function requestResetPassword(username, email, resetToken) {
     return new Promise(function (resolve, reject) {
         transporter.sendMail(mailOptions, (err, info) => {
             if (err) { reject(err); }
+            if (process.env.NODE_ENV === 'test') {
+                console.log('Preview URL: ' + nodemailer.getTestMessageUrl(info));
+            }
             resolve();
         })
     })
+}
 
+async function getTransporter() {
+    if (process.env.NODE_ENV === 'test') {
+        return mail_config.getTestTransporter();
+    } else {
+        return mail_config.getTransporter();
+    }
 }
