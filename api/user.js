@@ -36,9 +36,17 @@ function get_users(req, res, next) {
 }
 
 function delete_user(req, res, next) {
-    user_controller.delete_user(req.params.id).then(
+    user_controller.get_user(req.params.id).then(
         (result) => {
-            return res.status(200).json(result);
+            if (result.length < 1) {
+                return res.status(404).json({ message: "Gebruiker is niet gevonden" });
+            }
+            user_controller.delete_user(req.params.id).then(
+                (_) => {
+                    return res.status(200).send({ message: `Gebruiker ${result[0].username} is succesvol verwijderd` });
+                },
+                (error) => { return res.status(500).send(error) }
+            )
         },
         (error) => { return res.status(500).send(error) }
     )

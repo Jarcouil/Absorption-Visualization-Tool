@@ -10,7 +10,8 @@ module.exports = {
     requestResetPassword,
     findUser,
     updatePassword,
-    deleteResetToken
+    deleteResetToken,
+    deleteAllResetTokens
 }
 
 function register(username, email, password) {
@@ -30,6 +31,12 @@ function deleteResetToken(token) {
     const sql = "DELETE FROM resettoken WHERE resettoken = ?;"
 
     return db_controller.execute_sql(sql, [token])
+}
+
+function deleteAllResetTokens() {
+    const sql = "DELETE FROM resettoken;"
+
+    return db_controller.execute_sql(sql)
 }
 
 function findUser(resettoken) {

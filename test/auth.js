@@ -4,20 +4,23 @@ let server = require("../index");
 let chai = require("chai");
 let chaiHttp = require("chai-http");
 const user_controller = require("../controllers/user_controller");
+const auth_controller = require("../controllers/auth_controller");
 
-// Assertion 
 chai.should();
 chai.use(chaiHttp);
 
-function removeAllUsers() {
-    return user_controller.delete_all_users();
+function registerUser(user) {
+    return chai.request(server)
+            .post("/v1/auth/register")
+            .send(user)
+            .end();
 }
 
 describe('Register Auth API', () => {
     const user = { username: faker.name.findName(), email: faker.internet.email(), password: faker.random.alphaNumeric(6) }
 
     after(function (done) {
-        removeAllUsers().then(done())
+        user_controller.delete_all_users().then(done())
     });
 
     describe("It should POST a login wihtout username", () => {
@@ -135,14 +138,12 @@ describe('Register Auth API', () => {
 describe('Login Auth API', () => {
     const user = { username: faker.name.findName(), email: faker.internet.email(), password: faker.random.alphaNumeric(6) }
     before(function (done) {
-        chai.request(server)
-            .post("/v1/auth/register")
-            .send(user)
-            .end(done());
+        registerUser(user)
+        done()
     });
 
     after(function (done) {
-        removeAllUsers().then(done())
+        user_controller.delete_all_users().then(done());
     });
 
     describe("it should POST a login with the wrong credentials", () => {
@@ -180,14 +181,13 @@ describe('Login Auth API', () => {
 describe('Reset password Auth API', () => {
     const user = { username: faker.name.findName(), email: faker.internet.email(), password: faker.random.alphaNumeric(6) }
     before(function (done) {
-        chai.request(server)
-            .post("/v1/auth/register")
-            .send(user)
-            .end(done());
+        registerUser(user)
+        done()
     });
 
     after(function (done) {
-        removeAllUsers().then(done())
+        user_controller.delete_all_users().then()
+        auth_controller.deleteAllResetTokens().then(done())
     });
 
     describe("it should POST without an email", () => {
@@ -206,7 +206,7 @@ describe('Reset password Auth API', () => {
         it("It should give an error", (done) => {
             chai.request(server)
                 .post("/v1/auth/reset")
-                .send({email: faker.internet.email()})
+                .send({ email: faker.internet.email() })
                 .end((err, res) => {
                     res.should.have.status(404);
                     res.body.message.should.be.equal("Email niet gevonden!");
@@ -219,7 +219,7 @@ describe('Reset password Auth API', () => {
         it("It should send an email", (done) => {
             chai.request(server)
                 .post("/v1/auth/reset")
-                .send({email: user.email})
+                .send({ email: user.email })
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.message.should.be.equal("Wachtwoord reset succesvol aangevraagd.");
