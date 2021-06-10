@@ -4,25 +4,25 @@ const { authJwt } = require("../middleware");
 
 router.post(
     "/:id",
-    [authJwt.verifyToken, authJwt.isAdmin],
+    [authJwt.isAdmin],
     toggleAdmin
-)
+);
 
 router.get(
     "/",
-    [authJwt.verifyToken, authJwt.isAdmin],
+    [authJwt.isAdmin],
     get_users
 );
 
 router.get(
     "/:id",
-    [authJwt.verifyToken, authJwt.isAdmin],
+    [authJwt.isAdmin],
     get_user
 );
 
 router.delete(
     "/:id",
-    [authJwt.verifyToken, authJwt.isAdmin],
+    [authJwt.isAdmin],
     delete_user
 );
 

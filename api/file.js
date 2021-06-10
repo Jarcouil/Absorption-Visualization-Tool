@@ -6,7 +6,13 @@ const measurement_controller = require("../controllers/measurement_controller");
 const fs = require('fs');
 const path = require('path');
 const Json2csvParser = require("json2csv").Parser;
-router.post('/upload-file', postNewFile);
+const { verifyFile } = require("../middleware")
+
+router.post(
+    '/upload-file', 
+    [verifyFile.checkParameters],
+    postNewFile
+);
 router.get('/download-file/:id', downloadDadFile);
 router.get('/file-name/:id', getFileName);
 router.get('/csv/:id', getCSV);

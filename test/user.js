@@ -4,7 +4,6 @@ let server = require("../index");
 let chai = require("chai");
 let chaiHttp = require("chai-http");
 const user_controller = require("../controllers/user_controller");
-const auth_controller = require("../controllers/auth_controller");
 
 // Assertion 
 chai.should();
