@@ -134,7 +134,7 @@ async function requestResetPassword(req, res, next) {
                     (result) => {
                         auth_controller.requestResetPassword(user.username, user.email, resetToken).then(
                             (result) => {
-                                return res.status(200).json({ message: "Wachtwoord reset succesvol aangevraagd." })
+                                return res.status(200).json({ message: "Mail is succesvol verzonden." })
                             },
                             (error) => { return res.status(500).json({ message: error }); }
                         )

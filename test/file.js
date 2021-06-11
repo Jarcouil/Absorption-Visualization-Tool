@@ -44,7 +44,7 @@ describe('File API', () => {
         user_controller.delete_all_users().then(done())
     })
     after(function (done) {
-        user_controller.delete_all_users().then(done())
+        user_controller.delete_all_users().then()
         fileSystem.restore(done());
     });
 

@@ -1,7 +1,9 @@
 const router = require('express').Router({ mergeParams: true });
 const measurement_controller = require("../controllers/measurement_controller");
+const user_controller = require("../controllers/user_controller");
 const { authJwt } = require("../middleware");
 const fs = require('fs');
+const roleEnum = require('../middleware/roleEnum')
 
 router.get('/', getAllScansOfUser);
 router.get(
@@ -66,16 +68,35 @@ function getAllScans(req, res, next) {
 }
 
 function getMeasurement(req, res, next) {
-    measurement_controller.get_measurement(req.params.name, req.userId).then(
-        (result) => {
-            if (result.length > 0) {
-                return res.status(200).json(result[0]);
-            } else {
-                return res.status(404).json({ message: 'Kon de meting niet vinden' })
+    user_controller.get_user(req.userId).then(users => {
+            const user = users[0];
+      
+            if (user.isAdmin == roleEnum.admin) {
+                measurement_controller.get_measurement(req.params.name).then(
+                    (result) => {
+                        if (result.length > 0) {
+                            return res.status(200).json(result[0]);
+                        } else {
+                            return res.status(404).json({ message: 'Kon de meting niet vinden' })
+                        }
+                    },
+                    (error) => { return res.status(500).send(error) }
+                )
             }
-        },
-        (error) => { return res.status(500).send(error) }
-    )
+            else {
+                measurement_controller.get_measurement_of_user(req.params.name, req.userId).then(
+                    (result) => {
+                        if (result.length > 0) {
+                            return res.status(200).json(result[0]);
+                        } else {
+                            return res.status(404).json({ message: 'Kon de meting niet vinden' })
+                        }
+                    },
+                    (error) => { return res.status(500).send(error) }
+                )
+            }
+    })
+    
 }
 
 function getMeasurementData(req, res, next) {

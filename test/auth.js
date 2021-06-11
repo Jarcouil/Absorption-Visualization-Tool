@@ -222,7 +222,7 @@ describe('Reset password Auth API', () => {
                 .send({ email: user.email })
                 .end((err, res) => {
                     res.should.have.status(200);
-                    res.body.message.should.be.equal("Wachtwoord reset succesvol aangevraagd.");
+                    res.body.message.should.be.equal("Mail is succesvol verzonden.");
                     done();
                 });
         });

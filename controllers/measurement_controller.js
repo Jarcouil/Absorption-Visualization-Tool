@@ -12,6 +12,7 @@ module.exports = {
     get_measurement_data,
     get_table_name_of_id,
     get_all_scans_of_user,
+    get_measurement_of_user
 }
 
 function get_all_scans() {
@@ -44,10 +45,16 @@ function delete_scan_data_table(tablename) {
     return db_controller.execute_sql(sql, [tablename]);
 }
 
-function get_measurement(id, userId) {
+function get_measurement_of_user(id, userId) {
     var sql = "SELECT * FROM measurements WHERE id = ? and createdBy = ?;"
 
     return db_controller.execute_sql(sql, [id, userId]);
+}
+
+function get_measurement(id) {
+    var sql = "SELECT * FROM measurements WHERE id = ?;"
+
+    return db_controller.execute_sql(sql, [id]);
 }
 
 function get_all_id_of_wavelength(name, columns) {
