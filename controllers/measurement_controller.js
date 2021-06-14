@@ -1,27 +1,27 @@
 const db_controller = require('./database_controller');
 
 module.exports = {
-    delete_scan_data_table,
-    delete_scan_from_measurements,
+    delete_measurement_data_table,
+    delete_measurement_from_measurements,
     get_all_columns_of_measurement,
     get_all_id_of_wavelength,
     get_all_ids_of_measurement,
-    get_all_scans,
+    get_all_measurements,
     get_all_wavelengths_of_id,
     get_measurement,
     get_measurement_data,
     get_table_name_of_id,
-    get_all_scans_of_user,
-    get_measurement_of_user
+    get_all_measurements_of_user,
+    delete_all_measurements
 }
 
-function get_all_scans() {
+function get_all_measurements() {
     var sql = "SELECT u.username, m.* FROM measurements m inner join users u on m.createdBy = u.id;"
 
     return db_controller.execute_sql(sql);
 }
 
-function get_all_scans_of_user(userId) {
+function get_all_measurements_of_user(userId) {
     var sql = "SELECT u.username, m.* FROM measurements m inner join users u on m.createdBy = u.id WHERE u.id = ?;"
 
     return db_controller.execute_sql(sql, [userId]);
@@ -33,22 +33,22 @@ function get_table_name_of_id(id) {
     return db_controller.execute_sql(sql, [id]);
 }
 
-function delete_scan_from_measurements(id) {
+function delete_measurement_from_measurements(id) {
     var sql = "DELETE FROM measurements WHERE id = ?;"
 
     return db_controller.execute_sql(sql, [id]);
 }
 
-function delete_scan_data_table(tablename) {
+function delete_all_measurements() {
+    var sql = "DELETE FROM measurements;"
+
+    return db_controller.execute_sql(sql);
+}
+
+function delete_measurement_data_table(tablename) {
     var sql = "DROP TABLE IF EXISTS ??;"
 
     return db_controller.execute_sql(sql, [tablename]);
-}
-
-function get_measurement_of_user(id, userId) {
-    var sql = "SELECT * FROM measurements WHERE id = ? and createdBy = ?;"
-
-    return db_controller.execute_sql(sql, [id, userId]);
 }
 
 function get_measurement(id) {

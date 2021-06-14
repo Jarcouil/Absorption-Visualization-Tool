@@ -5,62 +5,68 @@ const { authJwt } = require("../middleware");
 const fs = require('fs');
 const roleEnum = require('../middleware/roleEnum')
 
-router.get('/', getAllScansOfUser);
+router.get('/', getAllMeasurementsOfUser);
 router.get(
-    '/all', 
-    [authJwt.verifyToken, authJwt.isAdmin],
-    getAllScans
+    '/all',
+    [authJwt.isAdmin],
+    getAllMeasurements
 );
-router.delete(
-    '/:id',
-    [authJwt.verifyToken],
-    deleteScan
-);
+router.delete('/:id', deleteMeasurement);
 router.get('/columns/:id', getAllWavelengths);
-router.get('/data/:name', getMeasurementData);
+router.get('/data/:id', getMeasurementData);
 router.get('/id/:id', getAllIds);
-router.get('/:name', getMeasurement);
+router.get('/:id', getMeasurement);
 router.get('/:name/columns', getAllIdOfWavelength);
 router.get('/:name/:id', getAllWavelengthsOfId);
 
-function deleteScan(req, res, next) {
-    measurement_controller.get_measurement(req.params.id, req.userId).then(
-        (result) => {
-            if (result.length < 1) {
-                return res.status(404).json({ message: "Meting niet gevonden" });
-            }
-            delete_file('./uploads/' + req.params.id.toString() + '_' + result[0].name);
-            measurement_controller.delete_scan_data_table(req.params.id.toString() + '_' + result[0].name).then(
-                (result) => {
-                    measurement_controller.delete_scan_from_measurements(req.params.id).then(
-                        (result) => {
-                            return res.status(200).json(result);
-                        },
-                        (error) => {
-                            return res.status(500).json({ message: error });
-                        } 
-                    )
-                },
-                (error) => {
-                    return res.status(500).json({ message: error });
+function deleteMeasurement(req, res, next) {
+    user_controller.get_user(req.userId).then(users => {
+        const user = users[0];
+        measurement_controller.get_measurement(req.params.id).then(
+            (measurements) => {
+                if (measurements.length < 1) {
+                    return res.status(404).json({ message: 'Kon de meting niet vinden!' });
                 }
-            )},
-        (error) => { return res.status(500).send(error) }
-    )
+                const measurement = measurements[0]
+                if (user.id !== measurement.createdBy && user.isAdmin !== roleEnum.admin) {
+                    return res.status(404).json({ message: 'Kon de meting niet vinden!' });
+                }
+                delete_file('./uploads/' + req.params.id.toString() + '_' + measurement.name);
+                measurement_controller.delete_measurement_data_table(req.params.id.toString() + '_' + measurement.name).then(
+                    (result) => {
+                        measurement_controller.delete_measurement_from_measurements(req.params.id).then(
+                            (result) => {
+                                return res.status(200).json({ message: `Meting ${measurement.name} is succesvol verwijderd` });
+                            },
+                            (error) => { return res.status(500).json({ message: error }); }
+                        )
+                    },
+                    (error) => { return res.status(500).json({ message: error }); }
+                )
+            },
+            (error) => { return res.status(500).send(error) }
+        )
+    })
 }
 
-function getAllScansOfUser(req, res, next) {
-    measurement_controller.get_all_scans_of_user(req.userId).then(
+function getAllMeasurementsOfUser(req, res, next) {
+    measurement_controller.get_all_measurements_of_user(req.userId).then(
         (result) => {
+            if (result.length < 1) {
+                return res.status(404).json({ message: "Er zijn geen metingen gevonden" });
+            }
             return res.status(200).json(result);
         },
         (error) => { return res.status(500).send(error) }
     )
 }
 
-function getAllScans(req, res, next) {
-    measurement_controller.get_all_scans().then(
+function getAllMeasurements(req, res, next) {
+    measurement_controller.get_all_measurements().then(
         (result) => {
+            if (result.length < 1) {
+                return res.status(404).json({ message: "Er zijn geen metingen gevonden" });
+            }
             return res.status(200).json(result);
         },
         (error) => { return res.status(500).send(error) }
@@ -69,43 +75,46 @@ function getAllScans(req, res, next) {
 
 function getMeasurement(req, res, next) {
     user_controller.get_user(req.userId).then(users => {
-            const user = users[0];
-      
-            if (user.isAdmin == roleEnum.admin) {
-                measurement_controller.get_measurement(req.params.name).then(
-                    (result) => {
-                        if (result.length > 0) {
-                            return res.status(200).json(result[0]);
-                        } else {
-                            return res.status(404).json({ message: 'Kon de meting niet vinden' })
-                        }
-                    },
-                    (error) => { return res.status(500).send(error) }
-                )
-            }
-            else {
-                measurement_controller.get_measurement_of_user(req.params.name, req.userId).then(
-                    (result) => {
-                        if (result.length > 0) {
-                            return res.status(200).json(result[0]);
-                        } else {
-                            return res.status(404).json({ message: 'Kon de meting niet vinden' })
-                        }
-                    },
-                    (error) => { return res.status(500).send(error) }
-                )
-            }
+        const user = users[0];
+        measurement_controller.get_measurement(req.params.id).then(
+            (measurements) => {
+                if (measurements.length < 1) {
+                    return res.status(404).json({ message: 'Kon de meting niet vinden!' });
+                }
+                const measurement = measurements[0]
+                if (user.id !== measurement.createdBy && user.isAdmin !== roleEnum.admin) {
+                    return res.status(404).json({ message: 'Kon de meting niet vinden!' });
+                }
+                return res.status(200).json(measurement);
+            },
+            (error) => { return res.status(500).send(error) }
+        )
     })
-    
 }
 
 function getMeasurementData(req, res, next) {
-    measurement_controller.get_measurement_data(req.params.name).then(
-        (result) => {
-            return res.status(200).json(removeIdFromAllData(result));
-        },
-        (error) => { return res.status(500).send(error) }
-    )
+    user_controller.get_user(req.userId).then(users => {
+        const user = users[0];
+        measurement_controller.get_measurement(req.params.id).then(
+            (measurements) => {
+                if (measurements.length < 1) {
+                    return res.status(404).json({ message: 'Kon de meting niet vinden!' });
+                }
+                const measurement = measurements[0]
+                if (user.id !== measurement.createdBy && user.isAdmin !== roleEnum.admin) {
+                    return res.status(404).json({ message: 'Kon de meting niet vinden!' });
+                }
+                measurement_controller.get_measurement_data(measurement.id + '_' + measurement.name).then(
+                    (data) => {
+                        return res.status(200).json(removeIdFromAllData(data));
+                    },
+                    (error) => { return res.status(500).send(error) }
+                )
+            },
+            (error) => { return res.status(500).send(error) }
+        )
+    })
+
 }
 
 function getAllIdOfWavelength(req, res, next) {
@@ -185,10 +194,10 @@ function removeIdFromAllData(result) {
 }
 
 function delete_file(folderName) {
-    try { 
-        fs.rmSync(folderName, { recursive: true }) 
-    } catch (err) { 
-        console.log("err", err); 
+    try {
+        fs.rmSync(folderName, { recursive: true })
+    } catch (err) {
+        console.log("err", err);
     }
 }
 

@@ -49,9 +49,7 @@ function getCSV(req, res, next) {
                     const csv = json2csvParser.parse(jsonData);
                     return res.send(csv)
                 },
-                (error) => {
-                    return res.status(500).json({ message: error });
-                }
+                (error) => { return res.status(500).json({ message: error }); }
             )
         },
         (error) => { return res.status(500).send(error) }
@@ -100,9 +98,7 @@ function postNewFile(req, res, next) {
 
 function makeDirectory(directoryPath) {
     fs.mkdir(path.join(directoryPath), (err) => {
-        if (err) {
-            return console.error(err);
-        }
+        if (err) { return console.error(err); }
     });
 }
 
