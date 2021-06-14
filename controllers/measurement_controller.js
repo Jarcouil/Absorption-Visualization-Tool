@@ -45,10 +45,10 @@ function delete_all_measurements() {
     return db_controller.execute_sql(sql);
 }
 
-function delete_measurement_data_table(tablename) {
+function delete_measurement_data_table(tableName) {
     var sql = "DROP TABLE IF EXISTS ??;"
 
-    return db_controller.execute_sql(sql, [tablename]);
+    return db_controller.execute_sql(sql, [tableName]);
 }
 
 function get_measurement(id) {
@@ -74,16 +74,16 @@ function get_all_wavelengths_of_id(name, id) {
     return db_controller.execute_sql(sql, data);
 }
 
-function get_all_columns_of_measurement(id) {
+function get_all_columns_of_measurement(tableName) {
     var sql = "SELECT COLUMN_NAME AS columns FROM information_schema.columns WHERE table_name = ?;";
 
-    return db_controller.execute_sql(sql, [id]);
+    return db_controller.execute_sql(sql, [tableName]);
 }
 
-function get_all_ids_of_measurement(id) {
+function get_all_ids_of_measurement(tableName) {
     var sql = "SELECT id FROM ??;";
 
-    return db_controller.execute_sql(sql, [id]);
+    return db_controller.execute_sql(sql, [tableName]);
 }
 
 function get_measurement_data(id) {

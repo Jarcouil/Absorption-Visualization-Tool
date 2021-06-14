@@ -162,21 +162,48 @@ function getAllWavelengthsOfTimestamp(req, res, next) {
 }
 
 function getAllWavelengths(req, res, next) {
-    measurement_controller.get_all_columns_of_measurement(req.params.id).then(
-        (result) => {
-            return res.status(200).json(removeIdFromWavelengths(normalizeResultsArray(result)['columns']));
-        },
-        (error) => { return res.status(500).send(error) }
-    )
+    user_controller.get_user(req.userId).then(users => {
+        const user = users[0];
+        measurement_controller.get_measurement(req.params.id).then(
+            (measurements) => {
+                if (measurements.length < 1) {
+                    return res.status(404).json({ message: 'Kon de meting niet vinden!' });
+                }
+                const measurement = measurements[0]
+                if (user.id !== measurement.createdBy && user.isAdmin !== roleEnum.admin) {
+                    return res.status(404).json({ message: 'Kon de meting niet vinden!' });
+                }
+                measurement_controller.get_all_columns_of_measurement(getMeasurmentName(measurement.id, measurement.name)).then(
+                    (result) => {
+                        return res.status(200).json(removeIdFromWavelengths(normalizeResultsArray(result)['columns']));
+                    },
+                    (error) => { return res.status(500).send(error) }
+                )
+            })
+    })
+    
 }
 
 function getAllIds(req, res, next) {
-    measurement_controller.get_all_ids_of_measurement(req.params.id).then(
-        (result) => {
-            return res.status(200).json(normalizeResultsArray(result)['id']);
-        },
-        (error) => { return res.status(500).send(error) }
-    )
+    user_controller.get_user(req.userId).then(users => {
+        const user = users[0];
+        measurement_controller.get_measurement(req.params.id).then(
+            (measurements) => {
+                if (measurements.length < 1) {
+                    return res.status(404).json({ message: 'Kon de meting niet vinden!' });
+                }
+                const measurement = measurements[0]
+                if (user.id !== measurement.createdBy && user.isAdmin !== roleEnum.admin) {
+                    return res.status(404).json({ message: 'Kon de meting niet vinden!' });
+                }
+                measurement_controller.get_all_ids_of_measurement(getMeasurmentName(measurement.id, measurement.name)).then(
+                    (result) => {
+                        return res.status(200).json((normalizeResultsArray(result)['id']));
+                    },
+                    (error) => { return res.status(500).send(error) }
+                )
+            })
+    })
 }
 
 function normalizeResultsArray(results) {
