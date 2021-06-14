@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 var session = require('express-session');
 const config = require("./config/config");
+var pathfinderUI = require('pathfinder-ui');
 
 const app = express()
 const port = config.port
@@ -23,6 +24,11 @@ app.use(session({
 	resave: true,
 	saveUninitialized: true
 }));
+
+app.use('/pathfinder', function(req, res, next){
+	pathfinderUI(app);
+	next();
+  }, pathfinderUI.router);
 
 app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));

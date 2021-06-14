@@ -4,7 +4,7 @@ module.exports = {
     delete_measurement_data_table,
     delete_measurement_from_measurements,
     get_all_columns_of_measurement,
-    get_all_id_of_wavelength,
+    get_all_timestamps_of_wavelength,
     get_all_ids_of_measurement,
     get_all_measurements,
     get_all_wavelengths_of_id,
@@ -57,7 +57,7 @@ function get_measurement(id) {
     return db_controller.execute_sql(sql, [id]);
 }
 
-function get_all_id_of_wavelength(name, columns) {
+function get_all_timestamps_of_wavelength(name, columns) {
     if (typeof (columns) != "object") {
         columns = [columns]
     }

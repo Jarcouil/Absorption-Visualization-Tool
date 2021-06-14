@@ -23,7 +23,7 @@ function getFileName(req, res, next) {
             if (result.length < 1) {
                 return res.status(404).json({ message: "Meting niet gevonden" });
             }
-            const file_location = './uploads/' + req.params.id.toString() + '_' + result[0].name;
+            const file_location = './uploads/' + getMeasurmentName(req.params.id, result[0].name);
             const file = getFile(file_location);
             if (file == null) {
                 return res.status(404).json({ message: 'Kon het bestand niet vinden' });
@@ -41,7 +41,7 @@ function getCSV(req, res, next) {
             if (result.length < 1) {
                 return res.status(404).json({ message: "Meting niet gevonden" });
             }
-            const table_name = req.params.id.toString() + '_' + result[0].name
+            const table_name = getMeasurmentName(req.params.id, result[0].name);
             file_controller.get_csv_data(table_name, req.query.minWavelength, req.query.maxWavelength, req.query.minTimestamp, req.query.maxTimestamp).then(
                 (result) => {
                     const jsonData = JSON.parse(JSON.stringify(result));
@@ -62,7 +62,7 @@ function downloadDadFile(req, res, next) {
             if (result.length < 1) {
                 return res.status(404).json({ message: "Meting niet gevonden" });
             }
-            const file_location = './uploads/' + req.params.id.toString() + '_' + result[0].name;
+            const file_location = './uploads/' + getMeasurmentName(req.params.id + result[0].name);
             return res.download(file_location + '/' + getFile(file_location));
         },
         (error) => { return res.status(500).send(error) }
@@ -76,7 +76,7 @@ function postNewFile(req, res, next) {
         (result) => {
             file_controller.add_file_to_table(req.body.name, req.body.description, req.userId).then(
                 (result2) => {
-                    const new_table_name = result2.insertId.toString() + '_' + req.body.name;
+                    const new_table_name = getMeasurmentName(result2.insertId, req.body.name);
                     const file_location = './uploads/' + new_table_name
                     makeDirectory(file_location);
                     file.mv(file_location + '/' + file.name);
@@ -114,6 +114,10 @@ function getFile(directoryPath) {
         console.log("err", err);
         return null
     }
+}
+
+function getMeasurmentName(id, name) {
+    return id.toString() + '_' + name
 }
 
 function runPythonScript(sourceFile, res, file, tablename, wavelengths, insertId) {
