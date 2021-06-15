@@ -1,12 +1,13 @@
 const router = require('express').Router({ mergeParams: true });
 const measurement_controller = require("../controllers/measurement_controller");
-const user_controller = require("../controllers/user_controller");
 const { authJwt } = require("../middleware");
 const { verifyMeasurement } = require("../middleware");
 const fs = require('fs');
-const roleEnum = require('../middleware/roleEnum')
 
-router.get('/', getAllMeasurementsOfUser);
+router.get(
+    '/',
+    getAllMeasurementsOfUser
+);
 router.get(
     '/all',
     authJwt.isAdmin,
@@ -14,42 +15,42 @@ router.get(
 );
 router.delete(
     '/:id',
-    verifyMeasurement.verifyUser,
+    [verifyMeasurement.ifMeasurements, verifyMeasurement.isAllowed],
     deleteMeasurement
 );
 router.get(
     '/columns/:id',
-    verifyMeasurement.verifyUser,
+    [verifyMeasurement.ifMeasurements, verifyMeasurement.isAllowed],
     getAllWavelengths
 );
 router.get(
     '/data/:id',
-    verifyMeasurement.verifyUser,
+    [verifyMeasurement.ifMeasurements, verifyMeasurement.isAllowed],
     getMeasurementData
 );
 router.get(
     '/id/:id', 
-    verifyMeasurement.verifyUser,
+    [verifyMeasurement.ifMeasurements, verifyMeasurement.isAllowed],
     getAllIds
 );
 router.get(
     '/:id',
-    verifyMeasurement.verifyUser,
+    [verifyMeasurement.ifMeasurements, verifyMeasurement.isAllowed],
     getMeasurement
 );
 router.get(
     '/:id/columns',
-    verifyMeasurement.verifyUser,
+    [verifyMeasurement.ifMeasurements, verifyMeasurement.isAllowed],
     getAllTimestampsOfWavelength
 );
 router.get(
     '/:id/:timestamp',
-    verifyMeasurement.verifyUser,
+    [verifyMeasurement.ifMeasurements, verifyMeasurement.isAllowed],
     getAllWavelengthsOfTimestamp
 );
 
 function deleteMeasurement(req, res, next) {
-    const measurement = res.measurement
+    const measurement = res.measurements[0]
     delete_file('./uploads/' + req.params.id.toString() + '_' + measurement.name);
     measurement_controller.delete_measurement_data_table(getMeasurmentName(req.params.id, measurement.name)).then(
         (result) => {
@@ -89,11 +90,11 @@ function getAllMeasurements(req, res, next) {
 }
 
 function getMeasurement(req, res, next) {
-    return res.status(200).json(res.measurement);
+    return res.status(200).json(res.measurements[0]);
 }
 
 function getMeasurementData(req, res, next) {
-    const measurement = res.measurement
+    const measurement = res.measurements[0]
     measurement_controller.get_measurement_data(getMeasurmentName(measurement.id, measurement.name)).then(
         (data) => {
             return res.status(200).json(removeIdFromAllData(data));
@@ -103,7 +104,7 @@ function getMeasurementData(req, res, next) {
 }
 
 function getAllTimestampsOfWavelength(req, res, next) {
-    const measurement = res.measurement
+    const measurement = res.measurements[0]
     measurement_controller.get_all_timestamps_of_wavelength(getMeasurmentName(measurement.id, measurement.name), req.query.c).then(
         (result) => {
             return res.status(200).json((result));
@@ -113,7 +114,7 @@ function getAllTimestampsOfWavelength(req, res, next) {
 }
 
 function getAllWavelengthsOfTimestamp(req, res, next) {
-    const measurement = res.measurement
+    const measurement = res.measurements[0]
     measurement_controller.get_all_wavelengths_of_id(getMeasurmentName(measurement.id, measurement.name), req.params.timestamp).then(
         (result) => {
             return res.status(200).json(removeIdFromAllWavelengths(normalizeResultsSingle(result)));
@@ -123,7 +124,7 @@ function getAllWavelengthsOfTimestamp(req, res, next) {
 }
 
 function getAllWavelengths(req, res, next) {
-    const measurement = res.measurement
+    const measurement = res.measurements[0]         
     measurement_controller.get_all_columns_of_measurement(getMeasurmentName(measurement.id, measurement.name)).then(
         (result) => {
             return res.status(200).json(removeIdFromWavelengths(normalizeResultsArray(result)['columns']));
@@ -133,7 +134,7 @@ function getAllWavelengths(req, res, next) {
 }
 
 function getAllIds(req, res, next) {
-    const measurement = res.measurement
+    const measurement = res.measurements[0]
     measurement_controller.get_all_ids_of_measurement(getMeasurmentName(measurement.id, measurement.name)).then(
         (result) => {
             return res.status(200).json((normalizeResultsArray(result)['id']));
