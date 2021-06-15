@@ -2,51 +2,66 @@ const router = require('express').Router({ mergeParams: true });
 const measurement_controller = require("../controllers/measurement_controller");
 const user_controller = require("../controllers/user_controller");
 const { authJwt } = require("../middleware");
+const { verifyMeasurement } = require("../middleware");
 const fs = require('fs');
 const roleEnum = require('../middleware/roleEnum')
 
 router.get('/', getAllMeasurementsOfUser);
 router.get(
     '/all',
-    [authJwt.isAdmin],
+    authJwt.isAdmin,
     getAllMeasurements
 );
-router.delete('/:id', deleteMeasurement);
-router.get('/columns/:id', getAllWavelengths);
-router.get('/data/:id', getMeasurementData);
-router.get('/id/:id', getAllIds);
-router.get('/:id', getMeasurement);
-router.get('/:id/columns', getAllTimestampsOfWavelength);
-router.get('/:id/:timestamp', getAllWavelengthsOfTimestamp);
+router.delete(
+    '/:id',
+    verifyMeasurement.verifyUser,
+    deleteMeasurement
+);
+router.get(
+    '/columns/:id',
+    verifyMeasurement.verifyUser,
+    getAllWavelengths
+);
+router.get(
+    '/data/:id',
+    verifyMeasurement.verifyUser,
+    getMeasurementData
+);
+router.get(
+    '/id/:id', 
+    verifyMeasurement.verifyUser,
+    getAllIds
+);
+router.get(
+    '/:id',
+    verifyMeasurement.verifyUser,
+    getMeasurement
+);
+router.get(
+    '/:id/columns',
+    verifyMeasurement.verifyUser,
+    getAllTimestampsOfWavelength
+);
+router.get(
+    '/:id/:timestamp',
+    verifyMeasurement.verifyUser,
+    getAllWavelengthsOfTimestamp
+);
 
 function deleteMeasurement(req, res, next) {
-    user_controller.get_user(req.userId).then(users => {
-        const user = users[0];
-        measurement_controller.get_measurement(req.params.id).then(
-            (measurements) => {
-                if (measurements.length < 1) {
-                    return res.status(404).json({ message: 'Kon de meting niet vinden!' });
-                }
-                const measurement = measurements[0]
-                if (user.id !== measurement.createdBy && user.isAdmin !== roleEnum.admin) {
-                    return res.status(404).json({ message: 'Kon de meting niet vinden!' });
-                }
-                delete_file('./uploads/' + req.params.id.toString() + '_' + measurement.name);
-                measurement_controller.delete_measurement_data_table(getMeasurmentName(req.params.id, measurement.name)).then(
-                    (result) => {
-                        measurement_controller.delete_measurement_from_measurements(req.params.id).then(
-                            (result) => {
-                                return res.status(200).json({ message: `Meting ${measurement.name} is succesvol verwijderd` });
-                            },
-                            (error) => { return res.status(500).json({ message: error }); }
-                        )
-                    },
-                    (error) => { return res.status(500).json({ message: error }); }
-                )
-            },
-            (error) => { return res.status(500).send(error) }
-        )
-    })
+    const measurement = res.measurement
+    delete_file('./uploads/' + req.params.id.toString() + '_' + measurement.name);
+    measurement_controller.delete_measurement_data_table(getMeasurmentName(req.params.id, measurement.name)).then(
+        (result) => {
+            measurement_controller.delete_measurement_from_measurements(req.params.id).then(
+                (result) => {
+                    return res.status(200).json({ message: `Meting ${measurement.name} is succesvol verwijderd` });
+                },
+                (error) => { return res.status(500).json({ message: error }); }
+            )
+        },
+        (error) => { return res.status(500).json({ message: error }); }
+    )
 }
 
 function getAllMeasurementsOfUser(req, res, next) {
@@ -74,136 +89,57 @@ function getAllMeasurements(req, res, next) {
 }
 
 function getMeasurement(req, res, next) {
-    user_controller.get_user(req.userId).then(users => {
-        const user = users[0];
-        measurement_controller.get_measurement(req.params.id).then(
-            (measurements) => {
-                if (measurements.length < 1) {
-                    return res.status(404).json({ message: 'Kon de meting niet vinden!' });
-                }
-                const measurement = measurements[0]
-                if (user.id !== measurement.createdBy && user.isAdmin !== roleEnum.admin) {
-                    return res.status(404).json({ message: 'Kon de meting niet vinden!' });
-                }
-                return res.status(200).json(measurement);
-            },
-            (error) => { return res.status(500).send(error) }
-        )
-    })
+    return res.status(200).json(res.measurement);
 }
 
 function getMeasurementData(req, res, next) {
-    user_controller.get_user(req.userId).then(users => {
-        const user = users[0];
-        measurement_controller.get_measurement(req.params.id).then(
-            (measurements) => {
-                if (measurements.length < 1) {
-                    return res.status(404).json({ message: 'Kon de meting niet vinden!' });
-                }
-                const measurement = measurements[0]
-                if (user.id !== measurement.createdBy && user.isAdmin !== roleEnum.admin) {
-                    return res.status(404).json({ message: 'Kon de meting niet vinden!' });
-                }
-                measurement_controller.get_measurement_data(getMeasurmentName(measurement.id, measurement.name)).then(
-                    (data) => {
-                        return res.status(200).json(removeIdFromAllData(data));
-                    },
-                    (error) => { return res.status(500).send(error) }
-                )
-            },
-            (error) => { return res.status(500).send(error) }
-        )
-    })
-
+    const measurement = res.measurement
+    measurement_controller.get_measurement_data(getMeasurmentName(measurement.id, measurement.name)).then(
+        (data) => {
+            return res.status(200).json(removeIdFromAllData(data));
+        },
+        (error) => { return res.status(500).send(error) }
+    )
 }
 
 function getAllTimestampsOfWavelength(req, res, next) {
-    user_controller.get_user(req.userId).then(users => {
-        const user = users[0];
-        measurement_controller.get_measurement(req.params.id).then(
-            (measurements) => {
-                if (measurements.length < 1) {
-                    return res.status(404).json({ message: 'Kon de meting niet vinden!' });
-                }
-                const measurement = measurements[0]
-                if (user.id !== measurement.createdBy && user.isAdmin !== roleEnum.admin) {
-                    return res.status(404).json({ message: 'Kon de meting niet vinden!' });
-                }
-                measurement_controller.get_all_timestamps_of_wavelength(getMeasurmentName(measurement.id, measurement.name), req.query.c).then(
-                    (result) => {
-                        return res.status(200).json((result));
-                    },
-                    (error) => { return res.status(500).send(error) }
-                )
-            })
-    })
+    const measurement = res.measurement
+    measurement_controller.get_all_timestamps_of_wavelength(getMeasurmentName(measurement.id, measurement.name), req.query.c).then(
+        (result) => {
+            return res.status(200).json((result));
+        },
+        (error) => { return res.status(500).send(error) }
+    )
 }
 
 function getAllWavelengthsOfTimestamp(req, res, next) {
-    user_controller.get_user(req.userId).then(users => {
-        const user = users[0];
-        measurement_controller.get_measurement(req.params.id).then(
-            (measurements) => {
-                if (measurements.length < 1) {
-                    return res.status(404).json({ message: 'Kon de meting niet vinden!' });
-                }
-                const measurement = measurements[0]
-                if (user.id !== measurement.createdBy && user.isAdmin !== roleEnum.admin) {
-                    return res.status(404).json({ message: 'Kon de meting niet vinden!' });
-                }
-                measurement_controller.get_all_wavelengths_of_id(getMeasurmentName(measurement.id, measurement.name), req.params.timestamp).then(
-                    (result) => {
-                        return res.status(200).json(removeIdFromAllWavelengths(normalizeResultsSingle(result)));
-                    },
-                    (error) => { return res.status(500).send(error) }
-                )
-            })
-    })
+    const measurement = res.measurement
+    measurement_controller.get_all_wavelengths_of_id(getMeasurmentName(measurement.id, measurement.name), req.params.timestamp).then(
+        (result) => {
+            return res.status(200).json(removeIdFromAllWavelengths(normalizeResultsSingle(result)));
+        },
+        (error) => { return res.status(500).send(error) }
+    )
 }
 
 function getAllWavelengths(req, res, next) {
-    user_controller.get_user(req.userId).then(users => {
-        const user = users[0];
-        measurement_controller.get_measurement(req.params.id).then(
-            (measurements) => {
-                if (measurements.length < 1) {
-                    return res.status(404).json({ message: 'Kon de meting niet vinden!' });
-                }
-                const measurement = measurements[0]
-                if (user.id !== measurement.createdBy && user.isAdmin !== roleEnum.admin) {
-                    return res.status(404).json({ message: 'Kon de meting niet vinden!' });
-                }
-                measurement_controller.get_all_columns_of_measurement(getMeasurmentName(measurement.id, measurement.name)).then(
-                    (result) => {
-                        return res.status(200).json(removeIdFromWavelengths(normalizeResultsArray(result)['columns']));
-                    },
-                    (error) => { return res.status(500).send(error) }
-                )
-            })
-    })
-    
+    const measurement = res.measurement
+    measurement_controller.get_all_columns_of_measurement(getMeasurmentName(measurement.id, measurement.name)).then(
+        (result) => {
+            return res.status(200).json(removeIdFromWavelengths(normalizeResultsArray(result)['columns']));
+        },
+        (error) => { return res.status(500).send(error) }
+    )
 }
 
 function getAllIds(req, res, next) {
-    user_controller.get_user(req.userId).then(users => {
-        const user = users[0];
-        measurement_controller.get_measurement(req.params.id).then(
-            (measurements) => {
-                if (measurements.length < 1) {
-                    return res.status(404).json({ message: 'Kon de meting niet vinden!' });
-                }
-                const measurement = measurements[0]
-                if (user.id !== measurement.createdBy && user.isAdmin !== roleEnum.admin) {
-                    return res.status(404).json({ message: 'Kon de meting niet vinden!' });
-                }
-                measurement_controller.get_all_ids_of_measurement(getMeasurmentName(measurement.id, measurement.name)).then(
-                    (result) => {
-                        return res.status(200).json((normalizeResultsArray(result)['id']));
-                    },
-                    (error) => { return res.status(500).send(error) }
-                )
-            })
-    })
+    const measurement = res.measurement
+    measurement_controller.get_all_ids_of_measurement(getMeasurmentName(measurement.id, measurement.name)).then(
+        (result) => {
+            return res.status(200).json((normalizeResultsArray(result)['id']));
+        },
+        (error) => { return res.status(500).send(error) }
+    )
 }
 
 function normalizeResultsArray(results) {
