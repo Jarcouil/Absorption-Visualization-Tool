@@ -16,13 +16,13 @@ module.exports = {
 }
 
 function get_all_measurements() {
-    var sql = "SELECT u.username, m.* FROM measurements m inner join users u on m.createdBy = u.id;"
+    var sql = "SELECT u.username, m.id, m.name, m.description, m.created_at as createdAt, created_by as createdBy FROM measurements m inner join users u on m.created_by = u.id;"
 
     return db_controller.execute_sql(sql);
 }
 
 function get_all_measurements_of_user(userId) {
-    var sql = "SELECT u.username, m.* FROM measurements m inner join users u on m.createdBy = u.id WHERE u.id = ?;"
+    var sql = "SELECT u.username, m.id, m.name, m.description, m.created_at as createdAt, created_by as createdBy FROM measurements m inner join users u on m.created_by = u.id WHERE u.id = ?;"
 
     return db_controller.execute_sql(sql, [userId]);
 }

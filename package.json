@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "SET NODE_ENV=dev&& node index.js",
+    "knex": "SET NODE_ENV=dev2&& node knex.js",
     "test": "mocha --timeout 10000"
   },
   "author": "",
@@ -25,6 +26,7 @@
     "faker": "^5.5.3",
     "json2csv": "^5.0.6",
     "jsonwebtoken": "^8.5.1",
+    "knex": "^0.95.6",
     "lodash": "^4.17.21",
     "mocha": "^8.4.0",
     "morgan": "^1.10.0",

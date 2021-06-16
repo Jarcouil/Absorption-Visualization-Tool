@@ -10,13 +10,13 @@ module.exports = {
 }
 
 function get_users() {
-  const sql = "SELECT id, username, email, isAdmin, createdAt FROM users;"
+  const sql = "SELECT id, username, email, is_admin as isAdmin, created_at as createdAt FROM users;"
 
   return db_controller.execute_sql(sql);
 }
 
 function get_user(id) {
-  const sql = "SELECT id, username, email, isAdmin, createdAt FROM users WHERE id = ?;"
+  const sql = "SELECT id, username, email, is_admin as isAdmin, created_at as createdAt FROM users WHERE id = ?;"
 
   return db_controller.execute_sql(sql, [id]);
 }
@@ -28,7 +28,7 @@ function delete_user(id) {
 }
 
 function toggle_admin(id) {
-  const sql = "UPDATE users SET isAdmin = !isAdmin WHERE id =  ?;";
+  const sql = "UPDATE users SET is_admin = !is_admin WHERE id =  ?;";
 
   return db_controller.execute_sql(sql, [id]);
 }

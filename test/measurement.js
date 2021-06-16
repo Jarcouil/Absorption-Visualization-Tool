@@ -133,7 +133,7 @@ describe('Measurements API', () => {
                     measurement1 = res.body[0]
                     res.body.should.be.an.instanceof(Array);
                     res.body.length.should.be.equal(1);
-                    res.body[0].should.include.all.keys(['id', 'name', 'description', 'createdAt', 'createdBy']);
+                    res.body[0].should.include.all.keys(['id', 'name', 'description', 'createdAt', 'createdBy', 'username']);
                     res.should.have.status(200);
                     done();
                 });
@@ -147,12 +147,12 @@ describe('Measurements API', () => {
                 .get(`/v1/measurement/${measurement1.id}`)
                 .set("x-access-token", user.accessToken)
                 .end((err, res) => {
-                    res.body.should.include.all.keys(['id', 'name', 'description', 'createdAt', 'createdBy']);
+                    res.body.should.include.all.keys(['id', 'name', 'description', 'created_at', 'created_by']);
                     res.body.id.should.be.equal(measurement1.id);
                     res.body.name.should.be.equal(measurement1.name);
                     res.body.description.should.be.equal(measurement1.description);
-                    res.body.createdAt.should.be.equal(measurement1.createdAt);
-                    res.body.createdBy.should.be.equal(measurement1.createdBy);
+                    res.body.created_at.should.be.equal(measurement1.createdAt);
+                    res.body.created_by.should.be.equal(measurement1.createdBy);
                     res.should.have.status(200);
                     done();
                 });
@@ -223,12 +223,12 @@ describe('Measurements API', () => {
                 .get(`/v1/measurement/${measurement1.id}`)
                 .set("x-access-token", user2.accessToken)
                 .end((err, res) => {
-                    res.body.should.include.all.keys(['id', 'name', 'description', 'createdAt', 'createdBy']);
+                    res.body.should.include.all.keys(['id', 'name', 'description', 'created_at', 'created_by']);
                     res.body.id.should.be.equal(measurement1.id);
                     res.body.name.should.be.equal(measurement1.name);
                     res.body.description.should.be.equal(measurement1.description);
-                    res.body.createdAt.should.be.equal(measurement1.createdAt);
-                    res.body.createdBy.should.be.equal(measurement1.createdBy);
+                    res.body.created_at.should.be.equal(measurement1.createdAt);
+                    res.body.created_by.should.be.equal(measurement1.createdBy);
                     res.should.have.status(200);
                     done();
                 });

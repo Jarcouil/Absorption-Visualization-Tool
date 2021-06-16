@@ -30,7 +30,7 @@ const isAdmin = (req, res, next) => {
     if (users.length > 0) {
       const user = users[0];
 
-      if (user.isAdmin == roleEnum.admin) {
+      if (user.is_admin == roleEnum.admin) {
         next();
         return;
       }
