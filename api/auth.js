@@ -44,7 +44,7 @@ function login(req, res, next) {
                 });
             } else {
                 const token = jwt.sign({ id: user.id }, config.secret, {
-                    expiresIn: 86400 // 24 hours
+                    expiresIn: 60 * 60 // 1 hour
                 });
 
                 return res.status(200).send({
