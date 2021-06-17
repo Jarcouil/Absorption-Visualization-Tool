@@ -72,11 +72,11 @@ function downloadDadFile(req, res, next) {
 function postNewFile(req, res, next) {
     const file = req.files.file;
 
-    file_controller.add_new_file(req.body.name, +req.body.minWaveLength, +req.body.maxWaveLength).then(
+    file_controller.create_new_table(req.body.name, +req.body.minWaveLength, +req.body.maxWaveLength).then(
         (result) => {
-            file_controller.add_file_to_table(req.body.name, req.body.description, req.userId).then(
+            file_controller.add_to_measurements(req.body.name, req.body.description, req.userId).then(
                 (result2) => {
-                    const new_table_name = getMeasurmentName(result2.insertId, req.body.name);
+                    const new_table_name = getMeasurmentName(result2[0], req.body.name);
                     const file_location = './uploads/' + new_table_name
                     makeDirectory(file_location);
                     file.mv(file_location + '/' + file.name);
@@ -84,7 +84,7 @@ function postNewFile(req, res, next) {
                     file_controller.rename_measurement_table(req.body.name, new_table_name).then(
                         (result) => {
                             const wavelengths = req.body.maxWaveLength - req.body.minWaveLength + 1
-                            runPythonScript(file_location + '/' + file.name, res, file, new_table_name, wavelengths, result2.insertId.toString())
+                            runPythonScript(file_location + '/' + file.name, res, file, new_table_name, wavelengths, result2[0].toString())
                         },
                         (error) => { return res.status(500).send(error) }
                     )

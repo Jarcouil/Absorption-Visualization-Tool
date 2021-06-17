@@ -1,4 +1,4 @@
-const db_controller = require('./database_controller');
+const knex = require('../knex');
 
 module.exports = {
     delete_measurement_data_table,
@@ -16,92 +16,68 @@ module.exports = {
 }
 
 function get_all_measurements() {
-    var sql = "SELECT u.username, m.id, m.name, m.description, m.created_at as createdAt, created_by as createdBy FROM measurements m inner join users u on m.created_by = u.id;"
-
-    return db_controller.execute_sql(sql);
+    return knex.from('measurements')
+        .innerJoin('users', 'measurements.created_by', 'users.id')
+        .select('users.username', 'measurements.id', 'measurements.name', 'measurements.description', 'measurements.created_at AS createdAt', 'measurements.created_by as createdBy',)
 }
 
 function get_all_measurements_of_user(userId) {
-    var sql = "SELECT u.username, m.id, m.name, m.description, m.created_at as createdAt, created_by as createdBy FROM measurements m inner join users u on m.created_by = u.id WHERE u.id = ?;"
-
-    return db_controller.execute_sql(sql, [userId]);
+    return knex.from('measurements')
+        .innerJoin('users', 'measurements.created_by', 'users.id')
+        .select('users.username', 'measurements.id', 'measurements.name', 'measurements.description', 'measurements.created_at AS createdAt', 'measurements.created_by as createdBy',)
+        .where('users.id', userId)
 }
 
 function get_table_name_of_id(id) {
-    var sql = "SELECT name FROM measurements WHERE id = ?;"
-
-    return db_controller.execute_sql(sql, [id]);
+    return knex.from('measurements')
+        .select('name')
+        .where('id', id)
 }
 
 function delete_measurement_from_measurements(id) {
-    var sql = "DELETE FROM measurements WHERE id = ?;"
-
-    return db_controller.execute_sql(sql, [id]);
+    return knex.from('measurements')
+        .where('id', id)
+        .del()
 }
 
 function delete_all_measurements() {
-    var sql = "DELETE FROM measurements;"
-
-    return db_controller.execute_sql(sql);
+    return knex.from('measurements')
+        .del()
 }
 
 function delete_measurement_data_table(tableName) {
-    var sql = "DROP TABLE IF EXISTS ??;"
-
-    return db_controller.execute_sql(sql, [tableName]);
+    return knex.schema.dropTableIfExists(tableName)
 }
 
 function get_measurement(id) {
-    var sql = "SELECT * FROM measurements WHERE id = ?;"
-
-    return db_controller.execute_sql(sql, [id]);
+    return knex.from('measurements')
+        .select('*')
+        .where('id', id)
 }
 
-function get_all_timestamps_of_wavelength(name, columns) {
-    if (typeof (columns) != "object") {
-        columns = [columns]
-    }
-    var sql = get_columns_sql(columns);
-    var data = columns
-    data.push(name)
-    return db_controller.execute_sql(sql, data);
-
+function get_all_timestamps_of_wavelength(tableName, columns) {
+    return knex.from(tableName)
+        .select('id', `${columns} as wavelength`)
 }
 
-function get_all_wavelengths_of_id(name, id) {
-    var sql = "SELECT * FROM ??  WHERE (id = ?) ;"
-    var data = [name, id]
-    return db_controller.execute_sql(sql, data);
+function get_all_wavelengths_of_id(tableName, id) {
+    return knex.from(tableName)
+        .select('*')
+        .where('id', id)
 }
 
 function get_all_columns_of_measurement(tableName) {
-    var sql = "SELECT COLUMN_NAME AS columns FROM information_schema.columns WHERE table_name = ?;";
-
-    return db_controller.execute_sql(sql, [tableName]);
+    return knex.from('information_schema.columns')
+        .select('COLUMN_NAME AS columns')
+        .where('table_name', tableName)
 }
 
 function get_all_ids_of_measurement(tableName) {
-    var sql = "SELECT id FROM ??;";
-
-    return db_controller.execute_sql(sql, [tableName]);
+    return knex.from(tableName)
+        .select('id')
 }
 
-function get_measurement_data(id) {
-    var sql = "SELECT * FROM ??;";
-
-    return db_controller.execute_sql(sql, [id])
-}
-
-function get_columns_sql(columns) {
-    var sql = "SELECT id, ";
-    var i = 0;
-    for (i; i < columns.length; i++) {
-        if (i == columns.length - 1) {
-            sql = sql + "?? as 'wavelength' ";
-        } else {
-            sql = sql + "?? as 'wavelength', ";
-        }
-    }
-
-    return sql + "FROM ??;";
+function get_measurement_data(tableName) {
+    return knex.from(tableName)
+        .select('*')
 }

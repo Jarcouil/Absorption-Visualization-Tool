@@ -1,4 +1,4 @@
-const db_controller = require('./database_controller');
+const knex = require('../knex');
 
 module.exports = {
   delete_user,
@@ -6,41 +6,46 @@ module.exports = {
   get_users,
   toggle_admin,
   get_user_by_email,
-  delete_all_users
+  delete_all_users,
+  get_user_by_username
 }
 
 function get_users() {
-  const sql = "SELECT id, username, email, is_admin as isAdmin, created_at as createdAt FROM users;"
-
-  return db_controller.execute_sql(sql);
+  return knex.from('users')
+    .select('id', 'username', 'email', 'is_admin as isAdmin', 'created_at as createdAt')
 }
 
 function get_user(id) {
-  const sql = "SELECT id, username, email, is_admin as isAdmin, created_at as createdAt FROM users WHERE id = ?;"
-
-  return db_controller.execute_sql(sql, [id]);
+  return knex.from('users')
+    .select('id', 'username', 'email', 'is_admin as isAdmin', 'created_at as createdAt')
+    .where('id', id)
 }
 
 function delete_user(id) {
-  const sql = "DELETE FROM users WHERE id = ?;"
-
-  return db_controller.execute_sql(sql, [id]);
+  return knex.from('users')
+    .where('id', id)
+    .del()
 }
 
 function toggle_admin(id) {
-  const sql = "UPDATE users SET is_admin = !is_admin WHERE id =  ?;";
-
-  return db_controller.execute_sql(sql, [id]);
+  return knex.from('users')
+    .update({ is_admin: knex.raw('!??', ['is_admin']) })
+    .where('id', id)
 }
 
 function get_user_by_email(email) {
-  const sql = "SELECT id, username, email FROM users WHERE email = ?;"
+  return knex.from('users')
+    .select('id', 'username', 'email', 'is_admin as isAdmin', 'created_at as createdAt')
+    .where('email', email)
+}
 
-  return db_controller.execute_sql(sql, [email]);
+function get_user_by_username(username) {
+  return knex.from('users')
+    .select('id', 'username', 'email', 'is_admin as isAdmin', 'created_at as createdAt')
+    .where('username', username)
 }
 
 function delete_all_users() {
-  const sql = "DELETE FROM users;";
-
-  return db_controller.execute_sql(sql);
+  return knex.from('users')
+    .del()
 }

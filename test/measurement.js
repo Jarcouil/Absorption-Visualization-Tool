@@ -40,7 +40,7 @@ function login(username, password) {
 }
 
 function addMeasurement(name, description) {
-    return file_controller.add_file_to_table(faker.random.word(), faker.lorem.sentence(), user.id)
+    return file_controller.add_to_measurements(faker.random.word(), faker.lorem.sentence(), user.id)
 }
 
 describe('Measurements API', () => {

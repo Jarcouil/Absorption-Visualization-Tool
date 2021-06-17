@@ -23,7 +23,7 @@ describe('Register Auth API', () => {
         user_controller.delete_all_users().then(done())
     });
 
-    describe("It should POST a login wihtout username", () => {
+    describe("It should POST a register wihtout username", () => {
         it("It should not create a new user", (done) => {
             const registerForm = { email: user.email, password: user.password }
             chai.request(server)

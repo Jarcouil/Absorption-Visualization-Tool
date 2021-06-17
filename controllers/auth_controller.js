@@ -1,6 +1,6 @@
-const db_controller = require('./database_controller');
 const mail_config = require("../config/mail.config");
 const nodemailer = require("nodemailer");
+const knex = require('../knex');
 var bcrypt = require("bcryptjs");
 
 module.exports = {
@@ -15,50 +15,43 @@ module.exports = {
 }
 
 function register(username, email, password) {
-    const sql = "INSERT INTO users (username, email, password) VALUES (?,?,?);"
-    const data = [username, email, bcrypt.hashSync(password, 8)];
-
-    return db_controller.execute_sql(sql, data);
+    return knex('users')
+        .insert({ username: username, email: email, password: bcrypt.hashSync(password, 8) })
 }
 
-function addResetToken(userId, resettoken) {
-    const sql = "INSERT INTO resettoken (userId, resettoken) VALUES (?,?);"
-
-    return db_controller.execute_sql(sql, [userId, resettoken])
+function addResetToken(userId, resetToken) {
+    return knex('reset_token')
+        .insert({ user_id: userId, reset_token: resetToken })
 }
 
 function deleteResetToken(token) {
-    const sql = "DELETE FROM resettoken WHERE resettoken = ?;"
-
-    return db_controller.execute_sql(sql, [token])
+    return knex.from('reset_token')
+        .where('reset_token', token)
+        .del()
 }
 
 function deleteAllResetTokens() {
-    const sql = "DELETE FROM resettoken;"
-
-    return db_controller.execute_sql(sql)
+    return knex.from('reset_token')
+        .del()
 }
 
-function findUser(resettoken) {
-    const sql = "SELECT u.id, u.username, u.email FROM resettoken r inner join users u on r.userId = u.id WHERE r.resettoken = ?;"
-
-    return db_controller.execute_sql(sql, [resettoken])
+function findUser(resetToken) {
+    return knex.from('reset_token')
+        .innerJoin('users', 'reset_token.user_id', 'users.id')
+        .select('users.id', 'users.username', 'users.email')
+        .where('reset_token.reset_token', resetToken)
 }
 
 function updatePassword(id, password) {
-    const sql = "UPDATE users SET password = ? WHERE id = ?;";
-    const data = [
-        bcrypt.hashSync(password, 8),
-        id
-    ];
-
-    return db_controller.execute_sql(sql, data)
+    return knex('users')
+        .update({ password: bcrypt.hashSync(password, 8) })
+        .where('id', id)
 }
 
 function login(username) {
-    const sql = "SELECT * from users WHERE username = ?;"
-
-    return db_controller.execute_sql(sql, [username]);
+    return knex.from('users')
+        .select('*')
+        .where('username', username)
 }
 
 async function requestResetPassword(username, email, resetToken) {

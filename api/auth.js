@@ -19,9 +19,11 @@ router.post('/reset-valid', validResetPassword)
 router.post(
     '/register',
     [
-        verifySignUp.checkValidEmail,
-        verifySignUp.checkDuplicateUsernameOrEmail,
+        verifySignUp.checkParameters,
+        verifySignUp.checkDuplicateEmail,
+        verifySignUp.checkDuplicateUsername,
         verifySignUp.checkRolesExisted,
+        verifySignUp.checkValidEmail,
         verifySignUp.checkPasswordLength
     ],
     register);
