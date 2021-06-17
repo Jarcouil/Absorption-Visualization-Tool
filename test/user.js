@@ -74,8 +74,6 @@ describe('User API', () => {
         it("It should give an error", (done) => {
             registerUser(user).then(res => login(user.username, user.password)
                 .then(userResult => {
-                    console.log("userResult")
-                    console.log(userResult)
                     user = userResult
                     chai.request(server)
                         .get("/v1/users")
@@ -97,7 +95,6 @@ describe('User API', () => {
                     .get("/v1/users")
                     .set("x-access-token", user.accessToken)
                     .end((err, res) => {
-                        console.log(res.body)
                         res.body.should.be.an.instanceof(Array);
                         res.body.length.should.be.equal(1);
                         res.body[0].should.include.all.keys(['id', 'username', 'email', 'isAdmin', 'createdAt']);

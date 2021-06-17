@@ -146,10 +146,40 @@ describe('Login Auth API', () => {
         user_controller.delete_all_users().then(done());
     });
 
-    describe("it should POST a login with the wrong credentials", () => {
+    describe("it should POST a login without username", () => {
         it("It should give a login error", (done) => {
             chai.request(server)
                 .post("/v1/auth/login")
+                .end((err, res) => {
+                    res.should.have.status(400);
+                    res.body.message.should.be.equal("Gebruikersnaam is verplicht!");
+                    done();
+                });
+        });
+    })
+
+    describe("it should POST a login without password", () => {
+        it("It should give a login error", (done) => {
+            chai.request(server)
+                .post("/v1/auth/login")
+                .send({username: user.username})
+                .end((err, res) => {
+                    res.should.have.status(400);
+                    res.body.message.should.be.equal("Wachtwoord is verplicht!");
+                    done();
+                });
+        });
+    })
+
+    describe("it should POST a login with the wrong credentials", () => {
+        it("It should  login", (done) => {
+            const logincredentials = {
+                username: faker.name.findName(),
+                password: faker.random.word()
+            }
+            chai.request(server)
+                .post("/v1/auth/login")
+                .send(logincredentials)
                 .end((err, res) => {
                     res.should.have.status(401);
                     res.body.message.should.be.equal("De combinatie van gebruikersnaam en wachtwoord is niet correct!");

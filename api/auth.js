@@ -1,13 +1,18 @@
 const router = require('express').Router({ mergeParams: true });
 const auth_controller = require("../controllers/auth_controller");
 const { verifySignUp } = require("../middleware");
+const { verifyLogin } = require("../middleware")
 const user_controller = require("../controllers/user_controller");
 const crypto = require('crypto');
 const config = require("../config/auth.config");
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 
-router.post('/login', login);
+router.post(
+    '/login',
+    verifyLogin.checkParameters,
+    login
+);
 router.post('/reset', requestResetPassword)
 router.post('/new-password', newPassword)
 router.post('/reset-valid', validResetPassword)
