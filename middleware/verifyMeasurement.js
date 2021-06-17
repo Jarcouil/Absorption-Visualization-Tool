@@ -6,7 +6,6 @@ const ifMeasurements = (req, res, next) => {
     measurement_controller.get_measurement(req.params.id).then(
         (measurements) => {
             if (measurements.length < 1) {
-                console.log('No measurements')
                 return res.status(404).json({ message: 'Kon de meting niet vinden!' });
             }
             res.measurements = measurements;
@@ -20,7 +19,6 @@ const isAllowed = (req, res, next) => {
         (users) => {
             const user = users[0];
             if (user.id !== res.measurements[0].createdBy && user.isAdmin !== roleEnum.admin) {
-                console.log('No rights')
                 return res.status(404).json({ message: 'Kon de meting niet vinden!' });
             }
             next();
