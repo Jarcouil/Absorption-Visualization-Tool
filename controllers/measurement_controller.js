@@ -15,17 +15,19 @@ module.exports = {
     delete_all_measurements
 }
 
-function get_all_measurements() {
+function get_all_measurements(sort, order) {
     return knex.from('measurements')
         .innerJoin('users', 'measurements.created_by', 'users.id')
         .select('users.username', 'measurements.id', 'measurements.name', 'measurements.description', 'measurements.created_at AS createdAt', 'measurements.created_by as createdBy',)
+        .orderBy(sort, order)
 }
 
-function get_all_measurements_of_user(userId) {
+function get_all_measurements_of_user(userId, sort, order) {
     return knex.from('measurements')
         .innerJoin('users', 'measurements.created_by', 'users.id')
         .select('users.username', 'measurements.id', 'measurements.name', 'measurements.description', 'measurements.created_at AS createdAt', 'measurements.created_by as createdBy',)
         .where('users.id', userId)
+        .orderBy(sort, order)
 }
 
 function get_table_name_of_id(id) {

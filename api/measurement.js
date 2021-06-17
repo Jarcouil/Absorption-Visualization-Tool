@@ -66,7 +66,7 @@ function deleteMeasurement(req, res, next) {
 }
 
 function getAllMeasurementsOfUser(req, res, next) {
-    measurement_controller.get_all_measurements_of_user(req.userId).then(
+    measurement_controller.get_all_measurements_of_user(req.userId, req.query.sort, req.query.order).then(
         (result) => {
             if (result.length < 1) {
                 return res.status(404).json({ message: "Er zijn geen metingen gevonden" });
@@ -78,7 +78,7 @@ function getAllMeasurementsOfUser(req, res, next) {
 }
 
 function getAllMeasurements(req, res, next) {
-    measurement_controller.get_all_measurements().then(
+    measurement_controller.get_all_measurements(req.query.sort, req.query.order).then(
         (result) => {
             if (result.length < 1) {
                 return res.status(404).json({ message: "Er zijn geen metingen gevonden" });
