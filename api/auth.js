@@ -85,7 +85,7 @@ function validResetPassword(req, res, next) {
         return res.status(400).json({ error: 'Token is verplicht' });
     }
 
-    auth_controller.findUser(req.body.resetToken).then(
+    auth_controller.getUserOfToken(req.body.resetToken).then(
         (result) => {
             if (result.length < 1) {
                 return res.status(404).json({ message: "Token is niet geldig" });
@@ -101,7 +101,7 @@ function newPassword(req, res, next) {
         return res.status(400).json({ error: 'Token is verplicht' });
     }
 
-    auth_controller.findUser(req.body.resetToken).then(
+    auth_controller.getUserOfToken(req.body.resetToken).then(
         (result) => {
             if (result.length < 1) {
                 return res.status(404).json({ message: "Token is niet geldig" });

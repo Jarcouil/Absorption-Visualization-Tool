@@ -115,7 +115,7 @@ function getAllTimestampsOfWavelength(req, res, next) {
 
 function getAllWavelengthsOfTimestamp(req, res, next) {
     const measurement = res.measurements[0]
-    measurement_controller.get_all_wavelengths_of_id(getMeasurmentName(measurement.id, measurement.name), req.params.timestamp).then(
+    measurement_controller.get_all_wavelengths_of_timestamp(getMeasurmentName(measurement.id, measurement.name), req.params.timestamp).then(
         (result) => {
             return res.status(200).json(removeIdFromAllWavelengths(normalizeResultsSingle(result)));
         },
@@ -125,7 +125,7 @@ function getAllWavelengthsOfTimestamp(req, res, next) {
 
 function getAllWavelengths(req, res, next) {
     const measurement = res.measurements[0]         
-    measurement_controller.get_all_columns_of_measurement(getMeasurmentName(measurement.id, measurement.name)).then(
+    measurement_controller.get_all_wavelengths_of_measurement(getMeasurmentName(measurement.id, measurement.name)).then(
         (result) => {
             return res.status(200).json(removeIdFromWavelengths(normalizeResultsArray(result)['columns']));
         },
@@ -135,7 +135,7 @@ function getAllWavelengths(req, res, next) {
 
 function getAllIds(req, res, next) {
     const measurement = res.measurements[0]
-    measurement_controller.get_all_ids_of_measurement(getMeasurmentName(measurement.id, measurement.name)).then(
+    measurement_controller.get_all_timestamps_of_measurement(getMeasurmentName(measurement.id, measurement.name)).then(
         (result) => {
             return res.status(200).json((normalizeResultsArray(result)['id']));
         },
