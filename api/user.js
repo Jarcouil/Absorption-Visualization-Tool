@@ -27,7 +27,7 @@ router.delete(
 );
 
 function get_users(req, res, next) {
-    user_controller.get_users().then(
+    user_controller.get_users(req.query.sort, req.query.order).then(
         (result) => {
             return res.status(200).json(result);
         },

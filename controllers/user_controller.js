@@ -10,9 +10,10 @@ module.exports = {
   get_user_by_username
 }
 
-function get_users() {
+function get_users(sort, order) {
   return knex.from('users')
     .select('id', 'username', 'email', 'is_admin as isAdmin', 'created_at as createdAt')
+    .orderBy(sort, order)
 }
 
 function get_user(id) {
