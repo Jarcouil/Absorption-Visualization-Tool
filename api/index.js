@@ -12,6 +12,13 @@ router.use('/measurement', [authJwt.verifyToken], measurement)
 router.use('/auth', auth)
 router.use('/users', [authJwt.verifyToken], user)
 
+/**
+ * No content
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @returns 
+ */
 function noContent(req, res, next) {
     return res.send('No content for /');
 }

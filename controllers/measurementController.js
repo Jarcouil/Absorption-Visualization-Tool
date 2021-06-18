@@ -3,11 +3,11 @@ const knex = require('../knexfile');
 module.exports = {
     deleteMeasurementDataTable,
     deleteMeasurementFromMeasurements,
-    getAllWavelengthsOfMeasurement,
-    getAllTimestampsOfWavelength,
+    getWavelengthsOfMeasurement,
+    getTimestampsOfWavelength,
     getAllTimestampsOfMeasurement,
     getMeasurements,
-    getAllWavelengthsOfTimestamp,
+    getWavelengthsOfTimestamp,
     getMeasurement,
     getMeasurementData,
     getMeasurementsOfUser,
@@ -80,6 +80,7 @@ function getMeasurement(id) {
     return knex.from('measurements')
         .select('*')
         .where('id', id)
+        .first()
 }
 
 /**
@@ -88,7 +89,7 @@ function getMeasurement(id) {
  * @param {number} columns 
  * @returns array with timestamps of wavelength
  */
-function getAllTimestampsOfWavelength(tableName, wavelength) {
+function getTimestampsOfWavelength(tableName, wavelength) {
     return knex.from(tableName)
         .select('id', `${wavelength} as wavelength`)
 }
@@ -99,7 +100,7 @@ function getAllTimestampsOfWavelength(tableName, wavelength) {
  * @param {number} timestamp 
  * @returns array with wavelengths of timestamp
  */
-function getAllWavelengthsOfTimestamp(tableName, timestamp) {
+function getWavelengthsOfTimestamp(tableName, timestamp) {
     return knex.from(tableName)
         .select('*')
         .where('id', timestamp)
@@ -110,7 +111,7 @@ function getAllWavelengthsOfTimestamp(tableName, timestamp) {
  * @param {string} tableName 
  * @returns array with all wavelengths of measurement
  */
-function getAllWavelengthsOfMeasurement(tableName) {
+function getWavelengthsOfMeasurement(tableName) {
     return knex.from('information_schema.columns')
         .select('COLUMN_NAME AS columns')
         .where('table_name', tableName)

@@ -1,73 +1,106 @@
 const { spawn } = require('child_process');
 const _ = require('lodash');
-const router = require('express').Router({ mergeParams: true });
-const fileController = require('./../controllers/fileController');
-const measurementController = require("../controllers/measurementController");
 const fs = require('fs');
 const path = require('path');
 const Json2csvParser = require("json2csv").Parser;
+
+const router = require('express').Router({ mergeParams: true });
+const fileController = require('./../controllers/fileController');
+const measurementController = require("../controllers/measurementController");
+
 const { verifyFile } = require("../middleware")
+const { verifyMeasurement } = require("../middleware");
 
 router.post(
     '/upload-file', 
     [verifyFile.checkParameters],
     postNewFile
 );
-router.get('/download-file/:id', downloadDadFile);
-router.get('/file-name/:id', getFileName);
-router.get('/csv/:id', getCSV);
+router.get(
+    '/download-file/:id',
+    [verifyMeasurement.ifMeasurement, verifyMeasurement.isAllowed],
+    downloadDadFile
+);
+router.get(
+    '/file-name/:id',
+    [verifyMeasurement.ifMeasurement, verifyMeasurement.isAllowed],
+    getFileName
+);
+router.get(
+    '/csv/:id',
+    [verifyMeasurement.ifMeasurement, verifyMeasurement.isAllowed],
+    getCSV
+);
 
+/**
+ * Get the name of the uploaded .dad file of the given measurement.
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @param {*} req.params.id measurement id 
+ */
 function getFileName(req, res, next) {
-    measurementController.getMeasurement(req.params.id).then(
-        (measurements) => {
-            if (measurements.length < 1) {
-                return res.status(404).json({ message: "Meting niet gevonden" });
-            }
-            const file_location = './uploads/' + getMeasurmentName(req.params.id, measurements[0].name);
-            const file = getFile(file_location);
-            if (file == null) {
-                return res.status(404).json({ message: 'Kon het bestand niet vinden' });
-            }
-            return res.status(200).json({ fileName: file });
-        },
-        (error) => { return res.status(500).send(error) }
-    )
+    const measurement = res.measurement
+    const file_location = './uploads/' + getMeasurementName(req.params.id, measurement.name);
+    const file = getFile(file_location);
+    if (file == null) {
+        return res.status(404).json({ message: 'Kon het bestand niet vinden' });
+    }
+    return res.status(200).json({ fileName: file });
+
+    
 }
 
+/**
+ * Get a .CSV file of the requested data of given measurement
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @param {*} req.params.id measurement id
+ * @param {*} req.query.minWavelength minWavelength
+ * @param {*} req.query.maxWavelength maxWavelength
+ * @param {*} req.query.minTimestamp minTimestamp
+ * @param {*} req.query.maxTimestamp maxTimestamp
+ */
 function getCSV(req, res, next) {
-    measurementController.getMeasurement(req.params.id).then(
-        (measurements) => {
-            if (measurements.length < 1) {
-                return res.status(404).json({ message: "Meting niet gevonden" });
-            }
-            const table_name = getMeasurmentName(req.params.id, measurements[0].name);
-            fileController.getCustomData(table_name, req.query.minWavelength, req.query.maxWavelength, req.query.minTimestamp, req.query.maxTimestamp).then(
-                (data) => {
-                    const jsonData = JSON.parse(JSON.stringify(data));
-                    const json2csvParser = new Json2csvParser({ header: true });
-                    const csv = json2csvParser.parse(jsonData);
-                    return res.send(csv)
-                },
-                (error) => { return res.status(500).json({ message: error }); }
-            )
+    const measurement = res.measurement
+    const table_name = getMeasurementName(req.params.id, measurement.name);
+    fileController.getCustomData(table_name, req.query.minWavelength, req.query.maxWavelength, req.query.minTimestamp, req.query.maxTimestamp).then(
+        (data) => {
+            const jsonData = JSON.parse(JSON.stringify(data));
+            const json2csvParser = new Json2csvParser({ header: true });
+            const csv = json2csvParser.parse(jsonData);
+            return res.send(csv)
         },
-        (error) => { return res.status(500).send(error) }
+        (error) => { return res.status(500).json({ message: error }); }
     )
+
 }
 
+/**
+ * Download .dad file of the given measurement
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @param {*} req.params.id measurement id
+ */
 function downloadDadFile(req, res, next) {
-    measurementController.getMeasurement(req.params.id).then(
-        (measurements) => {
-            if (measurements.length < 1) {
-                return res.status(404).json({ message: "Meting niet gevonden" });
-            }
-            const file_location = './uploads/' + getMeasurmentName(req.params.id, result[0].name);
-            return res.download(file_location + '/' + getFile(file_location));
-        },
-        (error) => { return res.status(500).send(error) }
-    )
+    const measurement = res.measurement;
+    const file_location = './uploads/' + getMeasurementName(req.params.id, measurement.name);
+    return res.download(file_location + '/' + getFile(file_location));
 }
 
+/**
+ * Post and process a new file
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @param {*} req.files.file file
+ * @param {*} req.body.name name
+ * @param {*} req.body.minWaveLength minWaveLength
+ * @param {*} req.body.maxWaveLength maxWaveLength
+ * @param {*} req.body.description description
+ */
 function postNewFile(req, res, next) {
     const file = req.files.file;
 
@@ -75,7 +108,7 @@ function postNewFile(req, res, next) {
         (result) => {
             fileController.addToMeasurements(req.body.name, req.body.description, req.userId).then(
                 (insertId) => {
-                    const new_table_name = getMeasurmentName(insertId[0], req.body.name);
+                    const new_table_name = getMeasurementName(insertId[0], req.body.name);
                     const file_location = './uploads/' + new_table_name
                     makeDirectory(file_location);
                     file.mv(file_location + '/' + file.name);
@@ -95,12 +128,21 @@ function postNewFile(req, res, next) {
     )
 }
 
+/**
+ * Create a new directory to store the uploaded file
+ * @param {string} directoryPath 
+ */
 function makeDirectory(directoryPath) {
     fs.mkdir(path.join(directoryPath), (err) => {
         if (err) { return console.error(err); }
     });
 }
 
+/**
+ * Get the file of given directory path
+ * @param {*} directoryPath 
+ * @returns File
+ */
 function getFile(directoryPath) {
     try {
         const files = fs.readdirSync(directoryPath)
@@ -115,10 +157,25 @@ function getFile(directoryPath) {
     }
 }
 
-function getMeasurmentName(id, name) {
+/**
+ * Get the name of a measurement
+ * @param {id} id 
+ * @param {name} name 
+ * @returns {string} measurement name
+ */
+function getMeasurementName(id, name) {
     return id.toString() + '_' + name
 }
 
+/**
+ * Run python script which extracts the data of the .dad file
+ * @param {string} sourceFile 
+ * @param {*} res 
+ * @param {*} file 
+ * @param {string} tablename 
+ * @param {number} wavelengths 
+ * @param {number} insertId 
+ */
 function runPythonScript(sourceFile, res, file, tablename, wavelengths, insertId) {
     const python = spawn('python', ['filereader.py', sourceFile, tablename, wavelengths]);
 

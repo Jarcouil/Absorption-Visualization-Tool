@@ -226,7 +226,7 @@ describe('Reset password Auth API', () => {
                 .post("/v1/auth/reset")
                 .end((err, res) => {
                     res.should.have.status(400);
-                    res.body.message.should.be.equal("Email is verplicht!");
+                    res.body.message.should.be.equal("Emailadres is verplicht!");
                     done();
                 });
         });

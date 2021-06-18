@@ -13,7 +13,11 @@ router.post(
     verifyLogin.checkParameters,
     login
 );
-router.post('/reset', requestResetPassword)
+router.post(
+    '/reset',
+    verifySignUp.checkValidEmail,
+    requestResetPassword
+)
 router.post('/new-password', newPassword)
 router.post('/reset-valid', validResetPassword)
 router.post(
@@ -28,6 +32,14 @@ router.post(
     ],
     register);
 
+/**
+ * Validate login credentials and respond accordingly
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @param {*} req.body.username username 
+ * @param {*} req.body.password password 
+ */
 function login(req, res, next) {
     const username = req.body.username
     authController.login(username).then(
@@ -68,10 +80,16 @@ function login(req, res, next) {
     )
 }
 
+/**
+ * Register new user
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @param {*} req.body.username username
+ * @param {*} req.body.email    email
+ * @param {*} req.body.password password
+ */
 function register(req, res, next) {
-    if (!req.body.username){
-        return res.status(400).json({ message: "Gebruikersnaam is verplicht!" });
-    }
     authController.register(req.body.username, req.body.email, req.body.password).then(
         (result) => {
             return res.send({ message: "Account is succesvol geregistreerd!" });
@@ -80,14 +98,21 @@ function register(req, res, next) {
     )
 }
 
+/**
+ * Validate given token to reset the password
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @param {*} req.body.resetToken resetToken 
+ */
 function validResetPassword(req, res, next) {
     if (!req.body.resetToken) {
         return res.status(400).json({ error: 'Token is verplicht' });
     }
 
     authController.getUserOfToken(req.body.resetToken).then(
-        (users) => {
-            if (users.length < 1) {
+        (tokens) => {
+            if (tokens.length < 1) {
                 return res.status(404).json({ message: "Token is niet geldig" });
             }
             return res.status(200).json({ message: "Token is geldig." })
@@ -96,6 +121,14 @@ function validResetPassword(req, res, next) {
     )
 }
 
+/**
+ * Set new password if token is valid
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @param {*} req.body.resetToken resetToken 
+ * @param {*} req.body.password password
+ */
 function newPassword(req, res, next) {
     if (!req.body.resetToken) {
         return res.status(400).json({ error: 'Token is verplicht' });
@@ -123,11 +156,14 @@ function newPassword(req, res, next) {
     )
 }
 
+/**
+ * Request an email to reset the password of account
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @param {*} req.body.email email
+ */
 async function requestResetPassword(req, res, next) {
-    if (!req.body.email) {
-        return res.status(400).json({ message: 'Email is verplicht!' });
-    }
-
     userController.getUserByEmail(req.body.email).then(
         (users) => {
             if (users.length < 1) {

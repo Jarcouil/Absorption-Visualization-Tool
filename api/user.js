@@ -26,6 +26,13 @@ router.delete(
     deleteUser
 );
 
+/**
+ * Get all users
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next
+ * @returns users
+ */
 function getUsers(req, res, next) {
     userController.getUsers(req.query?.sort, req.query?.order).then(
         (users) => {
@@ -38,6 +45,13 @@ function getUsers(req, res, next) {
     )
 }
 
+/**
+ * Delete user with given id
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @param {*} req.params.id id
+ */
 function deleteUser(req, res, next) {
     userController.getUser(req.params.id).then(
         (users) => {
@@ -55,6 +69,14 @@ function deleteUser(req, res, next) {
     )
 }
 
+/**
+ * Get user with given id
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @param {*} req.params.id id
+ * @return user
+ */
 function getUser(req, res, next) {
     userController.getUser(req.params.id).then(
         (users) => {
@@ -67,6 +89,13 @@ function getUser(req, res, next) {
     )
 }
 
+/**
+ * Toggle admin rights for user with given id
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @param {*} req.params.id id
+ */
 function toggleAdmin(req, res, next) {
     userController.getUser(req.params.id).then(
         (users) => {
@@ -75,14 +104,14 @@ function toggleAdmin(req, res, next) {
             }
             userController.toggleAdmin(req.params.id).then(
                 (result) => {
-                    
+
                     return res.status(200).json({ message: `Gebruiker ${users[0].username} zijn admin rechten zijn succesvol gewijzigd.` });
                 },
                 (error) => { return res.status(500).send(error) }
             )
         },
         (error) => { return res.status(500).send(error) }
-        )
+    )
 }
 
 module.exports = router;
