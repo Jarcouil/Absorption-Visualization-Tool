@@ -1,6 +1,6 @@
 const mail_config = require("../config/mail.config");
 const nodemailer = require("nodemailer");
-const knex = require('../knex');
+const knex = require('../knexfile');
 var bcrypt = require("bcryptjs");
 
 module.exports = {

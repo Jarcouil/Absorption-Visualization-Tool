@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "SET NODE_ENV=dev&& node index.js",
-    "knex": "SET NODE_ENV=dev2&& node knex.js",
+    "knex": "SET NODE_ENV=dev&& node knex.js",
+    "create-table": "SET NODE_ENV=dev&& node migrations/create_table.js",
     "test": "mocha --timeout 10000"
   },
   "author": "",
