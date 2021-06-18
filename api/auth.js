@@ -1,8 +1,8 @@
 const router = require('express').Router({ mergeParams: true });
-const auth_controller = require("../controllers/auth_controller");
+const authController = require("../controllers/authController");
 const { verifySignUp } = require("../middleware");
 const { verifyLogin } = require("../middleware")
-const user_controller = require("../controllers/user_controller");
+const userController = require("../controllers/userController");
 const crypto = require('crypto');
 const config = require("../config/auth.config");
 var jwt = require("jsonwebtoken");
@@ -30,7 +30,7 @@ router.post(
 
 function login(req, res, next) {
     const username = req.body.username
-    auth_controller.login(username).then(
+    authController.login(username).then(
         (result) => {
             if (result.length < 1) {
                 return res.status(401).send({ message: "De combinatie van gebruikersnaam en wachtwoord is niet correct!" });
@@ -72,7 +72,7 @@ function register(req, res, next) {
     if (!req.body.username){
         return res.status(400).json({ message: "Gebruikersnaam is verplicht!" });
     }
-    auth_controller.register(req.body.username, req.body.email, req.body.password).then(
+    authController.register(req.body.username, req.body.email, req.body.password).then(
         (result) => {
             return res.send({ message: "Account is succesvol geregistreerd!" });
         },
@@ -85,7 +85,7 @@ function validResetPassword(req, res, next) {
         return res.status(400).json({ error: 'Token is verplicht' });
     }
 
-    auth_controller.getUserOfToken(req.body.resetToken).then(
+    authController.getUserOfToken(req.body.resetToken).then(
         (result) => {
             if (result.length < 1) {
                 return res.status(404).json({ message: "Token is niet geldig" });
@@ -101,15 +101,15 @@ function newPassword(req, res, next) {
         return res.status(400).json({ error: 'Token is verplicht' });
     }
 
-    auth_controller.getUserOfToken(req.body.resetToken).then(
+    authController.getUserOfToken(req.body.resetToken).then(
         (result) => {
             if (result.length < 1) {
                 return res.status(404).json({ message: "Token is niet geldig" });
             }
             const user = result[0];
-            auth_controller.updatePassword(user.id, req.body.password).then(
+            authController.updatePassword(user.id, req.body.password).then(
                 (result) => {
-                    auth_controller.deleteResetToken(req.body.resetToken).then(
+                    authController.deleteResetToken(req.body.resetToken).then(
                         (result) => {
                             return res.status(200).json({ message: "Wachtwoord succesvol gewijzigd" })
                         },
@@ -128,7 +128,7 @@ async function requestResetPassword(req, res, next) {
         return res.status(400).json({ message: 'Email is verplicht!' });
     }
 
-    user_controller.get_user_by_email(req.body.email).then(
+    userController.getUserByEmail(req.body.email).then(
         (result) => {
             if (result.length < 1) {
                 return res.status(404).json({ message: "Email niet gevonden!" });
@@ -136,10 +136,9 @@ async function requestResetPassword(req, res, next) {
             const user = result[0];
             const resetToken = crypto.randomBytes(16).toString('hex');
 
-            auth_controller.addResetToken(user
-                .id, resetToken).then(
+            authController.addResetToken(user.id, resetToken).then(
                     (result) => {
-                        auth_controller.requestResetPassword(user.username, user.email, resetToken).then(
+                        authController.requestResetPassword(user.username, user.email, resetToken).then(
                             (result) => {
                                 return res.status(200).json({ message: "Mail is succesvol verzonden." })
                             },

@@ -1,13 +1,13 @@
 const knex = require('../knex');
 
 module.exports = {
-  delete_all_users,
-  delete_user,
-  get_user_by_email,
-  get_user_by_username,
-  get_user,
-  get_users,
-  toggle_admin
+  deleteAllUsers,
+  deleteUser,
+  getUserByEmail,
+  getUserByUsername,
+  getUser,
+  getUsers,
+  toggleAdmin
 }
 
 /**
@@ -16,7 +16,7 @@ module.exports = {
  * @param {string} order 
  * @returns array of users
  */
-function get_users(sort, order) {
+function getUsers(sort = 'id', order = 'asc') {
   return knex.from('users')
     .select('id', 'username', 'email', 'is_admin as isAdmin', 'created_at as createdAt')
     .orderBy(sort, order)
@@ -27,7 +27,7 @@ function get_users(sort, order) {
  * @param {number} id 
  * @returns array with user
  */
-function get_user(id) {
+function getUser(id) {
   return knex.from('users')
     .select('id', 'username', 'email', 'is_admin as isAdmin', 'created_at as createdAt')
     .where('id', id)
@@ -38,7 +38,7 @@ function get_user(id) {
  * @param {number} id 
  * @returns result
  */
-function delete_user(id) {
+function deleteUser(id) {
   return knex.from('users')
     .where('id', id)
     .del()
@@ -49,7 +49,7 @@ function delete_user(id) {
  * @param {number} id 
  * @returns result
  */
-function toggle_admin(id) {
+function toggleAdmin(id) {
   return knex.from('users')
     .update({ is_admin: knex.raw('!??', ['is_admin']) })
     .where('id', id)
@@ -60,7 +60,7 @@ function toggle_admin(id) {
  * @param {string} email 
  * @returns array with user
  */
-function get_user_by_email(email) {
+function getUserByEmail(email) {
   return knex.from('users')
     .select('id', 'username', 'email', 'is_admin as isAdmin', 'created_at as createdAt')
     .where('email', email)
@@ -71,7 +71,7 @@ function get_user_by_email(email) {
  * @param {string} username 
  * @returns array with user
  */
-function get_user_by_username(username) {
+function getUserByUsername(username) {
   return knex.from('users')
     .select('id', 'username', 'email', 'is_admin as isAdmin', 'created_at as createdAt')
     .where('username', username)
@@ -81,7 +81,7 @@ function get_user_by_username(username) {
  * Delete all users from the database (only used for testing purposes)
  * @returns result
  */
-function delete_all_users() {
+function deleteAllUsers() {
   return knex.from('users')
     .del()
 }

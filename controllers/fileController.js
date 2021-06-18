@@ -1,10 +1,10 @@
 const knex = require('../knex');
 
 module.exports = {
-    add_to_measurements,
-    create_new_table,
-    rename_measurement_table,
-    get_custom_data,
+    addToMeasurements,
+    createNewTable,
+    renameMeasurementTable,
+    getCustomData,
 }
 
 /**
@@ -14,7 +14,7 @@ module.exports = {
  * @param {number} maxWaveLength 
  * @returns result
  */
-function create_new_table(tableName, minWaveLength, maxWaveLength) {
+function createNewTable(tableName, minWaveLength, maxWaveLength) {
     return knex.schema
         .dropTableIfExists(tableName)
         .createTable(tableName, (table) => {
@@ -33,7 +33,7 @@ function create_new_table(tableName, minWaveLength, maxWaveLength) {
  * @param number createdBy 
  * @returns result
  */
-function add_to_measurements(name, description, createdBy) {
+function addToMeasurements(name, description, createdBy) {
     return knex('measurements')
         .insert({ name: name, description: description, created_by: createdBy })
 }
@@ -44,7 +44,7 @@ function add_to_measurements(name, description, createdBy) {
  * @param {string} newTableName 
  * @returns result
  */
-function rename_measurement_table(tableName, newTableName) {
+function renameMeasurementTable(tableName, newTableName) {
     return knex.schema.renameTable(tableName, newTableName)
 }
 
@@ -57,7 +57,7 @@ function rename_measurement_table(tableName, newTableName) {
  * @param {number} maxTimestamp 
  * @returns array results
  */
-function get_custom_data(tableName, minWavelength, maxWavelength, minTimestamp, maxTimestamp) {
+function getCustomData(tableName, minWavelength, maxWavelength, minTimestamp, maxTimestamp) {
     var columns = ['id']
     var rows = []
     for (var i = minWavelength; i <= maxWavelength; i++) columns.push(i.toString())

@@ -1,9 +1,9 @@
-const measurement_controller = require("../controllers/measurement_controller");
-const user_controller = require("../controllers/user_controller");
+const measurementController = require("../controllers/measurementController");
+const userController = require("../controllers/userController");
 const roleEnum = require('./roleEnum')
 
 const ifMeasurements = (req, res, next) => {
-    measurement_controller.get_measurement(req.params.id).then(
+    measurementController.getMeasurement(req.params.id).then(
         (measurements) => {
             if (measurements.length < 1) {
                 return res.status(404).json({ message: 'Kon de meting niet vinden!' });
@@ -15,7 +15,7 @@ const ifMeasurements = (req, res, next) => {
 }
 
 const isAllowed = (req, res, next) => {
-    user_controller.get_user(req.userId).then(
+    userController.getUser(req.userId).then(
         (users) => {
             const user = users[0];
             if (user.id !== res.measurements[0].createdBy && user.isAdmin !== roleEnum.admin) {

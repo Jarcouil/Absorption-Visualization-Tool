@@ -3,7 +3,7 @@ var faker = require('faker');
 let server = require("../index");
 let chai = require("chai");
 let chaiHttp = require("chai-http");
-const user_controller = require("../controllers/user_controller");
+const userController = require("../controllers/userController");
 
 // Assertion 
 chai.should();
@@ -39,10 +39,10 @@ function login(username, password) {
 
 describe('User API', () => {
     before(function (done) {
-        user_controller.delete_all_users().then(done())
+        userController.deleteAllUsers().then(done())
     })
     after(function (done) {
-        user_controller.delete_all_users().then(done())
+        userController.deleteAllUsers().then(done())
     });
 
     describe("It should GET users without a token", () => {
@@ -90,7 +90,7 @@ describe('User API', () => {
 
     describe("It should GET users with a valid token with admin rights", () => {
         it("It give an array of users", (done) => {
-            user_controller.toggle_admin(user.id).then(result => {
+            userController.toggleAdmin(user.id).then(result => {
                 chai.request(server)
                     .get("/v1/users")
                     .set("x-access-token", user.accessToken)
@@ -193,7 +193,7 @@ describe('User API', () => {
             registerUser(user3).then(res => login(user3.username, user3.password)
                 .then(userResult => {
                     user3 = userResult
-                    user_controller.toggle_admin(user3.id).then(result => {
+                    userController.toggleAdmin(user3.id).then(result => {
                         chai.request(server)
                             .delete(`/v1/users/${user.id}`)
                             .set("x-access-token", user3.accessToken)

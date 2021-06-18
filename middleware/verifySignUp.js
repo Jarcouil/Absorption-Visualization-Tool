@@ -1,5 +1,5 @@
 const roleEnum = require('./roleEnum')
-const user_controller = require("../controllers/user_controller");
+const userController = require("../controllers/userController");
 
 const checkParameters = (req, res, next) => {
   if (!req.body.username) {
@@ -15,7 +15,7 @@ const checkParameters = (req, res, next) => {
 }
 
 const checkDuplicateUsername = (req, res, next) => {
-  user_controller.get_user_by_username(req.body.username).then(users => {
+  userController.getUserByUsername(req.body.username).then(users => {
     if (users.length > 0) {
       res.status(400).send({
         message: "Helaas! Deze gebruikersnaam is helaas al in gebruik!"
@@ -27,7 +27,7 @@ const checkDuplicateUsername = (req, res, next) => {
 }
 
 const checkDuplicateEmail = (req, res, next) => {
-    user_controller.get_user_by_email(req.body.email).then(users => {
+    userController.getUserByEmail(req.body.email).then(users => {
       if (users.length > 0) {
         res.status(400).send({
           message: "Helaas! Dit emailadres is helaas al in gebruik!"

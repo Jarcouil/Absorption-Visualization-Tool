@@ -1,5 +1,5 @@
 const router = require('express').Router({ mergeParams: true });
-const user_controller = require("../controllers/user_controller");
+const userController = require("../controllers/userController");
 const { authJwt } = require("../middleware");
 
 router.post(
@@ -11,23 +11,23 @@ router.post(
 router.get(
     "/",
     [authJwt.isAdmin],
-    get_users
+    getUsers
 );
 
 router.get(
     "/:id",
     [authJwt.isAdmin],
-    get_user
+    getUser
 );
 
 router.delete(
     "/:id",
     [authJwt.isAdmin],
-    delete_user
+    deleteUser
 );
 
-function get_users(req, res, next) {
-    user_controller.get_users(req.query.sort, req.query.order).then(
+function getUsers(req, res, next) {
+    userController.getUsers(req.query?.sort, req.query?.order).then(
         (result) => {
             return res.status(200).json(result);
         },
@@ -35,13 +35,13 @@ function get_users(req, res, next) {
     )
 }
 
-function delete_user(req, res, next) {
-    user_controller.get_user(req.params.id).then(
+function deleteUser(req, res, next) {
+    userController.getUser(req.params.id).then(
         (result) => {
             if (result.length < 1) {
                 return res.status(404).json({ message: "Gebruiker is niet gevonden" });
             }
-            user_controller.delete_user(req.params.id).then(
+            userController.deleteUser(req.params.id).then(
                 (_) => {
                     return res.status(200).send({ message: `Gebruiker ${result[0].username} is succesvol verwijderd` });
                 },
@@ -52,8 +52,8 @@ function delete_user(req, res, next) {
     )
 }
 
-function get_user(req, res, next) {
-    user_controller.get_user(req.params.id).then(
+function getUser(req, res, next) {
+    userController.getUser(req.params.id).then(
         (result) => {
             if (result.length < 1) {
                 return res.status(404).json({ message: "Gebruiker is niet gevonden" });
@@ -65,7 +65,7 @@ function get_user(req, res, next) {
 }
 
 function toggleAdmin(req, res, next) {
-    user_controller.toggle_admin(req.params.id).then(
+    userController.toggleAdmin(req.params.id).then(
         (result) => {
             return res.status(200).json(result[0]);
         },

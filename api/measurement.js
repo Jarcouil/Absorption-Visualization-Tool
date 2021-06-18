@@ -1,5 +1,5 @@
 const router = require('express').Router({ mergeParams: true });
-const measurement_controller = require("../controllers/measurement_controller");
+const measurementController = require("../controllers/measurementController");
 const { authJwt } = require("../middleware");
 const { verifyMeasurement } = require("../middleware");
 const fs = require('fs');
@@ -52,9 +52,9 @@ router.get(
 function deleteMeasurement(req, res, next) {
     const measurement = res.measurements[0]
     delete_file('./uploads/' + req.params.id.toString() + '_' + measurement.name);
-    measurement_controller.delete_measurement_data_table(getMeasurmentName(req.params.id, measurement.name)).then(
+    measurementController.deleteMeasurementDataTable(getMeasurmentName(req.params.id, measurement.name)).then(
         (result) => {
-            measurement_controller.delete_measurement_from_measurements(req.params.id).then(
+            measurementController.deleteMeasurementFromMeasurements(req.params.id).then(
                 (result) => {
                     return res.status(200).json({ message: `Meting ${measurement.name} is succesvol verwijderd` });
                 },
@@ -66,7 +66,7 @@ function deleteMeasurement(req, res, next) {
 }
 
 function getAllMeasurementsOfUser(req, res, next) {
-    measurement_controller.get_all_measurements_of_user(req.userId, req.query.sort, req.query.order).then(
+    measurementController.getAllMeasurementsOfUser(req.userId, req.query?.sort, req.query?.order).then(
         (result) => {
             if (result.length < 1) {
                 return res.status(404).json({ message: "Er zijn geen metingen gevonden" });
@@ -78,7 +78,7 @@ function getAllMeasurementsOfUser(req, res, next) {
 }
 
 function getAllMeasurements(req, res, next) {
-    measurement_controller.get_all_measurements(req.query.sort, req.query.order).then(
+    measurementController.getAllMeasurements(req.query?.sort, req.query?.order).then(
         (result) => {
             if (result.length < 1) {
                 return res.status(404).json({ message: "Er zijn geen metingen gevonden" });
@@ -95,7 +95,7 @@ function getMeasurement(req, res, next) {
 
 function getMeasurementData(req, res, next) {
     const measurement = res.measurements[0]
-    measurement_controller.get_measurement_data(getMeasurmentName(measurement.id, measurement.name)).then(
+    measurementController.getMeasurementData(getMeasurmentName(measurement.id, measurement.name)).then(
         (data) => {
             return res.status(200).json(removeIdFromAllData(data));
         },
@@ -105,7 +105,7 @@ function getMeasurementData(req, res, next) {
 
 function getAllTimestampsOfWavelength(req, res, next) {
     const measurement = res.measurements[0]
-    measurement_controller.get_all_timestamps_of_wavelength(getMeasurmentName(measurement.id, measurement.name), req.query.c).then(
+    measurementController.getAllTimestampsOfWavelength(getMeasurmentName(measurement.id, measurement.name), req.query.c).then(
         (result) => {
             return res.status(200).json((result));
         },
@@ -115,7 +115,7 @@ function getAllTimestampsOfWavelength(req, res, next) {
 
 function getAllWavelengthsOfTimestamp(req, res, next) {
     const measurement = res.measurements[0]
-    measurement_controller.get_all_wavelengths_of_timestamp(getMeasurmentName(measurement.id, measurement.name), req.params.timestamp).then(
+    measurementController.getAllWavelengthsOfTimestamp(getMeasurmentName(measurement.id, measurement.name), req.params.timestamp).then(
         (result) => {
             return res.status(200).json(removeIdFromAllWavelengths(normalizeResultsSingle(result)));
         },
@@ -125,7 +125,7 @@ function getAllWavelengthsOfTimestamp(req, res, next) {
 
 function getAllWavelengths(req, res, next) {
     const measurement = res.measurements[0]         
-    measurement_controller.get_all_wavelengths_of_measurement(getMeasurmentName(measurement.id, measurement.name)).then(
+    measurementController.getAllWavelengthsOfMeasurement(getMeasurmentName(measurement.id, measurement.name)).then(
         (result) => {
             return res.status(200).json(removeIdFromWavelengths(normalizeResultsArray(result)['columns']));
         },
@@ -135,7 +135,7 @@ function getAllWavelengths(req, res, next) {
 
 function getAllIds(req, res, next) {
     const measurement = res.measurements[0]
-    measurement_controller.get_all_timestamps_of_measurement(getMeasurmentName(measurement.id, measurement.name)).then(
+    measurementController.getAllTimestampsOfMeasurement(getMeasurmentName(measurement.id, measurement.name)).then(
         (result) => {
             return res.status(200).json((normalizeResultsArray(result)['id']));
         },

@@ -1,8 +1,8 @@
 const { spawn } = require('child_process');
 const _ = require('lodash');
 const router = require('express').Router({ mergeParams: true });
-const file_controller = require('./../controllers/file_controller');
-const measurement_controller = require("../controllers/measurement_controller");
+const fileController = require('./../controllers/fileController');
+const measurementController = require("../controllers/measurementController");
 const fs = require('fs');
 const path = require('path');
 const Json2csvParser = require("json2csv").Parser;
@@ -18,7 +18,7 @@ router.get('/file-name/:id', getFileName);
 router.get('/csv/:id', getCSV);
 
 function getFileName(req, res, next) {
-    measurement_controller.get_name_of_measurement_id(req.params.id).then(
+    measurementController.getNameOfMeasurement_id(req.params.id).then(
         (result) => {
             if (result.length < 1) {
                 return res.status(404).json({ message: "Meting niet gevonden" });
@@ -36,13 +36,13 @@ function getFileName(req, res, next) {
 }
 
 function getCSV(req, res, next) {
-    measurement_controller.get_name_of_measurement_id(req.params.id).then(
+    measurementController.getNameOfMeasurement_id(req.params.id).then(
         (result) => {
             if (result.length < 1) {
                 return res.status(404).json({ message: "Meting niet gevonden" });
             }
             const table_name = getMeasurmentName(req.params.id, result[0].name);
-            file_controller.get_custom_data(table_name, req.query.minWavelength, req.query.maxWavelength, req.query.minTimestamp, req.query.maxTimestamp).then(
+            fileController.getCustomData(table_name, req.query.minWavelength, req.query.maxWavelength, req.query.minTimestamp, req.query.maxTimestamp).then(
                 (result) => {
                     const jsonData = JSON.parse(JSON.stringify(result));
                     const json2csvParser = new Json2csvParser({ header: true });
@@ -57,7 +57,7 @@ function getCSV(req, res, next) {
 }
 
 function downloadDadFile(req, res, next) {
-    measurement_controller.get_name_of_measurement_id(req.params.id).then(
+    measurementController.getNameOfMeasurement_id(req.params.id).then(
         (result) => {
             if (result.length < 1) {
                 return res.status(404).json({ message: "Meting niet gevonden" });
@@ -72,16 +72,16 @@ function downloadDadFile(req, res, next) {
 function postNewFile(req, res, next) {
     const file = req.files.file;
 
-    file_controller.create_new_table(req.body.name, +req.body.minWaveLength, +req.body.maxWaveLength).then(
+    fileController.createNewTable(req.body.name, +req.body.minWaveLength, +req.body.maxWaveLength).then(
         (result) => {
-            file_controller.add_to_measurements(req.body.name, req.body.description, req.userId).then(
+            fileController.addToMeasurements(req.body.name, req.body.description, req.userId).then(
                 (result2) => {
                     const new_table_name = getMeasurmentName(result2[0], req.body.name);
                     const file_location = './uploads/' + new_table_name
                     makeDirectory(file_location);
                     file.mv(file_location + '/' + file.name);
 
-                    file_controller.rename_measurement_table(req.body.name, new_table_name).then(
+                    fileController.renameMeasurementTable(req.body.name, new_table_name).then(
                         (result) => {
                             const wavelengths = req.body.maxWaveLength - req.body.minWaveLength + 1
                             runPythonScript(file_location + '/' + file.name, res, file, new_table_name, wavelengths, result2[0].toString())

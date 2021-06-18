@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const config = require("../config/auth.config.js");
 const roleEnum = require('./roleEnum')
-const user_controller = require("../controllers/user_controller");
+const userController = require("../controllers/userController");
 
 const verifyToken = (req, res, next) => {
   const token = req.headers["x-access-token"];
@@ -24,7 +24,7 @@ const verifyToken = (req, res, next) => {
 };
 
 const isAdmin = (req, res, next) => {
-  user_controller.get_user(req.userId).then(users => {
+  userController.getUser(req.userId).then(users => {
     if (users.length > 0) {
       const user = users[0];
 

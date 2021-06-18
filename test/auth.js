@@ -3,8 +3,8 @@ var faker = require('faker');
 let server = require("../index");
 let chai = require("chai");
 let chaiHttp = require("chai-http");
-const user_controller = require("../controllers/user_controller");
-const auth_controller = require("../controllers/auth_controller");
+const userController = require("../controllers/userController");
+const authController = require("../controllers/authController");
 
 chai.should();
 chai.use(chaiHttp);
@@ -20,7 +20,7 @@ describe('Register Auth API', () => {
     const user = { username: faker.name.findName(), email: faker.internet.email(), password: faker.random.alphaNumeric(6) }
 
     after(function (done) {
-        user_controller.delete_all_users().then(done())
+        userController.deleteAllUsers().then(done())
     });
 
     describe("It should POST a register wihtout username", () => {
@@ -143,7 +143,7 @@ describe('Login Auth API', () => {
     });
 
     after(function (done) {
-        user_controller.delete_all_users().then(done());
+        userController.deleteAllUsers().then(done());
     });
 
     describe("it should POST a login without username", () => {
@@ -216,8 +216,8 @@ describe('Reset password Auth API', () => {
     });
 
     after(function (done) {
-        user_controller.delete_all_users().then()
-        auth_controller.deleteAllResetTokens().then(done())
+        userController.deleteAllUsers().then()
+        authController.deleteAllResetTokens().then(done())
     });
 
     describe("it should POST without an email", () => {

@@ -3,8 +3,8 @@ var faker = require('faker');
 let server = require("../index");
 let chai = require("chai");
 let chaiHttp = require("chai-http");
-const file_controller = require("../controllers/file_controller");
-const user_controller = require("../controllers/user_controller");
+const fileController = require("../controllers/fileController");
+const userController = require("../controllers/userController");
 const fileSystem = require('mock-fs');
 const path = require('path');
 
@@ -41,10 +41,10 @@ function login(username, password) {
 describe('File API', () => {
     before(function (done) {
         fileSystem.restore();
-        user_controller.delete_all_users().then(done())
+        userController.deleteAllUsers().then(done())
     })
     after(function (done) {
-        user_controller.delete_all_users().then()
+        userController.deleteAllUsers().then()
         fileSystem.restore(done());
     });
 

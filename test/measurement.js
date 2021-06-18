@@ -3,9 +3,9 @@ var faker = require('faker');
 let server = require("../index");
 let chai = require("chai");
 let chaiHttp = require("chai-http");
-const user_controller = require("../controllers/user_controller");
-const measurement_controller = require("../controllers/measurement_controller");
-const file_controller = require("../controllers/file_controller");
+const userController = require("../controllers/userController");
+const measurementController = require("../controllers/measurementController");
+const fileController = require("../controllers/fileController");
 
 // Assertion 
 chai.should();
@@ -40,16 +40,16 @@ function login(username, password) {
 }
 
 function addMeasurement(name, description) {
-    return file_controller.add_to_measurements(faker.random.word(), faker.lorem.sentence(), user.id)
+    return fileController.addToMeasurements(faker.random.word(), faker.lorem.sentence(), user.id)
 }
 
 describe('Measurements API', () => {
     before(function (done) {
-        user_controller.delete_all_users().then(done())
+        userController.deleteAllUsers().then(done())
     })
     after(function (done) {
-        user_controller.delete_all_users().then()
-        measurement_controller.delete_all_measurements().then(done())
+        userController.deleteAllUsers().then()
+        measurementController.deleteAllMeasurements().then(done())
     });
 
     describe("It should GET measurements without a token", () => {
@@ -110,7 +110,7 @@ describe('Measurements API', () => {
 
     describe("It should GET all measurements with a valid token with admin rights", () => {
         it("It should give an error", (done) => {
-            user_controller.toggle_admin(user.id).then(result => {
+            userController.toggleAdmin(user.id).then(result => {
                 chai.request(server)
                 .get("/v1/measurement/all")
                 .set("x-access-token", user.accessToken)
@@ -218,7 +218,7 @@ describe('Measurements API', () => {
 
     describe("It should GET measurement1 of user1 with with user2 with admin rights", () => {
         it("It should an error", (done) => {
-            user_controller.toggle_admin(user2.id).then(result => {
+            userController.toggleAdmin(user2.id).then(result => {
                 chai.request(server)
                 .get(`/v1/measurement/${measurement1.id}`)
                 .set("x-access-token", user2.accessToken)
