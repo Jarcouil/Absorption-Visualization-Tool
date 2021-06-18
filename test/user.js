@@ -232,4 +232,64 @@ describe('User API', () => {
                 });
         })
     })
+
+    describe("It should toggle admin rights of user without admin rights", () => {
+        it("It give an error", (done) => {
+            chai.request(server)
+                .post(`/v1/users/${faker.datatype.number(-1)}`)
+                .set("x-access-token", user2.accessToken)
+                .end((err, res) => {
+                    res.body.message.should.be.equal("Require Admin Role!");
+                    res.should.have.status(403);
+                    done();
+                });
+        })
+    })
+
+    describe("It should toggle admin rights of user with a wrong id", () => {
+        it("It give an error", (done) => {
+            chai.request(server)
+                .post(`/v1/users/${faker.datatype.number(-1)}`)
+                .set("x-access-token", user3.accessToken)
+                .end((err, res) => {
+                    res.body.message.should.be.equal('Gebruiker is niet gevonden');
+                    res.should.have.status(404);
+                    done();
+                });
+        })
+    })
+
+    describe("It should toggle admin rights of user2", () => {
+        it("It give an error", (done) => {
+            chai.request(server)
+                .get(`/v1/users/${user2.id}`)
+                .set("x-access-token", user3.accessToken)
+                .end((err, res) => {
+                    res.body.isAdmin.should.be.equal(0);
+                    res.should.have.status(200);
+                })
+
+            chai.request(server)
+                .post(`/v1/users/${user2.id}`)
+                .set("x-access-token", user3.accessToken)
+                .end((err, res) => {
+                    res.body.message.should.be.equal(`Gebruiker ${user2.username} zijn admin rechten zijn succesvol gewijzigd.`);
+                    res.should.have.status(200);
+                    done();
+                });
+        })
+    })
+
+    describe("It should toggle admin rights of user with a wrong id", () => {
+        it("It give an error", (done) => {
+            chai.request(server)
+                .get(`/v1/users/${user2.id}`)
+                .set("x-access-token", user3.accessToken)
+                .end((err, res) => {
+                    res.body.isAdmin.should.be.equal(1);
+                    res.should.have.status(200);
+                    done();
+                });
+        })
+    })
 });
