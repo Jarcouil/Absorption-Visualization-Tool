@@ -28,8 +28,11 @@ router.delete(
 
 function getUsers(req, res, next) {
     userController.getUsers(req.query?.sort, req.query?.order).then(
-        (result) => {
-            return res.status(200).json(result);
+        (users) => {
+            if (users.length < 1) {
+                return res.status(404).json({ message: "Er zijn geen gebruikers gevonden" });
+            }
+            return res.status(200).json(users);
         },
         (error) => { return res.status(500).send(error) }
     )
@@ -37,13 +40,13 @@ function getUsers(req, res, next) {
 
 function deleteUser(req, res, next) {
     userController.getUser(req.params.id).then(
-        (result) => {
-            if (result.length < 1) {
+        (users) => {
+            if (users.length < 1) {
                 return res.status(404).json({ message: "Gebruiker is niet gevonden" });
             }
             userController.deleteUser(req.params.id).then(
-                (_) => {
-                    return res.status(200).send({ message: `Gebruiker ${result[0].username} is succesvol verwijderd` });
+                (result) => {
+                    return res.status(200).send({ message: `Gebruiker ${users[0].username} is succesvol verwijderd` });
                 },
                 (error) => { return res.status(500).send(error) }
             )
@@ -54,23 +57,32 @@ function deleteUser(req, res, next) {
 
 function getUser(req, res, next) {
     userController.getUser(req.params.id).then(
-        (result) => {
-            if (result.length < 1) {
+        (users) => {
+            if (users.length < 1) {
                 return res.status(404).json({ message: "Gebruiker is niet gevonden" });
             }
-            return res.status(200).json(result[0]);
+            return res.status(200).json(users[0]);
         },
         (error) => { return res.status(500).send(error) }
     )
 }
 
 function toggleAdmin(req, res, next) {
-    userController.toggleAdmin(req.params.id).then(
-        (result) => {
-            return res.status(200).json(result[0]);
+    userController.getUser(req.params.id).then(
+        (users) => {
+            if (users.length < 1) {
+                return res.status(404).json({ message: "Gebruiker is niet gevonden" });
+            }
+            userController.toggleAdmin(req.params.id).then(
+                (result) => {
+                    
+                    return res.status(200).json({ message: `Gebruiker ${users[0].username} zijn admin rechten zijn succesvol gewijzigd.` });
+                },
+                (error) => { return res.status(500).send(error) }
+            )
         },
         (error) => { return res.status(500).send(error) }
-    )
+        )
 }
 
 module.exports = router;

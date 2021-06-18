@@ -31,14 +31,14 @@ router.post(
 function login(req, res, next) {
     const username = req.body.username
     authController.login(username).then(
-        (result) => {
-            if (result.length < 1) {
+        (users) => {
+            if (users.length < 1) {
                 return res.status(401).send({ message: "De combinatie van gebruikersnaam en wachtwoord is niet correct!" });
-            } else if (result.length > 1) {
+            } else if (users.length > 1) {
                 return res.status(500).send({ message: "Er is een probleem opgetreden." });
             }
 
-            const user = result[0]
+            const user = users[0]
             const passwordIsValid = bcrypt.compareSync(
                 req.body.password,
                 user.password
@@ -86,8 +86,8 @@ function validResetPassword(req, res, next) {
     }
 
     authController.getUserOfToken(req.body.resetToken).then(
-        (result) => {
-            if (result.length < 1) {
+        (users) => {
+            if (users.length < 1) {
                 return res.status(404).json({ message: "Token is niet geldig" });
             }
             return res.status(200).json({ message: "Token is geldig." })
@@ -102,11 +102,11 @@ function newPassword(req, res, next) {
     }
 
     authController.getUserOfToken(req.body.resetToken).then(
-        (result) => {
-            if (result.length < 1) {
+        (users) => {
+            if (users.length < 1) {
                 return res.status(404).json({ message: "Token is niet geldig" });
             }
-            const user = result[0];
+            const user = users[0];
             authController.updatePassword(user.id, req.body.password).then(
                 (result) => {
                     authController.deleteResetToken(req.body.resetToken).then(
@@ -129,11 +129,11 @@ async function requestResetPassword(req, res, next) {
     }
 
     userController.getUserByEmail(req.body.email).then(
-        (result) => {
-            if (result.length < 1) {
+        (users) => {
+            if (users.length < 1) {
                 return res.status(404).json({ message: "Email niet gevonden!" });
             }
-            const user = result[0];
+            const user = users[0];
             const resetToken = crypto.randomBytes(16).toString('hex');
 
             authController.addResetToken(user.id, resetToken).then(

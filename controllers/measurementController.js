@@ -6,12 +6,11 @@ module.exports = {
     getAllWavelengthsOfMeasurement,
     getAllTimestampsOfWavelength,
     getAllTimestampsOfMeasurement,
-    getAllMeasurements,
+    getMeasurements,
     getAllWavelengthsOfTimestamp,
     getMeasurement,
     getMeasurementData,
-    getNameOfMeasurement_id,
-    getAllMeasurementsOfUser,
+    getMeasurementsOfUser,
     deleteAllMeasurements
 }
 
@@ -21,7 +20,7 @@ module.exports = {
  * @param {string} order
  * @returns array of measurements
  */
-function getAllMeasurements(sort = 'id', order = 'asc') {
+function getMeasurements(sort = 'id', order = 'asc') {
     return knex.from('measurements')
         .innerJoin('users', 'measurements.created_by', 'users.id')
         .select('users.username', 'measurements.id', 'measurements.name', 'measurements.description', 'measurements.created_at AS createdAt', 'measurements.created_by as createdBy',)
@@ -35,23 +34,12 @@ function getAllMeasurements(sort = 'id', order = 'asc') {
  * @param {string} order 
  * @returns array of measurements
  */
-function getAllMeasurementsOfUser(userId, sort = 'id', order = 'asc') {
+function getMeasurementsOfUser(userId, sort = 'id', order = 'asc') {
     return knex.from('measurements')
         .innerJoin('users', 'measurements.created_by', 'users.id')
         .select('users.username', 'measurements.id', 'measurements.name', 'measurements.description', 'measurements.created_at AS createdAt', 'measurements.created_by as createdBy',)
         .where('users.id', userId)
         .orderBy(sort, order)
-}
-
-/**
- * Get the measurment name of the measurment with the given id 
- * @param {number} id 
- * @returns array with name of the measurment
- */
-function getNameOfMeasurement_id(id) {
-    return knex.from('measurements')
-        .select('name')
-        .where('id', id)
 }
 
 /**

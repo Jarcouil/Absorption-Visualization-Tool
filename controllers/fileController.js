@@ -31,7 +31,7 @@ function createNewTable(tableName, minWaveLength, maxWaveLength) {
  * @param {string} name 
  * @param {string} description 
  * @param number createdBy 
- * @returns result
+ * @returns insertId
  */
 function addToMeasurements(name, description, createdBy) {
     return knex('measurements')
