@@ -3,20 +3,20 @@ const userController = require("../controllers/userController");
 
 const checkParameters = (req, res, next) => {
   if (!req.body.username) {
-      return res.status(400).json({ message: "Gebruikersnaam is verplicht!" });
+    return res.status(400).json({ message: "Gebruikersnaam is verplicht!" });
   }
   if (!req.body.email) {
     return res.status(400).json({ message: "Emailadres is verplicht!" });
   }
   if (!req.body.password) {
-      return res.status(400).json({ message: "Wachtwoord is verplicht!" });
+    return res.status(400).json({ message: "Wachtwoord is verplicht!" });
   }
   next();
 }
 
 const checkDuplicateUsername = (req, res, next) => {
-  userController.getUserByUsername(req.body.username).then(users => {
-    if (users.length > 0) {
+  userController.getUserByUsername(req.body.username).then(user => {
+    if (user) {
       res.status(400).send({
         message: "Helaas! Deze gebruikersnaam is helaas al in gebruik!"
       });
@@ -27,15 +27,15 @@ const checkDuplicateUsername = (req, res, next) => {
 }
 
 const checkDuplicateEmail = (req, res, next) => {
-    userController.getUserByEmail(req.body.email).then(users => {
-      if (users.length > 0) {
-        res.status(400).send({
-          message: "Helaas! Dit emailadres is helaas al in gebruik!"
-        });
-        return;
-      }
-      next();
-    });
+  userController.getUserByEmail(req.body.email).then(user => {
+    if (user) {
+      res.status(400).send({
+        message: "Helaas! Dit emailadres is helaas al in gebruik!"
+      });
+      return;
+    }
+    next();
+  });
 };
 
 const checkRolesExisted = (req, res, next) => {

@@ -24,10 +24,8 @@ const verifyToken = (req, res, next) => {
 };
 
 const isAdmin = (req, res, next) => {
-  userController.getUser(req.userId).then(users => {
-    if (users.length > 0) {
-      const user = users[0];
-
+  userController.getUser(req.userId).then(user => {
+    if (user) {
       if (user.isAdmin == roleEnum.admin) {
         next();
         return;

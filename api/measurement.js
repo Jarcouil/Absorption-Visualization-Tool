@@ -57,13 +57,12 @@ router.get(
  * @param {*} req.params.id id
  */
 function deleteMeasurement(req, res, next) {
-    const measurement = res.measurement
-    deleteFile('./uploads/' + req.params.id.toString() + '_' + measurement.name);
-    measurementController.deleteMeasurementDataTable(getMeasurementName(req.params.id, measurement.name)).then(
+    deleteFile('./uploads/' + req.params.id.toString() + '_' + res.measurement.name);
+    measurementController.deleteMeasurementDataTable(getMeasurementName(req.params.id, res.measurement.name)).then(
         (result) => {
             measurementController.deleteMeasurementFromMeasurements(req.params.id).then(
                 (result) => {
-                    return res.status(200).json({ message: `Meting ${measurement.name} is succesvol verwijderd` });
+                    return res.status(200).json({ message: `Meting ${res.measurement.name} is succesvol verwijderd` });
                 },
                 (error) => { return res.status(500).json({ message: error }); }
             )
@@ -131,8 +130,7 @@ function getMeasurement(req, res, next) {
  * @param {*} req.params.id
  */
 function getMeasurementData(req, res, next) {
-    const measurement = res.measurement
-    measurementController.getMeasurementData(getMeasurementName(measurement.id, measurement.name)).then(
+    measurementController.getMeasurementData(getMeasurementName(res.measurement.id, res.measurement.name)).then(
         (data) => {
             return res.status(200).json(removeIdFromAllData(data));
         },
@@ -149,8 +147,7 @@ function getMeasurementData(req, res, next) {
  * @param {number} req.query.wavelength
  */
 function getTimestampsOfWavelength(req, res, next) {
-    const measurement = res.measurement
-    measurementController.getTimestampsOfWavelength(getMeasurementName(measurement.id, measurement.name), req.query.wavelength).then(
+    measurementController.getTimestampsOfWavelength(getMeasurementName(res.measurement.id, res.measurement.name), req.query.wavelength).then(
         (data) => {
             return res.status(200).json((data));
         },
@@ -167,8 +164,7 @@ function getTimestampsOfWavelength(req, res, next) {
  * @param {number} req.query.timestamp timestamp
  */
 function getWavelengthsOfTimestamp(req, res, next) {
-    const measurement = res.measurement
-    measurementController.getWavelengthsOfTimestamp(getMeasurementName(measurement.id, measurement.name), req.params.timestamp).then(
+    measurementController.getWavelengthsOfTimestamp(getMeasurementName(res.measurement.id, res.measurement.name), req.params.timestamp).then(
         (data) => {
             return res.status(200).json(removeIdFromAllWavelengths(normalizeResultsSingle(data)));
         },
@@ -184,8 +180,7 @@ function getWavelengthsOfTimestamp(req, res, next) {
  * @param {number} req.params.id measurement id
  */
 function getWavelengths(req, res, next) {
-    const measurement = res.measurement
-    measurementController.getWavelengthsOfMeasurement(getMeasurementName(measurement.id, measurement.name)).then(
+    measurementController.getWavelengthsOfMeasurement(getMeasurementName(res.measurement.id, res.measurement.name)).then(
         (data) => {
             return res.status(200).json(removeIdFromWavelengths(normalizeResultsArray(data)['columns']));
         },
@@ -201,8 +196,7 @@ function getWavelengths(req, res, next) {
  * @param {number} req.params.id measurement id
  */
 function getTimestamps(req, res, next) {
-    const measurement = res.measurement
-    measurementController.getAllTimestampsOfMeasurement(getMeasurementName(measurement.id, measurement.name)).then(
+    measurementController.getAllTimestampsOfMeasurement(getMeasurementName(res.measurement.id, res.measurement.name)).then(
         (data) => {
             return res.status(200).json((normalizeResultsArray(data)['id']));
         },

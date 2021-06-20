@@ -67,6 +67,7 @@ function getUserOfToken(resetToken) {
         .innerJoin('users', 'reset_token.user_id', 'users.id')
         .select('users.id', 'users.username', 'users.email')
         .where('reset_token.reset_token', resetToken)
+        .first();
 }
 
 /**
@@ -90,6 +91,7 @@ function login(username) {
     return knex.from('users')
         .select('*')
         .where('username', username)
+        .first()
 }
 
 /**

@@ -25,12 +25,13 @@ function getUsers(sort = 'id', order = 'asc') {
 /**
  * Get user with given id from database
  * @param {number} id 
- * @returns array with user
+ * @returns user
  */
 function getUser(id) {
   return knex.from('users')
     .select('id', 'username', 'email', 'is_admin as isAdmin', 'created_at as createdAt')
     .where('id', id)
+    .first();
 }
 
 /**
@@ -58,12 +59,13 @@ function toggleAdmin(id) {
 /**
  * Get user with given email from database
  * @param {string} email 
- * @returns array with user
+ * @returns user
  */
 function getUserByEmail(email) {
   return knex.from('users')
     .select('id', 'username', 'email', 'is_admin as isAdmin', 'created_at as createdAt')
     .where('email', email)
+    .first();
 }
 
 /**
@@ -75,6 +77,7 @@ function getUserByUsername(username) {
   return knex.from('users')
     .select('id', 'username', 'email', 'is_admin as isAdmin', 'created_at as createdAt')
     .where('username', username)
+    .first();
 }
 
 /**

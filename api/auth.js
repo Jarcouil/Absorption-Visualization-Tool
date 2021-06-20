@@ -43,14 +43,11 @@ router.post(
 function login(req, res, next) {
     const username = req.body.username
     authController.login(username).then(
-        (users) => {
-            if (users.length < 1) {
+        (user) => {
+            if (!user) {
                 return res.status(401).send({ message: "De combinatie van gebruikersnaam en wachtwoord is niet correct!" });
-            } else if (users.length > 1) {
-                return res.status(500).send({ message: "Er is een probleem opgetreden." });
             }
 
-            const user = users[0]
             const passwordIsValid = bcrypt.compareSync(
                 req.body.password,
                 user.password
@@ -135,11 +132,10 @@ function newPassword(req, res, next) {
     }
 
     authController.getUserOfToken(req.body.resetToken).then(
-        (users) => {
-            if (users.length < 1) {
+        (user) => {
+            if (!user) {
                 return res.status(404).json({ message: "Token is niet geldig" });
             }
-            const user = users[0];
             authController.updatePassword(user.id, req.body.password).then(
                 (result) => {
                     authController.deleteResetToken(req.body.resetToken).then(
@@ -165,11 +161,10 @@ function newPassword(req, res, next) {
  */
 async function requestResetPassword(req, res, next) {
     userController.getUserByEmail(req.body.email).then(
-        (users) => {
-            if (users.length < 1) {
+        (user) => {
+            if (!user) {
                 return res.status(404).json({ message: "Email niet gevonden!" });
             }
-            const user = users[0];
             const resetToken = crypto.randomBytes(16).toString('hex');
 
             authController.addResetToken(user.id, resetToken).then(

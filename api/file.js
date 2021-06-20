@@ -6,7 +6,6 @@ const Json2csvParser = require("json2csv").Parser;
 
 const router = require('express').Router({ mergeParams: true });
 const fileController = require('./../controllers/fileController');
-const measurementController = require("../controllers/measurementController");
 
 const { verifyFile } = require("../middleware")
 const { verifyMeasurement } = require("../middleware");
@@ -40,8 +39,7 @@ router.get(
  * @param {*} req.params.id measurement id 
  */
 function getFileName(req, res, next) {
-    const measurement = res.measurement
-    const file_location = './uploads/' + getMeasurementName(req.params.id, measurement.name);
+    const file_location = './uploads/' + getMeasurementName(req.params.id, res.measurement.name);
     const file = getFile(file_location);
     if (file == null) {
         return res.status(404).json({ message: 'Kon het bestand niet vinden' });
@@ -63,8 +61,7 @@ function getFileName(req, res, next) {
  * @param {*} req.query.maxTimestamp maxTimestamp
  */
 function getCSV(req, res, next) {
-    const measurement = res.measurement
-    const table_name = getMeasurementName(req.params.id, measurement.name);
+    const table_name = getMeasurementName(req.params.id, res.measurement.name);
     fileController.getCustomData(table_name, req.query.minWavelength, req.query.maxWavelength, req.query.minTimestamp, req.query.maxTimestamp).then(
         (data) => {
             const jsonData = JSON.parse(JSON.stringify(data));
@@ -85,8 +82,7 @@ function getCSV(req, res, next) {
  * @param {*} req.params.id measurement id
  */
 function downloadDadFile(req, res, next) {
-    const measurement = res.measurement;
-    const file_location = './uploads/' + getMeasurementName(req.params.id, measurement.name);
+    const file_location = './uploads/' + getMeasurementName(req.params.id, res.measurement.name);
     return res.download(file_location + '/' + getFile(file_location));
 }
 

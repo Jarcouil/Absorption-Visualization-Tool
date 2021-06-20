@@ -1,10 +1,11 @@
 const router = require('express').Router({ mergeParams: true });
 const userController = require("../controllers/userController");
 const { authJwt } = require("../middleware");
+const { verifyUser } = require("../middleware");
 
 router.post(
     "/:id",
-    [authJwt.isAdmin],
+    [authJwt.isAdmin,  verifyUser.ifUser],
     toggleAdmin
 );
 
@@ -16,13 +17,13 @@ router.get(
 
 router.get(
     "/:id",
-    [authJwt.isAdmin],
+    [authJwt.isAdmin, verifyUser.ifUser],
     getUser
 );
 
 router.delete(
     "/:id",
-    [authJwt.isAdmin],
+    [authJwt.isAdmin, verifyUser.ifUser],
     deleteUser
 );
 
@@ -53,20 +54,12 @@ function getUsers(req, res, next) {
  * @param {*} req.params.id id
  */
 function deleteUser(req, res, next) {
-    userController.getUser(req.params.id).then(
-        (users) => {
-            if (users.length < 1) {
-                return res.status(404).json({ message: "Gebruiker is niet gevonden" });
-            }
-            userController.deleteUser(req.params.id).then(
-                (result) => {
-                    return res.status(200).send({ message: `Gebruiker ${users[0].username} is succesvol verwijderd` });
-                },
-                (error) => { return res.status(500).send(error) }
-            )
+    userController.deleteUser(req.params.id).then(
+        (result) => {
+            return res.status(200).send({ message: `Gebruiker ${res.user.username} is succesvol verwijderd` });
         },
         (error) => { return res.status(500).send(error) }
-    )
+    )  
 }
 
 /**
@@ -78,15 +71,7 @@ function deleteUser(req, res, next) {
  * @return user
  */
 function getUser(req, res, next) {
-    userController.getUser(req.params.id).then(
-        (users) => {
-            if (users.length < 1) {
-                return res.status(404).json({ message: "Gebruiker is niet gevonden" });
-            }
-            return res.status(200).json(users[0]);
-        },
-        (error) => { return res.status(500).send(error) }
-    )
+    return res.status(200).json(res.user);
 }
 
 /**
@@ -97,18 +82,9 @@ function getUser(req, res, next) {
  * @param {*} req.params.id id
  */
 function toggleAdmin(req, res, next) {
-    userController.getUser(req.params.id).then(
-        (users) => {
-            if (users.length < 1) {
-                return res.status(404).json({ message: "Gebruiker is niet gevonden" });
-            }
-            userController.toggleAdmin(req.params.id).then(
-                (result) => {
-
-                    return res.status(200).json({ message: `Gebruiker ${users[0].username} zijn admin rechten zijn succesvol gewijzigd.` });
-                },
-                (error) => { return res.status(500).send(error) }
-            )
+    userController.toggleAdmin(req.params.id).then(
+        (result) => {
+            return res.status(200).json({ message: `Gebruiker ${res.user.username} zijn admin rechten zijn succesvol gewijzigd.` });
         },
         (error) => { return res.status(500).send(error) }
     )
