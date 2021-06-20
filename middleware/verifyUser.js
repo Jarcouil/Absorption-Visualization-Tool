@@ -1,5 +1,11 @@
 const userController = require("../controllers/userController");
 
+/**
+ * Check if user of given id exists
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
 const ifUser = (req, res, next) => {
     userController.getUser(req.params.id).then(
         (user) => {

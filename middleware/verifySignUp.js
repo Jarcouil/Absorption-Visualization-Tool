@@ -1,6 +1,12 @@
 const roleEnum = require('./roleEnum')
 const userController = require("../controllers/userController");
 
+/**
+ * Check if all required parameters are present.
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
 const checkParameters = (req, res, next) => {
   if (!req.body.username) {
     return res.status(400).json({ message: "Gebruikersnaam is verplicht!" });
@@ -14,6 +20,12 @@ const checkParameters = (req, res, next) => {
   next();
 }
 
+/**
+ * Check if username is already taken
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
 const checkDuplicateUsername = (req, res, next) => {
   userController.getUserByUsername(req.body.username).then(user => {
     if (user) {
@@ -26,6 +38,12 @@ const checkDuplicateUsername = (req, res, next) => {
   });
 }
 
+/**
+ * Check if email is already taken
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
 const checkDuplicateEmail = (req, res, next) => {
   userController.getUserByEmail(req.body.email).then(user => {
     if (user) {
@@ -38,6 +56,12 @@ const checkDuplicateEmail = (req, res, next) => {
   });
 };
 
+/**
+ * Check if role exists
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
 const checkRolesExisted = (req, res, next) => {
   if (req.body.isAdmin) {
     let roleExists = false;
@@ -58,6 +82,12 @@ const checkRolesExisted = (req, res, next) => {
   next();
 };
 
+/**
+ * Check if email is of valid format
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
 const checkValidEmail = (req, res, next) => {
   const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   if (!req.body.email) {
@@ -73,6 +103,12 @@ const checkValidEmail = (req, res, next) => {
   next();
 }
 
+/**
+ * Check if password is of minimal length.
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
 const checkPasswordLength = (req, res, next) => {
   if (req.body.password.length < 6) {
     res.status(400).send({

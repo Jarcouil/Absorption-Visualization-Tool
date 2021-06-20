@@ -1,5 +1,11 @@
 const path = require('path')
 
+/**
+ * Check if all required parameters are present.
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
 const checkParameters = (req, res, next) => {
     if (!req.files?.file) {
         return res.status(400).json({ message: "Bestand is verplicht!" });

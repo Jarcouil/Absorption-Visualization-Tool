@@ -2,6 +2,12 @@ const measurementController = require("../controllers/measurementController");
 const userController = require("../controllers/userController");
 const roleEnum = require('./roleEnum')
 
+/**
+ * Validate if measurment of given id exists
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
 const ifMeasurement = (req, res, next) => {
     measurementController.getMeasurement(req.params.id).then(
         (measurement) => {
@@ -14,6 +20,12 @@ const ifMeasurement = (req, res, next) => {
         (error) => { return res.status(500).send(error) })
 }
 
+/**
+ * Validate if user is allowed to access the given measurment
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
 const isAllowed = (req, res, next) => {
     userController.getUser(req.userId).then(
         (user) => {
