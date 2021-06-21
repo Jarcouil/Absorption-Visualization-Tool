@@ -19,9 +19,14 @@ router.delete(
     deleteMeasurement
 );
 router.get(
-    '/columns/:id',
+    '/wavelengths/:id',
     [verifyMeasurement.ifMeasurement, verifyMeasurement.isAllowed],
     getWavelengths
+);
+router.get(
+    '/timestamps/:id',
+    [verifyMeasurement.ifMeasurement, verifyMeasurement.isAllowed],
+    getTimestamps
 );
 router.get(
     '/data/:id',
@@ -29,22 +34,17 @@ router.get(
     getMeasurementData
 );
 router.get(
-    '/id/:id',
-    [verifyMeasurement.ifMeasurement, verifyMeasurement.isAllowed],
-    getTimestamps
-);
-router.get(
     '/:id',
     [verifyMeasurement.ifMeasurement, verifyMeasurement.isAllowed],
     getMeasurement
 );
 router.get(
-    '/:id/columns',
+    '/:id/timestamps',
     [verifyMeasurement.ifMeasurement, verifyMeasurement.isAllowed],
     getTimestampsOfWavelength
 );
 router.get(
-    '/:id/:timestamp',
+    '/:id/wavelengths',
     [verifyMeasurement.ifMeasurement, verifyMeasurement.isAllowed],
     getWavelengthsOfTimestamp
 );
@@ -164,7 +164,7 @@ function getTimestampsOfWavelength(req, res, next) {
  * @param {number} req.query.timestamp timestamp
  */
 function getWavelengthsOfTimestamp(req, res, next) {
-    measurementController.getWavelengthsOfTimestamp(getMeasurementName(res.measurement.id, res.measurement.name), req.params.timestamp).then(
+    measurementController.getWavelengthsOfTimestamp(getMeasurementName(res.measurement.id, res.measurement.name), req.query.timestamp).then(
         (data) => {
             return res.status(200).json(removeIdFromAllWavelengths(normalizeResultsSingle(data)));
         },
