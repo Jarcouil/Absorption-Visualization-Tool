@@ -3,10 +3,8 @@ var faker = require('faker');
 let server = require("../index");
 let chai = require("chai");
 let chaiHttp = require("chai-http");
-const fileController = require("../controllers/fileController");
 const userController = require("../controllers/userController");
 const fileSystem = require('mock-fs');
-const path = require('path');
 
 chai.should();
 chai.use(chaiHttp);

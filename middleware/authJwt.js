@@ -37,15 +37,12 @@ const verifyToken = (req, res, next) => {
  */
 const isAdmin = (req, res, next) => {
   userController.getUser(req.userId).then(user => {
-    if (user) {
-      if (user.isAdmin == roleEnum.admin) {
-        next();
-        return;
-      }
+    if (user?.isAdmin !== roleEnum.admin) {
+      return res.status(403).send({
+        message: "Require Admin Role!"
+      });
     }
-    res.status(403).send({
-      message: "Require Admin Role!"
-    });
+    next();
   });
 };
 

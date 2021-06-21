@@ -10,14 +10,6 @@ import mysql.connector
 # 601 golflengtes
 # 601 golflengtes * 3 = 1803 bytes per golflengte blok.
 #
-# small DAD size = 140154 bytes
-# small Data size = 140154 - 49658 = 90496
-#
-# big DAD size = 3702784 bytes
-# big Data size = 3702784 - 49906 = 3652878
-#
-# headerSize = 49536 #49536 00000001big.dad
-# headerSize = 49658 #49536 00000001.dad
 
 c0 = -0.640000000000001
 c1 = 0.000000250000000000135

@@ -13,6 +13,11 @@ router.get(
     authJwt.isAdmin,
     getMeasurements
 );
+router.get(
+    '/:id',
+    [verifyMeasurement.ifMeasurement, verifyMeasurement.isAllowed],
+    getMeasurement
+);
 router.delete(
     '/:id',
     [verifyMeasurement.ifMeasurement, verifyMeasurement.isAllowed],
@@ -32,11 +37,6 @@ router.get(
     '/data/:id',
     [verifyMeasurement.ifMeasurement, verifyMeasurement.isAllowed],
     getMeasurementData
-);
-router.get(
-    '/:id',
-    [verifyMeasurement.ifMeasurement, verifyMeasurement.isAllowed],
-    getMeasurement
 );
 router.get(
     '/:id/timestamps',
