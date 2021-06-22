@@ -18,12 +18,11 @@ function createNewTable(tableName, minWaveLength, maxWaveLength) {
     return knex.schema
         .dropTableIfExists(tableName)
         .createTable(tableName, (table) => {
-            table.increments('id')
-            var i;
-            for (i = minWaveLength; i < maxWaveLength + 1; i++) {
-                table.float(i.toString())
+            table.increments('id');
+            for (var i = minWaveLength; i < maxWaveLength + 1; i++) {
+                table.float(i.toString());
             }
-        })
+        });
 }
 
 /**
@@ -35,7 +34,7 @@ function createNewTable(tableName, minWaveLength, maxWaveLength) {
  */
 function addToMeasurements(name, description, createdBy) {
     return knex('measurements')
-        .insert({ name: name, description: description, created_by: createdBy })
+        .insert({ name: name, description: description, created_by: createdBy });
 }
 
 /**
@@ -45,7 +44,7 @@ function addToMeasurements(name, description, createdBy) {
  * @returns result
  */
 function renameMeasurementTable(tableName, newTableName) {
-    return knex.schema.renameTable(tableName, newTableName)
+    return knex.schema.renameTable(tableName, newTableName);
 }
 
 /**
@@ -58,12 +57,12 @@ function renameMeasurementTable(tableName, newTableName) {
  * @returns array results
  */
 function getCustomData(tableName, minWavelength, maxWavelength, minTimestamp, maxTimestamp) {
-    var columns = ['id']
-    var rows = []
-    for (var i = minWavelength; i <= maxWavelength; i++) columns.push(i.toString()) // add all numbers between min and max wavelength to array
-    for (var j = minTimestamp; j <= maxTimestamp; j++) rows.push(j) // add all numbers between min and max timestamp to array
+    var columns = ['id'];
+    var rows = [];
+    for (var i = minWavelength; i <= maxWavelength; i++) columns.push(i.toString()); // add all numbers between min and max wavelength to array
+    for (var j = minTimestamp; j <= maxTimestamp; j++) rows.push(j); // add all numbers between min and max timestamp to array
 
     return knex.columns(columns).select()
         .from(tableName)
-        .whereIn('id', rows)
+        .whereIn('id', rows);
 }

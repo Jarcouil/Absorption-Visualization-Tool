@@ -11,13 +11,11 @@ const roleEnum = require('./roleEnum')
 const ifMeasurement = (req, res, next) => {
     measurementController.getMeasurement(req.params.id).then(
         (measurement) => {
-            if (!measurement) {
-                return res.status(404).json({ message: 'Kon de meting niet vinden!' });
-            }
+            if (!measurement) return res.status(404).json({ message: 'Kon de meting niet vinden!' });
             res.measurement = measurement;
             next();
         },
-        (error) => { return res.status(500).send(error) })
+        (error) => { return res.status(500).send(error); })
 }
 
 /**
@@ -34,7 +32,7 @@ const isAllowed = (req, res, next) => {
             }
             next();
         },
-        (error) => { return res.status(500).send(error) })
+        (error) => { return res.status(500).send(error); })
 }
 
 const verifyMeasurement = {

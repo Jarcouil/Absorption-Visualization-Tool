@@ -11,19 +11,10 @@ const userController = require("../controllers/userController");
  */
 const verifyToken = (req, res, next) => {
   const token = req.headers["x-access-token"];
-
-  if (!token) {
-    return res.status(401).send({
-      message: "No token provided!"
-    });
-  }
+  if (!token) return res.status(401).send({message: "No token provided!"});
 
   jwt.verify(token, config.secret, (err, decoded) => {
-    if (err) {
-      return res.status(401).send({
-        message: "Unauthorized!"
-      });
-    }
+    if (err) return res.status(401).send({message: "Unauthorized!"});
     req.userId = decoded.id;
     next();
   });
@@ -37,11 +28,7 @@ const verifyToken = (req, res, next) => {
  */
 const isAdmin = (req, res, next) => {
   userController.getUser(req.userId).then(user => {
-    if (user?.isAdmin !== roleEnum.admin) {
-      return res.status(403).send({
-        message: "Require Admin Role!"
-      });
-    }
+    if (user?.isAdmin !== roleEnum.admin) return res.status(403).send({message: "Require Admin Role!"});
     next();
   });
 };

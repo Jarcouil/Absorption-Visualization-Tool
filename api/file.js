@@ -39,14 +39,12 @@ router.get(
  * @param {*} req.params.id measurement id 
  */
 function getFileName(req, res, next) {
-    const file_location = './uploads/' + getMeasurementName(req.params.id, res.measurement.name);
+    const file_location = `./uploads/${getMeasurementName(req.params.id, res.measurement.name)}`;
     const file = getFile(file_location);
     if (file == null) {
         return res.status(404).json({ message: 'Kon het bestand niet vinden' });
     }
     return res.status(200).json({ fileName: file });
-
-    
 }
 
 /**
@@ -82,8 +80,8 @@ function getCSV(req, res, next) {
  * @param {*} req.params.id measurement id
  */
 function downloadDadFile(req, res, next) {
-    const file_location = './uploads/' + getMeasurementName(req.params.id, res.measurement.name);
-    return res.download(file_location + '/' + getFile(file_location));
+    const file_location = `./uploads/${getMeasurementName(req.params.id, res.measurement.name)}`;
+    return res.download(`${file_location}/${getFile(file_location)}`);
 }
 
 /**
@@ -105,23 +103,23 @@ function postNewFile(req, res, next) {
             fileController.addToMeasurements(req.body.name, req.body.description, req.userId).then(
                 (insertId) => {
                     const new_table_name = getMeasurementName(insertId[0], req.body.name);
-                    const file_location = './uploads/' + new_table_name
+                    const file_location = `./uploads/${new_table_name}`;
                     makeDirectory(file_location);
-                    file.mv(file_location + '/' + file.name);
+                    file.mv(`${file_location}/${file.name}`);
 
                     fileController.renameMeasurementTable(req.body.name, new_table_name).then(
                         (result) => {
-                            const wavelengths = req.body.maxWaveLength - req.body.minWaveLength + 1
-                            runPythonScript(file_location + '/' + file.name, res, file, new_table_name, wavelengths, insertId[0].toString())
+                            const wavelengths = req.body.maxWaveLength - req.body.minWaveLength + 1;
+                            runPythonScript(`${file_location}/${file.name}`, res, file, new_table_name, wavelengths, insertId[0].toString());
                         },
-                        (error) => { return res.status(500).send(error) }
-                    )
+                        (error) => { return res.status(500).send(error); }
+                    );
                 },
-                (error) => { return res.status(500).send(error) }
-            )
+                (error) => { return res.status(500).send(error); }
+            );
         },
-        (error) => { return res.status(500).send(error) }
-    )
+        (error) => { return res.status(500).send(error); }
+    );
 }
 
 /**
@@ -141,15 +139,12 @@ function makeDirectory(directoryPath) {
  */
 function getFile(directoryPath) {
     try {
-        const files = fs.readdirSync(directoryPath)
-        if (files.length > 0) {
-            return files[0]
-        } else {
-            return null
-        }
+        const files = fs.readdirSync(directoryPath);
+        if (files.length < 1) return null;
+        return files[0];
     } catch (err) {
         console.log("err", err);
-        return null
+        return null;
     }
 }
 
@@ -160,7 +155,7 @@ function getFile(directoryPath) {
  * @returns {string} measurement name
  */
 function getMeasurementName(id, name) {
-    return id.toString() + '_' + name
+    return `${id}_${name}`;
 }
 
 /**
@@ -177,20 +172,18 @@ function runPythonScript(sourceFile, res, file, tablename, wavelengths, insertId
 
     python.on('close', (code) => {
         console.log(`child process close all stdio with code ${code}`);
-        if (code === 0) {
-            res.send({
-                id: insertId,
-                status: true,
-                message: 'Meting is succesvol opgeslagen!',
-                data: {
-                    name: file.name,
-                    mimetype: file.mimetype,
-                    size: file.size
-                }
-            });
-        } else {
-            return res.status(500).json("Er heeft zich een probleem voorgedaan met het verwerken van het bestand.")
-        }
+        if (code !== 0) return res.status(500).json("Er heeft zich een probleem voorgedaan met het verwerken van het bestand.");
+
+        return res.send({
+            id: insertId,
+            status: true,
+            message: 'Meting is succesvol opgeslagen!',
+            data: {
+                name: file.name,
+                mimetype: file.mimetype,
+                size: file.size
+            }
+        });
     });
 }
 

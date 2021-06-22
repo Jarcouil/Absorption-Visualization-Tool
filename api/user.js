@@ -42,8 +42,8 @@ function getUsers(req, res, next) {
             }
             return res.status(200).json(users);
         },
-        (error) => { return res.status(500).send(error) }
-    )
+        (error) => { return res.status(500).send(error); }
+    );
 }
 
 /**
@@ -58,8 +58,8 @@ function deleteUser(req, res, next) {
         (result) => {
             return res.status(200).send({ message: `Gebruiker ${res.user.username} is succesvol verwijderd` });
         },
-        (error) => { return res.status(500).send(error) }
-    )  
+        (error) => { return res.status(500).send(error); }
+    );  
 }
 
 /**
@@ -86,8 +86,8 @@ function toggleAdmin(req, res, next) {
         (result) => {
             return res.status(200).json({ message: `Gebruiker ${res.user.username} zijn admin rechten zijn succesvol gewijzigd.` });
         },
-        (error) => { return res.status(500).send(error) }
-    )
+        (error) => { return res.status(500).send(error); }
+    );
 }
 
 module.exports = router;

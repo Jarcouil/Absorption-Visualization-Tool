@@ -5,12 +5,12 @@ const auth = require('./auth');
 const user = require('./user');
 const { authJwt } = require("../middleware");
 
-router.get('/', noContent)
+router.get('/', noContent);
 
-router.use('/file', [authJwt.verifyToken], file)
-router.use('/measurement', [authJwt.verifyToken], measurement)
-router.use('/auth', auth)
-router.use('/users', [authJwt.verifyToken], user)
+router.use('/file', [authJwt.verifyToken], file);
+router.use('/measurement', [authJwt.verifyToken], measurement);
+router.use('/auth', auth);
+router.use('/users', [authJwt.verifyToken], user);
 
 /**
  * No content

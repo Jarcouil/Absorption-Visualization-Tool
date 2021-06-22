@@ -19,7 +19,7 @@ module.exports = {
 function getUsers(sort = 'id', order = 'asc') {
   return knex.from('users')
     .select('id', 'username', 'email', 'is_admin as isAdmin', 'created_at as createdAt')
-    .orderBy(sort, order)
+    .orderBy(sort, order);
 }
 
 /**
@@ -42,7 +42,7 @@ function getUser(id) {
 function deleteUser(id) {
   return knex.from('users')
     .where('id', id)
-    .del()
+    .del();
 }
 
 /**
@@ -53,7 +53,7 @@ function deleteUser(id) {
 function toggleAdmin(id) {
   return knex.from('users')
     .update({ is_admin: knex.raw('!??', ['is_admin']) })
-    .where('id', id)
+    .where('id', id);
 }
 
 /**
@@ -86,5 +86,5 @@ function getUserByUsername(username) {
  */
 function deleteAllUsers() {
   return knex.from('users')
-    .del()
+    .del();
 }

@@ -79,7 +79,7 @@ function getUserOfToken(resetToken) {
 function updatePassword(id, password) {
     return knex('users')
         .update({ password: bcrypt.hashSync(password, 8) })
-        .where('id', id)
+        .where('id', id);
 }
 
 /**
@@ -91,7 +91,7 @@ function login(username) {
     return knex.from('users')
         .select('*')
         .where('username', username)
-        .first()
+        .first();
 }
 
 /**
@@ -114,10 +114,10 @@ async function requestResetPassword(username, email, resetToken) {
         transporter.sendMail(mailOptions, (err, info) => {
             if (err) { reject(err); }
             if (process.env.NODE_ENV === 'test') {
-                console.log('Preview URL: ' + nodemailer.getTestMessageUrl(info));
+                console.log(`Preview URL: ${nodemailer.getTestMessageUrl(info)}`);
             }
             resolve();
-        })
+        });
     })
 }
 
@@ -126,9 +126,6 @@ async function requestResetPassword(username, email, resetToken) {
  * @returns mail transporter
  */
 async function getTransporter() {
-    if (process.env.NODE_ENV === 'test') {
-        return mail_config.getTestTransporter();
-    } else {
-        return mail_config.getTransporter();
-    }
+    if (process.env.NODE_ENV === 'test') return mail_config.getTestTransporter();
+    return mail_config.getTransporter();
 }

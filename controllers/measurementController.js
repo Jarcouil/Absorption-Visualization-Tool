@@ -24,7 +24,7 @@ function getMeasurements(sort = 'id', order = 'asc') {
     return knex.from('measurements')
         .innerJoin('users', 'measurements.created_by', 'users.id')
         .select('users.username', 'measurements.id', 'measurements.name', 'measurements.description', 'measurements.created_at AS createdAt', 'measurements.created_by as createdBy',)
-        .orderBy(sort, order)
+        .orderBy(sort, order);
 }
 
 /**
@@ -39,7 +39,7 @@ function getMeasurementsOfUser(userId, sort = 'id', order = 'asc') {
         .innerJoin('users', 'measurements.created_by', 'users.id')
         .select('users.username', 'measurements.id', 'measurements.name', 'measurements.description', 'measurements.created_at AS createdAt', 'measurements.created_by as createdBy',)
         .where('users.id', userId)
-        .orderBy(sort, order)
+        .orderBy(sort, order);
 }
 
 /**
@@ -50,7 +50,7 @@ function getMeasurementsOfUser(userId, sort = 'id', order = 'asc') {
 function deleteMeasurementFromMeasurements(id) {
     return knex.from('measurements')
         .where('id', id)
-        .del()
+        .del();
 }
 
 /**
@@ -59,7 +59,7 @@ function deleteMeasurementFromMeasurements(id) {
  */
 function deleteAllMeasurements() {
     return knex.from('measurements')
-        .del()
+        .del();
 }
 
 /**
@@ -68,7 +68,7 @@ function deleteAllMeasurements() {
  * @returns result
  */
 function deleteMeasurementDataTable(tableName) {
-    return knex.schema.dropTableIfExists(tableName)
+    return knex.schema.dropTableIfExists(tableName);
 }
 
 /**
@@ -80,7 +80,7 @@ function getMeasurement(id) {
     return knex.from('measurements')
         .select('*')
         .where('id', id)
-        .first()
+        .first();
 }
 
 /**
@@ -91,7 +91,7 @@ function getMeasurement(id) {
  */
 function getTimestampsOfWavelength(tableName, wavelength) {
     return knex.from(tableName)
-        .select('id', `${wavelength} as wavelength`)
+        .select('id', `${wavelength} as wavelength`);
 }
 
 /**
@@ -103,7 +103,7 @@ function getTimestampsOfWavelength(tableName, wavelength) {
 function getWavelengthsOfTimestamp(tableName, timestamp) {
     return knex.from(tableName)
         .select('*')
-        .where('id', timestamp)
+        .where('id', timestamp);
 }
 
 /**
@@ -114,7 +114,7 @@ function getWavelengthsOfTimestamp(tableName, timestamp) {
 function getWavelengthsOfMeasurement(tableName) {
     return knex.from('information_schema.columns')
         .select('COLUMN_NAME AS columns')
-        .where('table_name', tableName)
+        .where('table_name', tableName);
 }
 
 /**
@@ -124,7 +124,7 @@ function getWavelengthsOfMeasurement(tableName) {
  */
 function getAllTimestampsOfMeasurement(tableName) {
     return knex.from(tableName)
-        .select('id')
+        .select('id');
 }
 
 /**
@@ -134,5 +134,5 @@ function getAllTimestampsOfMeasurement(tableName) {
  */
 function getMeasurementData(tableName) {
     return knex.from(tableName)
-        .select('*')
+        .select('*');
 }

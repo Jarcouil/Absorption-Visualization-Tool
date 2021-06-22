@@ -57,7 +57,7 @@ router.get(
  * @param {*} req.params.id id
  */
 function deleteMeasurement(req, res, next) {
-    deleteFile('./uploads/' + req.params.id.toString() + '_' + res.measurement.name);
+    deleteFile(`./uploads/${getMeasurementName(req.params.id, res.measurement.name)}`);
     measurementController.deleteMeasurementDataTable(getMeasurementName(req.params.id, res.measurement.name)).then(
         (result) => {
             measurementController.deleteMeasurementFromMeasurements(req.params.id).then(
@@ -65,10 +65,10 @@ function deleteMeasurement(req, res, next) {
                     return res.status(200).json({ message: `Meting ${res.measurement.name} is succesvol verwijderd` });
                 },
                 (error) => { return res.status(500).json({ message: error }); }
-            )
+            );
         },
         (error) => { return res.status(500).json({ message: error }); }
-    )
+    );
 }
 
 /**
@@ -87,8 +87,8 @@ function getMeasurementsOfUser(req, res, next) {
             }
             return res.status(200).json(measurements);
         },
-        (error) => { return res.status(500).send(error) }
-    )
+        (error) => { return res.status(500).send(error); }
+    );
 }
 
 /**
@@ -107,8 +107,8 @@ function getMeasurements(req, res, next) {
             }
             return res.status(200).json(measurements);
         },
-        (error) => { return res.status(500).send(error) }
-    )
+        (error) => { return res.status(500).send(error); }
+    );
 }
 
 /**
@@ -134,8 +134,8 @@ function getMeasurementData(req, res, next) {
         (data) => {
             return res.status(200).json(removeIdFromAllData(data));
         },
-        (error) => { return res.status(500).send(error) }
-    )
+        (error) => { return res.status(500).send(error); }
+    );
 }
 
 /**
@@ -151,8 +151,8 @@ function getTimestampsOfWavelength(req, res, next) {
         (data) => {
             return res.status(200).json((data));
         },
-        (error) => { return res.status(500).send(error) }
-    )
+        (error) => { return res.status(500).send(error); }
+    );
 }
 
 /**
@@ -168,8 +168,8 @@ function getWavelengthsOfTimestamp(req, res, next) {
         (data) => {
             return res.status(200).json(removeIdFromAllWavelengths(normalizeResultsSingle(data)));
         },
-        (error) => { return res.status(500).send(error) }
-    )
+        (error) => { return res.status(500).send(error); }
+    );
 }
 
 /**
@@ -184,8 +184,8 @@ function getWavelengths(req, res, next) {
         (data) => {
             return res.status(200).json(removeIdFromWavelengths(normalizeResultsArray(data)['columns']));
         },
-        (error) => { return res.status(500).send(error) }
-    )
+        (error) => { return res.status(500).send(error); }
+    );
 }
 
 /**
@@ -200,8 +200,8 @@ function getTimestamps(req, res, next) {
         (data) => {
             return res.status(200).json((normalizeResultsArray(data)['id']));
         },
-        (error) => { return res.status(500).send(error) }
-    )
+        (error) => { return res.status(500).send(error); }
+    );
 }
 
 /**
@@ -228,28 +228,26 @@ function normalizeResultsSingle(results) {
     var normalResults = results.map(v => Object.assign({}, v));
     return normalResults.reduce(function (r, e) {
         return Object.keys(e).forEach(function (k) {
-            if (!r[k]) r[k] = e[k]
-            else r[k] = r[k].concat(e[k])
+            if (!r[k]) r[k] = e[k];
+            else r[k] = r[k].concat(e[k]);
         }), r
-    }, {})
+    }, {});
 }
 
 /**
  * Remove id from wavelengths
- * @param {*} columns 
+ * @param {Array} columns 
  * @returns data
  */
 function removeIdFromWavelengths(data) {
     const index = data.indexOf('id');
-    if (index > -1) {
-        data.splice(index, 1);
-    }
+    if (index > -1) data.splice(index, 1);
     return data;
 }
 
 /**
- * Remove id from wavelegnths
- * @param {*} result 
+ * Remove id from wavelengths
+ * @param {object} result 
  * @returns result
  */
 function removeIdFromAllWavelengths(result) {
@@ -259,7 +257,7 @@ function removeIdFromAllWavelengths(result) {
 
 /**
  * Remove id from all data
- * @param {*} result 
+ * @param {object of objects} result 
  * @returns result
  */
 function removeIdFromAllData(result) {
@@ -288,7 +286,7 @@ function deleteFile(folderName) {
  * @returns 
  */
 function getMeasurementName(id, name) {
-    return id.toString() + '_' + name
+    return `${id}_${name}`;
 }
 
 module.exports = router;
