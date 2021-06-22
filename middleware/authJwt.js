@@ -26,11 +26,12 @@ const verifyToken = (req, res, next) => {
  * @param {*} res 
  * @param {*} next 
  */
-const isAdmin = (req, res, next) => {
-  userController.getUser(req.userId).then(user => {
+const isAdmin = async (req, res, next) => {
+  try {
+    const user = await userController.getUser(req.userId);
     if (user?.isAdmin !== roleEnum.admin) return res.status(403).send({message: "Require Admin Role!"});
     next();
-  });
+  } catch (error) { return res.status(500).send(error)}
 };
 
 const authJwt = {

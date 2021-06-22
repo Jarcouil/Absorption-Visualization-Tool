@@ -58,18 +58,15 @@ function getFileName(req, res, next) {
  * @param {*} req.query.minTimestamp minTimestamp
  * @param {*} req.query.maxTimestamp maxTimestamp
  */
-function getCSV(req, res, next) {
-    const table_name = getMeasurementName(req.params.id, res.measurement.name);
-    fileController.getCustomData(table_name, req.query.minWavelength, req.query.maxWavelength, req.query.minTimestamp, req.query.maxTimestamp).then(
-        (data) => {
-            const jsonData = JSON.parse(JSON.stringify(data));
-            const json2csvParser = new Json2csvParser({ header: true });
-            const csv = json2csvParser.parse(jsonData);
-            return res.send(csv)
-        },
-        (error) => { return res.status(500).json({ message: error }); }
-    )
-
+async function getCSV(req, res, next) {
+    try {
+        const table_name = getMeasurementName(req.params.id, res.measurement.name);
+        const data = await fileController.getCustomData(table_name, req.query.minWavelength, req.query.maxWavelength, req.query.minTimestamp, req.query.maxTimestamp);
+        const jsonData = JSON.parse(JSON.stringify(data));
+        const json2csvParser = new Json2csvParser({ header: true });
+        const csv = json2csvParser.parse(jsonData);
+        return res.send(csv)
+    } catch (error) { return res.status(500).send(error)}
 }
 
 /**
@@ -95,31 +92,19 @@ function downloadDadFile(req, res, next) {
  * @param {*} req.body.maxWaveLength maxWaveLength
  * @param {*} req.body.description description
  */
-function postNewFile(req, res, next) {
-    const file = req.files.file;
-
-    fileController.createNewTable(req.body.name, +req.body.minWaveLength, +req.body.maxWaveLength).then(
-        (result) => {
-            fileController.addToMeasurements(req.body.name, req.body.description, req.userId).then(
-                (insertId) => {
-                    const new_table_name = getMeasurementName(insertId[0], req.body.name);
-                    const file_location = `./uploads/${new_table_name}`;
-                    makeDirectory(file_location);
-                    file.mv(`${file_location}/${file.name}`);
-
-                    fileController.renameMeasurementTable(req.body.name, new_table_name).then(
-                        (result) => {
-                            const wavelengths = req.body.maxWaveLength - req.body.minWaveLength + 1;
-                            runPythonScript(`${file_location}/${file.name}`, res, file, new_table_name, wavelengths, insertId[0].toString());
-                        },
-                        (error) => { return res.status(500).send(error); }
-                    );
-                },
-                (error) => { return res.status(500).send(error); }
-            );
-        },
-        (error) => { return res.status(500).send(error); }
-    );
+async function postNewFile(req, res, next) {
+    try {
+        const file = req.files.file;
+        await fileController.createNewTable(req.body.name, +req.body.minWaveLength, +req.body.maxWaveLength);
+        const insertId = await fileController.addToMeasurements(req.body.name, req.body.description, req.userId);
+        const new_table_name = getMeasurementName(insertId[0], req.body.name);
+        const file_location = `./uploads/${new_table_name}`;
+        makeDirectory(file_location);
+        file.mv(`${file_location}/${file.name}`);
+        await fileController.renameMeasurementTable(req.body.name, new_table_name);
+        const wavelengths = req.body.maxWaveLength - req.body.minWaveLength + 1;
+        runPythonScript(`${file_location}/${file.name}`, res, file, new_table_name, wavelengths, insertId[0].toString());
+    } catch (error) { return res.status(500).send(error)}
 }
 
 /**

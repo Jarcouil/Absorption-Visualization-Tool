@@ -5,7 +5,7 @@ const { verifyUser } = require("../middleware");
 
 router.post(
     "/:id",
-    [authJwt.isAdmin,  verifyUser.ifUser],
+    [authJwt.isAdmin, verifyUser.ifUser],
     toggleAdmin
 );
 
@@ -34,16 +34,15 @@ router.delete(
  * @param {*} next
  * @returns users
  */
-function getUsers(req, res, next) {
-    userController.getUsers(req.query?.sort, req.query?.order).then(
-        (users) => {
-            if (users.length < 1) {
-                return res.status(404).json({ message: "Er zijn geen gebruikers gevonden" });
-            }
-            return res.status(200).json(users);
-        },
-        (error) => { return res.status(500).send(error); }
-    );
+async function getUsers(req, res, next) {
+    try {
+        const users = await userController.getUsers(req.query?.sort, req.query?.order)
+        if (users.length < 1) {
+            return res.status(404).json({ message: "Er zijn geen gebruikers gevonden" });
+        }
+        return res.status(200).json(users);
+    } catch (error) { return res.status(500).send(error); }
+
 }
 
 /**
@@ -53,13 +52,11 @@ function getUsers(req, res, next) {
  * @param {*} next 
  * @param {*} req.params.id id
  */
-function deleteUser(req, res, next) {
-    userController.deleteUser(req.params.id).then(
-        (result) => {
-            return res.status(200).send({ message: `Gebruiker ${res.user.username} is succesvol verwijderd` });
-        },
-        (error) => { return res.status(500).send(error); }
-    );  
+async function deleteUser(req, res, next) {
+    try {
+        await userController.deleteUser(req.params.id)
+        return res.status(200).send({ message: `Gebruiker ${res.user.username} is succesvol verwijderd` });
+    } catch (error) { return res.status(500).send(error); }
 }
 
 /**
@@ -81,13 +78,12 @@ function getUser(req, res, next) {
  * @param {*} next 
  * @param {*} req.params.id id
  */
-function toggleAdmin(req, res, next) {
-    userController.toggleAdmin(req.params.id).then(
-        (result) => {
-            return res.status(200).json({ message: `Gebruiker ${res.user.username} zijn admin rechten zijn succesvol gewijzigd.` });
-        },
-        (error) => { return res.status(500).send(error); }
-    );
+async function toggleAdmin(req, res, next) {
+    try {
+        await userController.toggleAdmin(req.params.id)
+        return res.status(200).json({ message: `Gebruiker ${res.user.username} zijn admin rechten zijn succesvol gewijzigd.` });
+
+    } catch (error) { return res.status(500).send(error); }
 }
 
 module.exports = router;

@@ -86,17 +86,13 @@ function register(req, res, next) {
  * @param {*} next 
  * @param {*} req.body.resetToken resetToken 
  */
-function validResetPassword(req, res, next) {
-    if (!req.body.resetToken) return res.status(400).json({ error: 'Token is verplicht' });
-
-    authController.getUserOfToken(req.body.resetToken).then(
-        (tokens) => {
-            if (tokens.length < 1) return res.status(404).json({ message: "Token is niet geldig" });
-
-            return res.status(200).json({ message: "Token is geldig." })
-        },
-        (error) => { return res.status(500).send(error); }
-    );
+async function validResetPassword(req, res, next) {
+    try {
+        if (!req.body.resetToken) return res.status(400).json({ error: 'Token is verplicht' });
+        const tokens = await authController.getUserOfToken(req.body.resetToken)
+        if (tokens.length < 1) return res.status(404).json({ message: "Token is niet geldig" });
+        return res.status(200).json({ message: "Token is geldig." })
+    } catch (error) { return res.status(500).send(error)}
 }
 
 /**
@@ -107,27 +103,15 @@ function validResetPassword(req, res, next) {
  * @param {*} req.body.resetToken resetToken 
  * @param {*} req.body.password password
  */
-function newPassword(req, res, next) {
-    if (!req.body.resetToken) return res.status(400).json({ error: 'Token is verplicht' });
-
-    authController.getUserOfToken(req.body.resetToken).then(
-        (user) => {
-            if (!user) return res.status(404).json({ message: "Token is niet geldig" });
-
-            authController.updatePassword(user.id, req.body.password).then(
-                (result) => {
-                    authController.deleteResetToken(req.body.resetToken).then(
-                        (result) => {
-                            return res.status(200).json({ message: "Wachtwoord succesvol gewijzigd" });
-                        },
-                        (error) => { return res.status(500).json({ message: error }); }
-                    );
-                },
-                (error) => { return res.status(500).json({ message: error }); }
-            );
-        },
-        (error) => { return res.status(500).send(error); }
-    );
+async function newPassword(req, res, next) {
+    try {
+        if (!req.body.resetToken) return res.status(400).json({ error: 'Token is verplicht' });
+        const user = await authController.getUserOfToken(req.body.resetToken);
+        if (!user) return res.status(404).json({ message: "Token is niet geldig" });
+        await authController.updatePassword(user.id, req.body.password);
+        await  authController.deleteResetToken(req.body.resetToken);
+        return res.status(200).json({ message: "Wachtwoord succesvol gewijzigd" });
+    } catch (error) { return res.status(500).send(error)}
 }
 
 /**
@@ -138,25 +122,14 @@ function newPassword(req, res, next) {
  * @param {*} req.body.email email
  */
 async function requestResetPassword(req, res, next) {
-    userController.getUserByEmail(req.body.email).then(
-        (user) => {
-            if (!user) return res.status(404).json({ message: "Email niet gevonden!" });
-
-            const resetToken = crypto.randomBytes(16).toString('hex');
-            authController.addResetToken(user.id, resetToken).then(
-                    (result) => {
-                        authController.requestResetPassword(user.username, user.email, resetToken).then(
-                            (result) => {
-                                return res.status(200).json({ message: "Mail is succesvol verzonden." });
-                            },
-                            (error) => { return res.status(500).json({ message: error }); }
-                        )
-                    },
-                    (error) => { return res.status(500).json({ message: error }); }
-                );
-        },
-        (error) => { return res.status(500).send(error); }
-    );
+    try {
+        const user = await userController.getUserByEmail(req.body.email);
+        if (!user) return res.status(404).json({ message: "Email niet gevonden!" });
+        const resetToken = crypto.randomBytes(16).toString('hex');
+        await authController.addResetToken(user.id, resetToken);
+        await authController.requestResetPassword(user.username, user.email, resetToken);
+        return res.status(200).json({ message: "Mail is succesvol verzonden." });
+    } catch (error) { return res.status(500).send(error)}
 }
 
 module.exports = router;

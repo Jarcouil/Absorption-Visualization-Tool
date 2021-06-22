@@ -56,19 +56,13 @@ router.get(
  * @param {*} next 
  * @param {*} req.params.id id
  */
-function deleteMeasurement(req, res, next) {
-    deleteFile(`./uploads/${getMeasurementName(req.params.id, res.measurement.name)}`);
-    measurementController.deleteMeasurementDataTable(getMeasurementName(req.params.id, res.measurement.name)).then(
-        (result) => {
-            measurementController.deleteMeasurementFromMeasurements(req.params.id).then(
-                (result) => {
-                    return res.status(200).json({ message: `Meting ${res.measurement.name} is succesvol verwijderd` });
-                },
-                (error) => { return res.status(500).json({ message: error }); }
-            );
-        },
-        (error) => { return res.status(500).json({ message: error }); }
-    );
+async function deleteMeasurement(req, res, next) {
+    try {
+        deleteFile(`./uploads/${getMeasurementName(req.params.id, res.measurement.name)}`);
+        await measurementController.deleteMeasurementDataTable(getMeasurementName(req.params.id, res.measurement.name));
+        await measurementController.deleteMeasurementFromMeasurements(req.params.id);
+        return res.status(200).json({ message: `Meting ${res.measurement.name} is succesvol verwijderd` });
+    } catch (error) { return res.status(500).send(error)}
 }
 
 /**
@@ -79,16 +73,14 @@ function deleteMeasurement(req, res, next) {
  * @param {*} req.query.sort
  * @param {*} req.query.order
  */
-function getMeasurementsOfUser(req, res, next) {
-    measurementController.getMeasurementsOfUser(req.userId, req.query?.sort, req.query?.order).then(
-        (measurements) => {
-            if (measurements.length < 1) {
-                return res.status(404).json({ message: "Er zijn geen metingen gevonden" });
-            }
-            return res.status(200).json(measurements);
-        },
-        (error) => { return res.status(500).send(error); }
-    );
+async function getMeasurementsOfUser(req, res, next) {
+    try {
+        const measurements = await measurementController.getMeasurementsOfUser(req.userId, req.query?.sort, req.query?.order);
+        if (measurements.length < 1) {
+            return res.status(404).json({ message: "Er zijn geen metingen gevonden" });
+        }
+        return res.status(200).json(measurements);
+    } catch (error) { return res.status(500).send(error)}
 }
 
 /**
@@ -99,16 +91,14 @@ function getMeasurementsOfUser(req, res, next) {
  * @param {*} req.query.sort
  * @param {*} req.query.order
  */
-function getMeasurements(req, res, next) {
-    measurementController.getMeasurements(req.query?.sort, req.query?.order).then(
-        (measurements) => {
-            if (measurements.length < 1) {
-                return res.status(404).json({ message: "Er zijn geen metingen gevonden" });
-            }
-            return res.status(200).json(measurements);
-        },
-        (error) => { return res.status(500).send(error); }
-    );
+async function getMeasurements(req, res, next) {
+    try {
+        const measurements = await measurementController.getMeasurements(req.query?.sort, req.query?.order);
+        if (measurements.length < 1) {
+            return res.status(404).json({ message: "Er zijn geen metingen gevonden" });
+        }
+        return res.status(200).json(measurements);
+    } catch (error) { return res.status(500).send(error)}
 }
 
 /**
@@ -129,13 +119,11 @@ function getMeasurement(req, res, next) {
  * @param {*} next 
  * @param {*} req.params.id
  */
-function getMeasurementData(req, res, next) {
-    measurementController.getMeasurementData(getMeasurementName(res.measurement.id, res.measurement.name)).then(
-        (data) => {
-            return res.status(200).json(removeIdFromAllData(data));
-        },
-        (error) => { return res.status(500).send(error); }
-    );
+async function getMeasurementData(req, res, next) {
+    try {
+        const data = await measurementController.getMeasurementData(getMeasurementName(res.measurement.id, res.measurement.name));
+        return res.status(200).json(removeIdFromAllData(data));
+    } catch (error) { return res.status(500).send(error)}
 }
 
 /**
@@ -146,13 +134,11 @@ function getMeasurementData(req, res, next) {
  * @param {number} req.params.id
  * @param {number} req.query.wavelength
  */
-function getTimestampsOfWavelength(req, res, next) {
-    measurementController.getTimestampsOfWavelength(getMeasurementName(res.measurement.id, res.measurement.name), req.query.wavelength).then(
-        (data) => {
-            return res.status(200).json((data));
-        },
-        (error) => { return res.status(500).send(error); }
-    );
+async function getTimestampsOfWavelength(req, res, next) {
+    try {
+        const data = await measurementController.getTimestampsOfWavelength(getMeasurementName(res.measurement.id, res.measurement.name), req.query.wavelength);
+        return res.status(200).json((data));
+    } catch (error) { return res.status(500).send(error)}
 }
 
 /**
@@ -163,13 +149,11 @@ function getTimestampsOfWavelength(req, res, next) {
  * @param {number} req.params.id measurement id
  * @param {number} req.query.timestamp timestamp
  */
-function getWavelengthsOfTimestamp(req, res, next) {
-    measurementController.getWavelengthsOfTimestamp(getMeasurementName(res.measurement.id, res.measurement.name), req.query.timestamp).then(
-        (data) => {
-            return res.status(200).json(removeIdFromAllWavelengths(normalizeResultsSingle(data)));
-        },
-        (error) => { return res.status(500).send(error); }
-    );
+ async function getWavelengthsOfTimestamp(req, res, next) {
+    try {
+        const data = await measurementController.getWavelengthsOfTimestamp(getMeasurementName(res.measurement.id, res.measurement.name), req.query.timestamp);
+        return res.status(200).json(removeIdFromAllWavelengths(normalizeResultsSingle(data)));
+    } catch (error) { return res.status(500).send(error)}
 }
 
 /**
@@ -179,13 +163,11 @@ function getWavelengthsOfTimestamp(req, res, next) {
  * @param {*} next 
  * @param {number} req.params.id measurement id
  */
-function getWavelengths(req, res, next) {
-    measurementController.getWavelengthsOfMeasurement(getMeasurementName(res.measurement.id, res.measurement.name)).then(
-        (data) => {
-            return res.status(200).json(removeIdFromWavelengths(normalizeResultsArray(data)['columns']));
-        },
-        (error) => { return res.status(500).send(error); }
-    );
+ async function getWavelengths(req, res, next) {
+    try {
+        const data = await measurementController.getWavelengthsOfMeasurement(getMeasurementName(res.measurement.id, res.measurement.name));
+        return res.status(200).json(removeIdFromWavelengths(normalizeResultsArray(data)['columns']));
+    } catch (error) { return res.status(500).send(error)}
 }
 
 /**
@@ -195,13 +177,11 @@ function getWavelengths(req, res, next) {
  * @param {*} next 
  * @param {number} req.params.id measurement id
  */
-function getTimestamps(req, res, next) {
-    measurementController.getAllTimestampsOfMeasurement(getMeasurementName(res.measurement.id, res.measurement.name)).then(
-        (data) => {
-            return res.status(200).json((normalizeResultsArray(data)['id']));
-        },
-        (error) => { return res.status(500).send(error); }
-    );
+ async function getTimestamps(req, res, next) {
+    try {
+        const data = await  measurementController.getAllTimestampsOfMeasurement(getMeasurementName(res.measurement.id, res.measurement.name));
+        return res.status(200).json((normalizeResultsArray(data)['id']));
+    } catch (error) { return res.status(500).send(error)}
 }
 
 /**
