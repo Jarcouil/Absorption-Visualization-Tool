@@ -20,11 +20,16 @@ module.exports = {
  * @param {string} order
  * @returns array of measurements
  */
-function getMeasurements(sort = 'id', order = 'asc') {
+function getMeasurements(sort = 'id', order = 'asc', page = 1, perPage = 10) {
     return knex.from('measurements')
         .innerJoin('users', 'measurements.created_by', 'users.id')
         .select('users.username', 'measurements.id', 'measurements.name', 'measurements.description', 'measurements.created_at AS createdAt', 'measurements.created_by as createdBy',)
-        .orderBy(sort, order);
+        .orderBy(sort, order)
+        .paginate({
+            perPage: perPage,
+            currentPage: page,
+            isLengthAware: true,
+        });
 }
 
 /**
@@ -34,12 +39,17 @@ function getMeasurements(sort = 'id', order = 'asc') {
  * @param {string} order 
  * @returns array of measurements
  */
-function getMeasurementsOfUser(userId, sort = 'id', order = 'asc') {
+function getMeasurementsOfUser(userId, sort = 'id', order = 'asc', page = 1, perPage = 10) {
     return knex.from('measurements')
         .innerJoin('users', 'measurements.created_by', 'users.id')
         .select('users.username', 'measurements.id', 'measurements.name', 'measurements.description', 'measurements.created_at AS createdAt', 'measurements.created_by as createdBy',)
         .where('users.id', userId)
-        .orderBy(sort, order);
+        .orderBy(sort, order)
+        .paginate({
+            perPage: perPage,
+            currentPage: page,
+            isLengthAware: true,
+        });
 }
 
 /**

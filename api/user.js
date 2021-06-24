@@ -36,7 +36,7 @@ router.delete(
  */
 async function getUsers(req, res, next) {
     try {
-        const users = await userController.getUsers(req.query?.sort, req.query?.order)
+        const users = await userController.getUsers(req.query?.sort, req.query?.order, req.query?.page, req.query?.perPage)
         if (users.length < 1) {
             return res.status(404).json({ message: "Er zijn geen gebruikers gevonden" });
         }

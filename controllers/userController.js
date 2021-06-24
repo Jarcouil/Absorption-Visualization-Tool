@@ -16,10 +16,15 @@ module.exports = {
  * @param {string} order 
  * @returns array of users
  */
-function getUsers(sort = 'id', order = 'asc') {
+function getUsers(sort = 'id', order = 'asc', page = 1, perPage = 10) {
   return knex.from('users')
     .select('id', 'username', 'email', 'is_admin as isAdmin', 'created_at as createdAt')
-    .orderBy(sort, order);
+    .orderBy(sort, order)
+    .paginate({
+      perPage: perPage,
+      currentPage: page,
+      isLengthAware: true,
+  });
 }
 
 /**

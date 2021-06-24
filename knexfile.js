@@ -14,3 +14,6 @@ const options = {
 }
 
 module.exports = require("knex")(options);
+
+const { attachPaginate } = require('knex-paginate');
+attachPaginate();
