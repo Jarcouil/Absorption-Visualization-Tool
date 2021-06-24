@@ -95,14 +95,14 @@ describe('User API', () => {
                     .get("/v1/users")
                     .set("x-access-token", user.accessToken)
                     .end((err, res) => {
-                        res.body.should.be.an.instanceof(Array);
-                        res.body.length.should.be.equal(1);
-                        res.body[0].should.include.all.keys(['id', 'username', 'email', 'isAdmin', 'createdAt']);
-                        res.body[0].id.should.be.equal(user.id);
-                        res.body[0].username.should.be.equal(user.username);
-                        res.body[0].email.should.be.equal(user.email);
-                        res.body[0].isAdmin.should.be.equal(1);
-                        res.body[0].createdAt.should.be.equal(user.createdAt);
+                        res.body.data.should.be.an.instanceof(Array);
+                        res.body.data.length.should.be.equal(1);
+                        res.body.data[0].should.include.all.keys(['id', 'username', 'email', 'isAdmin', 'createdAt']);
+                        res.body.data[0].id.should.be.equal(user.id);
+                        res.body.data[0].username.should.be.equal(user.username);
+                        res.body.data[0].email.should.be.equal(user.email);
+                        res.body.data[0].isAdmin.should.be.equal(1);
+                        res.body.data[0].createdAt.should.be.equal(user.createdAt);
                         res.should.have.status(200);
                         done();
                     });
@@ -117,9 +117,9 @@ describe('User API', () => {
                     .get("/v1/users")
                     .set("x-access-token", user.accessToken)
                     .end((err, res) => {
-                        res.body.should.be.an.instanceof(Array);
-                        res.body.length.should.be.equal(2);
-                        res.body[0].should.include.all.keys(['id', 'username', 'email', 'isAdmin', 'createdAt']);
+                        res.body.data.should.be.an.instanceof(Array);
+                        res.body.data.length.should.be.equal(2);
+                        res.body.data[0].should.include.all.keys(['id', 'username', 'email', 'isAdmin', 'createdAt']);
                         res.should.have.status(200);
                         done();
                     });
@@ -214,19 +214,19 @@ describe('User API', () => {
                 .get("/v1/users")
                 .set("x-access-token", user3.accessToken)
                 .end((err, res) => {
-                    res.body.should.be.an.instanceof(Array);
-                    res.body.length.should.be.equal(2);
-                    res.body[0].should.include.all.keys(['id', 'username', 'email', 'isAdmin', 'createdAt']);
-                    res.body[0].id.should.be.equal(user2.id);
-                    res.body[0].username.should.be.equal(user2.username);
-                    res.body[0].email.should.be.equal(user2.email);
-                    res.body[0].isAdmin.should.be.equal(0);
-                    res.body[0].createdAt.should.be.equal(user2.createdAt);
-                    res.body[1].id.should.be.equal(user3.id);
-                    res.body[1].username.should.be.equal(user3.username);
-                    res.body[1].email.should.be.equal(user3.email);
-                    res.body[1].isAdmin.should.be.equal(1);
-                    res.body[1].createdAt.should.be.equal(user3.createdAt);
+                    res.body.data.should.be.an.instanceof(Array);
+                    res.body.data.length.should.be.equal(2);
+                    res.body.data[0].should.include.all.keys(['id', 'username', 'email', 'isAdmin', 'createdAt']);
+                    res.body.data[0].id.should.be.equal(user2.id);
+                    res.body.data[0].username.should.be.equal(user2.username);
+                    res.body.data[0].email.should.be.equal(user2.email);
+                    res.body.data[0].isAdmin.should.be.equal(0);
+                    res.body.data[0].createdAt.should.be.equal(user2.createdAt);
+                    res.body.data[1].id.should.be.equal(user3.id);
+                    res.body.data[1].username.should.be.equal(user3.username);
+                    res.body.data[1].email.should.be.equal(user3.email);
+                    res.body.data[1].isAdmin.should.be.equal(1);
+                    res.body.data[1].createdAt.should.be.equal(user3.createdAt);
                     res.should.have.status(200);
                     done();
                 });

@@ -3,7 +3,7 @@ const userController = require("../controllers/userController");
 const roleEnum = require('./roleEnum')
 
 /**
- * Validate if measurment of given id exists
+ * Validate if measurement of given id exists
  * @param {*} req 
  * @param {*} res 
  * @param {*} next 
@@ -18,7 +18,7 @@ const ifMeasurement = async (req, res, next) => {
 }
 
 /**
- * Validate if user is allowed to access the given measurment
+ * Validate if user is allowed to access the given measurement
  * @param {*} req 
  * @param {*} res 
  * @param {*} next 

@@ -26,7 +26,7 @@ function createNewTable(tableName, minWaveLength, maxWaveLength) {
 }
 
 /**
- * Add measurement meta data to the measurment table
+ * Add measurement meta data to the measurement table
  * @param {string} name 
  * @param {string} description 
  * @param number createdBy 

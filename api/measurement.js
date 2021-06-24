@@ -76,7 +76,7 @@ async function deleteMeasurement(req, res, next) {
 async function getMeasurementsOfUser(req, res, next) {
     try {
         const measurements = await measurementController.getMeasurementsOfUser(req.userId, req.query?.sort, req.query?.order, req.query?.page, req.query?.perPage);
-        if (measurements.length < 1) {
+        if (measurements.data.length < 1) {
             return res.status(404).json({ message: "Er zijn geen metingen gevonden" });
         }
         return res.status(200).json(measurements);
@@ -94,7 +94,7 @@ async function getMeasurementsOfUser(req, res, next) {
 async function getMeasurements(req, res, next) {
     try {
         const measurements = await measurementController.getMeasurements(req.query?.sort, req.query?.order, req.query?.page, req.query?.perPage);
-        if (measurements.length < 1) {
+        if (measurements.data.length < 1) {
             return res.status(404).json({ message: "Er zijn geen metingen gevonden" });
         }
         return res.status(200).json(measurements);

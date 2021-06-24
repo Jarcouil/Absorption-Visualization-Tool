@@ -130,10 +130,10 @@ describe('Measurements API', () => {
                 .get("/v1/measurement")
                 .set("x-access-token", user.accessToken)
                 .end((err, res) => {
-                    measurement1 = res.body[0]
-                    res.body.should.be.an.instanceof(Array);
-                    res.body.length.should.be.equal(1);
-                    res.body[0].should.include.all.keys(['id', 'name', 'description', 'createdAt', 'createdBy', 'username']);
+                    measurement1 = res.body.data[0]
+                    res.body.data.should.be.an.instanceof(Array);
+                    res.body.data.length.should.be.equal(1);
+                    res.body.data[0].should.include.all.keys(['id', 'name', 'description', 'createdAt', 'createdBy', 'username']);
                     res.should.have.status(200);
                     done();
                 });
@@ -142,7 +142,7 @@ describe('Measurements API', () => {
     })
 
     describe("It should GET measurement1 with a valid token with admin rights", () => {
-        it("It should give measurment1", (done) => {
+        it("It should give measurement1", (done) => {
             chai.request(server)
                 .get(`/v1/measurement/${measurement1.id}`)
                 .set("x-access-token", user.accessToken)
@@ -160,7 +160,7 @@ describe('Measurements API', () => {
     })
 
     describe("It should GET a measurement with a random id", () => {
-        it("It should give measurment1", (done) => {
+        it("It should give measurement1", (done) => {
             chai.request(server)
                 .get(`/v1/measurement/${faker.random.alphaNumeric()}`)
                 .set("x-access-token", user.accessToken)
@@ -172,7 +172,7 @@ describe('Measurements API', () => {
         });
     })
 
-    describe("It should GET measurements after other user has added a measurment", () => {
+    describe("It should GET measurements after other user has added a measurement", () => {
         it("It should give an error", (done) => {
             registerUser(user2).then(res => login(user2.username, user2.password)
                 .then(userResult => {
