@@ -21,7 +21,7 @@ function createNewTable(tableName, minWaveLength, maxWaveLength) {
         .createTable(tableName, (table) => {
             table.increments('id');
             for (var i = minWaveLength; i < maxWaveLength + 1; i++) {
-                table.float(i.toString());
+                table.specificType(i.toString(), 'float');
             }
         });
 }
