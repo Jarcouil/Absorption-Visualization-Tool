@@ -9,11 +9,17 @@ const options = {
         database: config.database.DB
     },
     migrations: {
+        tableName: "knex_migrations",
         directory: './migrations'
+    },
+    seeds: {
+        tableName: "knex_seeds",
+        directory: './seeds'
     }
 }
 
-module.exports = require("knex")(options);
+
+module.exports = options;
 
 const { attachPaginate } = require('knex-paginate');
 attachPaginate();
