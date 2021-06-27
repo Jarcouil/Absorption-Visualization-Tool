@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
-const config = require("../config/auth.config.js");
 const roleEnum = require('./roleEnum')
 const userController = require("../controllers/userController");
+const config = require("../config/config");
 
 /**
  * Verify if token is valid

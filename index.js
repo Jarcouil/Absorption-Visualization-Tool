@@ -20,7 +20,7 @@ app.use(fileUpload({
 }));
 
 app.use(session({
-	secret: 'secret',
+	secret: config.secret,
 	resave: true,
 	saveUninitialized: true
 }));

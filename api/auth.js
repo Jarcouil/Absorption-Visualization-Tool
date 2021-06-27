@@ -4,9 +4,9 @@ const { verifySignUp } = require("../middleware");
 const { verifyLogin } = require("../middleware")
 const userController = require("../controllers/userController");
 const crypto = require('crypto');
-const config = require("../config/auth.config");
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
+const config = require("../config/config");
 
 router.post(
     '/login',

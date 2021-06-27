@@ -17,5 +17,6 @@ module.exports = {
             acquire: process.env.ACQUIRE,
             idle: process.env.IDLE
         }
-    }
+    },
+    secret: process.env.SECRET
 };
