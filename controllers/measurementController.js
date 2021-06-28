@@ -111,10 +111,10 @@ function getTimestampsOfWavelength(tableName, wavelength) {
  * @param {number} timestamp 
  * @returns array with wavelengths of timestamp
  */
-function getWavelengthsOfTimestamp(tableName, timestamp) {
+function getWavelengthsOfTimestamp(tableName, timestamps) {
     return knex.from(tableName)
         .select('*')
-        .where('id', timestamp);
+        .whereIn('id', timestamps);
 }
 
 /**
