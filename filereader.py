@@ -1,23 +1,15 @@
 import sys
-from getpass import getpass
 import mysql.connector
 
 # DAD FILE
 # Ieder absorptie-meetpunt = 3 bytes (b1,b2,b3)
 # Absorptie = b1 + 256*b2 + 256*256*b3
 # Header = 49658 bytes (BOUNDARY + 16 bytes)
-#
-# 601 golflengtes
-# 601 golflengtes * 3 = 1803 bytes per golflengte blok.
-#
 
 c0 = -0.640000000000001
 c1 = 0.000000250000000000135
-c2 = 6.400E-05
-c3 = 0.016
 
-wavelength_offset = 200
-
+# connect to the database
 def connect_to_db():
     try:
         return mysql.connector.connect(
@@ -29,18 +21,24 @@ def connect_to_db():
     except mysql.connector.Error as e:
         print(e)
 
-def return_sql_string(columns, table_name, min_wavelength):
-    sql = "INSERT INTO `" + table_name + "` ("
-    for i in range(columns):
-        sql += "`" + str(i+min_wavelength) + "`, "
-    sql = sql[:-2]
-    sql += ") VALUES ("
+# Return SQL string for inserting data
+def return_sql_string(table_name):
+    sql_string = "INSERT INTO `" + table_name + "` ("
+    for i in range(ammount_of_columns):
+        sql_string += "`" + str(i+min_wavelength) + "`, "
+    sql_string = sql_string[:-2]
+    sql_string += ") VALUES ("
+    for i in range(ammount_of_columns):
+        sql_string += "%s, "
+    sql_string = sql_string[:-2] + ")"
 
-    return sql
+    return sql_string
 
+# calculate the absorption
 def get_absorption(long_int):
-    return c0 + c1 * long_int
+    return str(c0 + c1 * long_int)
 
+# get the content of the file in a list
 def get_listed_file(file_name):
     with open(file_name, "rb") as file:
         byte = file.read(1)
@@ -53,6 +51,7 @@ def get_listed_file(file_name):
     file.close()
     return(letters)
 
+# return the byte where header of the file ends
 def get_header_size(file_name):
     listed_file = get_listed_file(file_name)
 
@@ -65,36 +64,38 @@ def get_header_size(file_name):
 def get_int_from_byte(byte):
     return int.from_bytes(byte, byteorder='little')
 
-def insert_chromatogram_to_db(source_file, table_name, min_wavelength, max_wavelength):
+# insert row to database
+def insert_row_to_db(values):
+    sql_string = return_sql_string(table_name)
+    mycursor.execute(sql_string, values)
+    mydb.commit()
+
+# Iterate over file and insert absoprtions to the database
+def insert_chromatogram_to_db(source_file):
     with open(source_file, "rb") as file:
-        mydb = connect_to_db()
-        mycursor = mydb.cursor()
-        byte = file.read(get_header_size(source_file))  # read header of dad file
-
-        wavelength = min_wavelength
-        ammount_of_columns = max_wavelength - min_wavelength + 1
-
-        sql = return_sql_string(ammount_of_columns, table_name, wavelength)
+        byte = file.read(get_header_size(source_file))
+        current_wavelength = min_wavelength
         values = ()
 
         while byte:
             byte = file.read(3)
-            if len(byte) != 3:
+            if len(byte) != 3: # end of the file
                 break
 
-            absorption = get_absorption(get_int_from_byte(byte))
-            sql += "%s, "
-            values += (str(absorption),)
-
-            if wavelength % (max_wavelength) == 0:
-                sql = sql[:-2] + ")"
-                mycursor.execute(sql, values)
-                mydb.commit()
-                wavelength = min_wavelength
-                sql = return_sql_string(ammount_of_columns, table_name, wavelength)
+            values += (get_absorption(get_int_from_byte(byte)),)
+            if current_wavelength % (max_wavelength) == 0: # when row is read 
+                insert_row_to_db(values) # insert row to database
+                current_wavelength = min_wavelength # reset values
                 values = ()
-
             else:
-                wavelength += 1
+                current_wavelength += 1
+    file.close()
 
-insert_chromatogram_to_db(sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4]))
+mydb = connect_to_db()
+mycursor = mydb.cursor()
+table_name = sys.argv[2]
+min_wavelength = int(sys.argv[3])
+max_wavelength = int(sys.argv[4])
+ammount_of_columns = max_wavelength - min_wavelength + 1
+
+insert_chromatogram_to_db(sys.argv[1])

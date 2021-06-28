@@ -138,9 +138,7 @@ function getFile(directoryPath) {
  * @param {name} name 
  * @returns {string} measurement name
  */
-function getMeasurementName(id, name) {
-    return `${id}_${name}`;
-}
+const getMeasurementName = (id, name) => `${id}_${name}`;
 
 /**
  * Run python script which extracts the data of the .dad file

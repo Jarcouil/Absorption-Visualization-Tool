@@ -255,8 +255,6 @@ function deleteFile(folderName) {
  * @param {string} name 
  * @returns 
  */
-function getMeasurementName(id, name) {
-    return `${id}_${name}`;
-}
+ const getMeasurementName = (id, name) => `${id}_${name}`;
 
 module.exports = router;
