@@ -29,10 +29,10 @@ def connect_to_db():
     except mysql.connector.Error as e:
         print(e)
 
-def return_sql_string(columns, table_name, wavelength):
+def return_sql_string(columns, table_name, min_wavelength):
     sql = "INSERT INTO `" + table_name + "` ("
     for i in range(columns):
-        sql += "`" + str(i+wavelength) + "`, "
+        sql += "`" + str(i+min_wavelength) + "`, "
     sql = sql[:-2]
     sql += ") VALUES ("
 
@@ -65,14 +65,16 @@ def get_header_size(file_name):
 def get_int_from_byte(byte):
     return int.from_bytes(byte, byteorder='little')
 
-def insert_chromatogram_to_db(source_file, table_name, wavelengths):
+def insert_chromatogram_to_db(source_file, table_name, min_wavelength, max_wavelength):
     with open(source_file, "rb") as file:
         mydb = connect_to_db()
         mycursor = mydb.cursor()
         byte = file.read(get_header_size(source_file))  # read header of dad file
 
-        wavelength = wavelength_offset
-        sql = return_sql_string(wavelengths, table_name, wavelength)
+        wavelength = min_wavelength
+        ammount_of_columns = max_wavelength - min_wavelength + 1
+
+        sql = return_sql_string(ammount_of_columns, table_name, wavelength)
         values = ()
 
         while byte:
@@ -84,15 +86,15 @@ def insert_chromatogram_to_db(source_file, table_name, wavelengths):
             sql += "%s, "
             values += (str(absorption),)
 
-            if wavelength % (wavelengths+wavelength_offset -1) == 0:
+            if wavelength % (max_wavelength) == 0:
                 sql = sql[:-2] + ")"
                 mycursor.execute(sql, values)
                 mydb.commit()
-                wavelength = wavelength_offset
-                sql = return_sql_string(wavelengths, table_name, wavelength)
+                wavelength = min_wavelength
+                sql = return_sql_string(ammount_of_columns, table_name, wavelength)
                 values = ()
 
             else:
                 wavelength += 1
 
-insert_chromatogram_to_db(sys.argv[1], sys.argv[2], int(sys.argv[3]))
+insert_chromatogram_to_db(sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4]))

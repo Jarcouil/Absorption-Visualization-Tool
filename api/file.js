@@ -102,8 +102,7 @@ async function postNewFile(req, res, next) {
         makeDirectory(file_location);
         file.mv(`${file_location}/${file.name}`);
         await fileController.renameMeasurementTable(req.body.name, new_table_name);
-        const wavelengths = req.body.maxWaveLength - req.body.minWaveLength + 1;
-        runPythonScript(`${file_location}/${file.name}`, res, file, new_table_name, wavelengths, insertId[0].toString());
+        runPythonScript(`${file_location}/${file.name}`, res, file, new_table_name, req.body.minWaveLength, req.body.maxWaveLength, insertId[0].toString());
     } catch (error) { return res.status(500).send(error)}
 }
 
@@ -152,8 +151,8 @@ function getMeasurementName(id, name) {
  * @param {number} wavelengths 
  * @param {number} insertId 
  */
-function runPythonScript(sourceFile, res, file, tablename, wavelengths, insertId) {
-    const python = spawn('python', ['filereader.py', sourceFile, tablename, wavelengths]);
+function runPythonScript(sourceFile, res, file, tablename, minWaveLength, maxWaveLength, insertId) {
+    const python = spawn('python', ['filereader.py', sourceFile, tablename, minWaveLength, maxWaveLength]);
 
     python.on('close', (code) => {
         console.log(`child process close all stdio with code ${code}`);
