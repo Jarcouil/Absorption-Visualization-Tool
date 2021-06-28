@@ -60,13 +60,12 @@ def get_header_size(file_name):
             return i + 16
     return 0
 
-
+# get int from byte
 def get_int_from_byte(byte):
     return int.from_bytes(byte, byteorder='little')
 
 # insert row to database
 def insert_row_to_db(values):
-    sql_string = return_sql_string(table_name)
     mycursor.execute(sql_string, values)
     mydb.commit()
 
@@ -85,7 +84,7 @@ def insert_chromatogram_to_db(source_file):
             values += (get_absorption(get_int_from_byte(byte)),)
             if current_wavelength % (max_wavelength) == 0: # when row is read 
                 insert_row_to_db(values) # insert row to database
-                current_wavelength = min_wavelength # reset values
+                current_wavelength = min_wavelength # reset values to read next row
                 values = ()
             else:
                 current_wavelength += 1
@@ -97,5 +96,6 @@ table_name = sys.argv[2]
 min_wavelength = int(sys.argv[3])
 max_wavelength = int(sys.argv[4])
 ammount_of_columns = max_wavelength - min_wavelength + 1
+sql_string = return_sql_string(table_name)    
 
 insert_chromatogram_to_db(sys.argv[1])
