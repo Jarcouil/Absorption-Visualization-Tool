@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const roleEnum = require('./roleEnum')
+const roleEnum = require('./roleEnum');
 const userController = require("../controllers/userController");
 const config = require("../config/config");
 
@@ -31,7 +31,7 @@ const isAdmin = async (req, res, next) => {
     const user = await userController.getUser(req.userId);
     if (user?.isAdmin !== roleEnum.admin) return res.status(403).send({message: "Require Admin Role!"});
     next();
-  } catch (error) { return res.status(500).send(error)}
+  } catch (error) { return res.status(500).send(error);}
 };
 
 const authJwt = {

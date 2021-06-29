@@ -1,6 +1,6 @@
 const measurementController = require("../controllers/measurementController");
 const userController = require("../controllers/userController");
-const roleEnum = require('./roleEnum')
+const roleEnum = require('./roleEnum');
 
 /**
  * Validate if measurement of given id exists
@@ -14,8 +14,8 @@ const ifMeasurement = async (req, res, next) => {
         if (!measurement) return res.status(404).json({ message: 'Kon de meting niet vinden!' });
         res.measurement = measurement;
         next();     
-    } catch (error) { return res.status(500).send(error)}
-}
+    } catch (error) { return res.status(500).send(error);}
+};
 
 /**
  * Validate if user is allowed to access the given measurement
@@ -30,8 +30,8 @@ const isAllowed = async (req, res, next) => {
             return res.status(404).json({ message: 'Kon de meting niet vinden!' });
         }
         next();
-    } catch (error) { return res.status(500).send(error)}
-}
+    } catch (error) { return res.status(500).send(error);}
+};
 
 const verifyMeasurement = {
     ifMeasurement: ifMeasurement,

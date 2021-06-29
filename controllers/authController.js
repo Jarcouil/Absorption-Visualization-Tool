@@ -1,6 +1,6 @@
 const mail_config = require("../config/mail.config");
 const nodemailer = require("nodemailer");
-const options = require('../knexfile')
+const options = require('../knexfile');
 const knex = require("knex")(options);
 var bcrypt = require("bcryptjs");
 
@@ -13,7 +13,7 @@ module.exports = {
     updatePassword,
     deleteResetToken,
     deleteAllResetTokens
-}
+};
 
 /**
  * Register user with given data
@@ -24,7 +24,7 @@ module.exports = {
  */
 function register(username, email, password) {
     return knex('users')
-        .insert({ username: username, email: email, password: bcrypt.hashSync(password, 8) })
+        .insert({ username: username, email: email, password: bcrypt.hashSync(password, 8) });
 }
 
 /**
@@ -35,7 +35,7 @@ function register(username, email, password) {
  */
 function addResetToken(userId, resetToken) {
     return knex('reset_token')
-        .insert({ user_id: userId, reset_token: resetToken })
+        .insert({ user_id: userId, reset_token: resetToken });
 }
 
 /**
@@ -46,7 +46,7 @@ function addResetToken(userId, resetToken) {
 function deleteResetToken(token) {
     return knex.from('reset_token')
         .where('reset_token', token)
-        .del()
+        .del();
 }
 
 /**
@@ -55,7 +55,7 @@ function deleteResetToken(token) {
  */
 function deleteAllResetTokens() {
     return knex.from('reset_token')
-        .del()
+        .del();
 }
 
 /**
@@ -119,7 +119,7 @@ async function requestResetPassword(username, email, resetToken) {
             }
             resolve();
         });
-    })
+    });
 }
 
 /**

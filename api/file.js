@@ -7,7 +7,7 @@ const Json2csvParser = require("json2csv").Parser;
 const router = require('express').Router({ mergeParams: true });
 const fileController = require('./../controllers/fileController');
 
-const { verifyFile } = require("../middleware")
+const { verifyFile } = require("../middleware");
 const { verifyMeasurement } = require("../middleware");
 
 router.post(
@@ -65,8 +65,8 @@ async function getCSV(req, res, next) {
         const jsonData = JSON.parse(JSON.stringify(data));
         const json2csvParser = new Json2csvParser({ header: true });
         const csv = json2csvParser.parse(jsonData);
-        return res.send(csv)
-    } catch (error) { return res.status(500).send(error)}
+        return res.send(csv);
+    } catch (error) { return res.status(500).send(error);}
 }
 
 /**
@@ -103,7 +103,7 @@ async function postNewFile(req, res, next) {
         file.mv(`${file_location}/${file.name}`);
         await fileController.renameMeasurementTable(req.body.name, new_table_name);
         runPythonScript(`${file_location}/${file.name}`, res, file, new_table_name, req.body.minWaveLength, req.body.maxWaveLength, insertId[0].toString());
-    } catch (error) { return res.status(500).send(error)}
+    } catch (error) { return res.status(500).send(error);}
 }
 
 /**

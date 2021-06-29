@@ -36,7 +36,7 @@ router.delete(
  */
 async function getUsers(req, res, next) {
     try {
-        const users = await userController.getUsers(req.query?.sort, req.query?.order, req.query?.page, req.query?.perPage)
+        const users = await userController.getUsers(req.query?.sort, req.query?.order, req.query?.page, req.query?.perPage);
         if (users.data.length < 1) {
             return res.status(404).json({ message: "Er zijn geen gebruikers gevonden" });
         }
@@ -54,7 +54,7 @@ async function getUsers(req, res, next) {
  */
 async function deleteUser(req, res, next) {
     try {
-        await userController.deleteUser(req.params.id)
+        await userController.deleteUser(req.params.id);
         return res.status(200).send({ message: `Gebruiker ${res.user.username} is succesvol verwijderd` });
     } catch (error) { return res.status(500).send(error); }
 }
@@ -80,7 +80,7 @@ function getUser(req, res, next) {
  */
 async function toggleAdmin(req, res, next) {
     try {
-        await userController.toggleAdmin(req.params.id)
+        await userController.toggleAdmin(req.params.id);
         return res.status(200).json({ message: `Gebruiker ${res.user.username} zijn admin rechten zijn succesvol gewijzigd.` });
 
     } catch (error) { return res.status(500).send(error); }

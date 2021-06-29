@@ -62,7 +62,7 @@ async function deleteMeasurement(req, res, next) {
         await measurementController.deleteMeasurementDataTable(getMeasurementName(req.params.id, res.measurement.name));
         await measurementController.deleteMeasurementFromMeasurements(req.params.id);
         return res.status(200).json({ message: `Meting ${res.measurement.name} is succesvol verwijderd` });
-    } catch (error) { return res.status(500).send(error)}
+    } catch (error) { return res.status(500).send(error);}
 }
 
 /**
@@ -80,7 +80,7 @@ async function getMeasurementsOfUser(req, res, next) {
             return res.status(404).json({ message: "Er zijn geen metingen gevonden" });
         }
         return res.status(200).json(measurements);
-    } catch (error) { return res.status(500).send(error)}
+    } catch (error) { return res.status(500).send(error);}
 }
 
 /**
@@ -98,7 +98,7 @@ async function getMeasurements(req, res, next) {
             return res.status(404).json({ message: "Er zijn geen metingen gevonden" });
         }
         return res.status(200).json(measurements);
-    } catch (error) { return res.status(500).send(error)}
+    } catch (error) { return res.status(500).send(error);}
 }
 
 /**
@@ -123,7 +123,7 @@ async function getMeasurementData(req, res, next) {
     try {
         const data = await measurementController.getMeasurementData(getMeasurementName(res.measurement.id, res.measurement.name));
         return res.status(200).json(removeIdFromAllData(data));
-    } catch (error) { return res.status(500).send(error)}
+    } catch (error) { return res.status(500).send(error);}
 }
 
 /**
@@ -138,7 +138,7 @@ async function getTimestampsOfWavelength(req, res, next) {
     try {
         const data = await measurementController.getTimestampsOfWavelength(getMeasurementName(res.measurement.id, res.measurement.name), req.query.wavelength);
         return res.status(200).json((data));
-    } catch (error) { return res.status(500).send(error)}
+    } catch (error) { return res.status(500).send(error);}
 }
 
 /**
@@ -153,7 +153,7 @@ async function getTimestampsOfWavelength(req, res, next) {
     try {
         const data = await measurementController.getWavelengthsOfTimestamp(getMeasurementName(res.measurement.id, res.measurement.name), JSON.parse(req.query.timestamps));
         return res.status(200).json(normalizeResultsArray(data));
-    } catch (error) { return res.status(500).send(error)}
+    } catch (error) { return res.status(500).send(error);}
 }
 
 /**
@@ -166,8 +166,8 @@ async function getTimestampsOfWavelength(req, res, next) {
  async function getWavelengths(req, res, next) {
     try {
         const data = await measurementController.getWavelengthsOfMeasurement(getMeasurementName(res.measurement.id, res.measurement.name));
-        return res.status(200).json(removeIdFromWavelengths(normalizeResultsArray(data)['columns']));
-    } catch (error) { return res.status(500).send(error)}
+        return res.status(200).json(removeIdFromWavelengths(normalizeResultsArray(data).columns));
+    } catch (error) { return res.status(500).send(error);}
 }
 
 /**
@@ -180,8 +180,8 @@ async function getTimestampsOfWavelength(req, res, next) {
  async function getTimestamps(req, res, next) {
     try {
         const data = await  measurementController.getAllTimestampsOfMeasurement(getMeasurementName(res.measurement.id, res.measurement.name));
-        return res.status(200).json((normalizeResultsArray(data)['id']));
-    } catch (error) { return res.status(500).send(error)}
+        return res.status(200).json((normalizeResultsArray(data).id));
+    } catch (error) { return res.status(500).send(error);}
 }
 
 /**
@@ -193,10 +193,10 @@ function normalizeResultsArray(results) {
     var normalResults = results.map(v => Object.assign({}, v));
     return normalResults.reduce(function (r, e) {
         return Object.keys(e).forEach(function (k) {
-            if (!r[k]) r[k] = [].concat(e[k])
-            else r[k] = r[k].concat(e[k])
-        }), r
-    }, {})
+            if (!r[k]) r[k] = [].concat(e[k]);
+            else r[k] = r[k].concat(e[k]);
+        }), r;
+    }, {});
 }
 
 /**
@@ -210,7 +210,7 @@ function normalizeResultsSingle(results) {
         return Object.keys(e).forEach(function (k) {
             if (!r[k]) r[k] = e[k];
             else r[k] = r[k].concat(e[k]);
-        }), r
+        }), r;
     }, {});
 }
 
@@ -232,8 +232,8 @@ function removeIdFromWavelengths(data) {
  */
 function removeIdFromAllData(result) {
     result.map(element => {
-        delete element['id'];
-    })
+        delete element.id;
+    });
     return result;
 }
 
@@ -243,7 +243,7 @@ function removeIdFromAllData(result) {
  */
 function deleteFile(folderName) {
     try {
-        fs.rmSync(folderName, { recursive: true })
+        fs.rmSync(folderName, { recursive: true });
     } catch (err) {
         console.log("err", err);
     }

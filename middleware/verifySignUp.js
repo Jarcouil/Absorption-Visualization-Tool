@@ -1,4 +1,4 @@
-const roleEnum = require('./roleEnum')
+const roleEnum = require('./roleEnum');
 const userController = require("../controllers/userController");
 
 /**
@@ -12,7 +12,7 @@ const checkParameters = (req, res, next) => {
   if (!req.body.email) return res.status(400).json({ message: "Emailadres is verplicht!" });
   if (!req.body.password) return res.status(400).json({ message: "Wachtwoord is verplicht!" });
   next();
-}
+};
 
 /**
  * Check if username is already taken
@@ -23,9 +23,9 @@ const checkParameters = (req, res, next) => {
 const checkDuplicateUsername = (req, res, next) => {
   userController.getUserByUsername(req.body.username).then(user => {
     if (user) return res.status(400).send({message: "Helaas! Deze gebruikersnaam is helaas al in gebruik!"});
-    next()
+    next();
   });
-}
+};
 
 /**
  * Check if email is already taken
@@ -67,7 +67,7 @@ const checkValidEmail = (req, res, next) => {
   if (!re.test(req.body.email)) return res.status(400).send({message: "Helaas! Dit emailadres is helaas niet geldig!"});
 
   next();
-}
+};
 
 /**
  * Check if password is of minimal length.
@@ -78,7 +78,7 @@ const checkValidEmail = (req, res, next) => {
 const checkPasswordLength = (req, res, next) => {
   if (req.body.password.length < 6) return res.status(400).send({message: "Wachtwoord moet minimaal 6 tekens lang zijn!"});
   next();
-}
+};
 
 const verifySignUp = {
   checkDuplicateEmail: checkDuplicateEmail,

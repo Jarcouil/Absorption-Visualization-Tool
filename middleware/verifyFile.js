@@ -1,4 +1,4 @@
-const path = require('path')
+const path = require('path');
 
 /**
  * Check if all required parameters are present.
@@ -30,7 +30,7 @@ const checkParameters = (req, res, next) => {
     }
 
     next();
-}
+};
 
 const verifyFile = {
     checkParameters: checkParameters,

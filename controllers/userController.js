@@ -1,4 +1,4 @@
-const options = require('../knexfile')
+const options = require('../knexfile');
 const knex = require("knex")(options);
 
 module.exports = {
@@ -9,7 +9,7 @@ module.exports = {
   getUser,
   getUsers,
   toggleAdmin
-}
+};
 
 /**
  * Get all users from database

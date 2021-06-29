@@ -1,4 +1,4 @@
-const options = require('../knexfile')
+const options = require('../knexfile');
 const knex = require("knex")(options);
 
 module.exports = {
@@ -6,7 +6,7 @@ module.exports = {
     createNewTable,
     renameMeasurementTable,
     getCustomData,
-}
+};
 
 /**
  * Create a new table for the data of a new measurement

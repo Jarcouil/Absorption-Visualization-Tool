@@ -1,4 +1,4 @@
-const options = require('../knexfile')
+const options = require('../knexfile');
 const knex = require("knex")(options);
 
 module.exports = {
@@ -13,7 +13,7 @@ module.exports = {
     getMeasurementData,
     getMeasurementsOfUser,
     deleteAllMeasurements
-}
+};
 
 /**
  * Get all measurements from the database

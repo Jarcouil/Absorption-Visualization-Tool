@@ -12,8 +12,8 @@ const ifUser = async (req, res, next) => {
         if (!user) return res.status(404).json({ message: "Gebruiker is niet gevonden" });
         res.user = user;
         next();
-    } catch (error) { return res.status(500).send(error)}
-}
+    } catch (error) { return res.status(500).send(error);}
+};
 
 const verifyuser = {
     ifUser: ifUser,
