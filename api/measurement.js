@@ -200,21 +200,6 @@ function normalizeResultsArray(results) {
 }
 
 /**
- * Normalize array results (Merging the same keys of array of objects together)
- * @param {*} results 
- * @returns normalized array
- */
-function normalizeResultsSingle(results) {
-    var normalResults = results.map(v => Object.assign({}, v));
-    return normalResults.reduce(function (r, e) {
-        return Object.keys(e).forEach(function (k) {
-            if (!r[k]) r[k] = e[k];
-            else r[k] = r[k].concat(e[k]);
-        }), r;
-    }, {});
-}
-
-/**
  * Remove id from wavelengths
  * @param {Array} columns 
  * @returns data

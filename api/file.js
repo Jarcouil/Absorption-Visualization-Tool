@@ -11,7 +11,7 @@ const { verifyFile } = require("../middleware");
 const { verifyMeasurement } = require("../middleware");
 
 router.post(
-    '/upload-file', 
+    '/upload-file',
     [verifyFile.checkParameters],
     postNewFile
 );
@@ -39,8 +39,8 @@ router.get(
  * @param {*} req.params.id measurement id 
  */
 function getFileName(req, res, next) {
-    const file_location = `./uploads/${getMeasurementName(req.params.id, res.measurement.name)}`;
-    const file = getFile(file_location);
+    const fileLocation = `./uploads/${getMeasurementName(req.params.id, res.measurement.name)}`;
+    const file = getFile(fileLocation);
     if (file == null) {
         return res.status(404).json({ message: 'Kon het bestand niet vinden' });
     }
@@ -60,13 +60,13 @@ function getFileName(req, res, next) {
  */
 async function getCSV(req, res, next) {
     try {
-        const table_name = getMeasurementName(req.params.id, res.measurement.name);
-        const data = await fileController.getCustomData(table_name, req.query.minWavelength, req.query.maxWavelength, req.query.minTimestamp, req.query.maxTimestamp);
+        const tableName = getMeasurementName(req.params.id, res.measurement.name);
+        const data = await fileController.getCustomData(tableName, req.query.minWavelength, req.query.maxWavelength, req.query.minTimestamp, req.query.maxTimestamp);
         const jsonData = JSON.parse(JSON.stringify(data));
         const json2csvParser = new Json2csvParser({ header: true });
         const csv = json2csvParser.parse(jsonData);
         return res.send(csv);
-    } catch (error) { return res.status(500).send(error);}
+    } catch (error) { return res.status(500).send(error); }
 }
 
 /**
@@ -77,8 +77,8 @@ async function getCSV(req, res, next) {
  * @param {*} req.params.id measurement id
  */
 function downloadDadFile(req, res, next) {
-    const file_location = `./uploads/${getMeasurementName(req.params.id, res.measurement.name)}`;
-    return res.download(`${file_location}/${getFile(file_location)}`);
+    const fileLocation = `./uploads/${getMeasurementName(req.params.id, res.measurement.name)}`;
+    return res.download(`${fileLocation}/${getFile(fileLocation)}`);
 }
 
 /**
@@ -94,16 +94,16 @@ function downloadDadFile(req, res, next) {
  */
 async function postNewFile(req, res, next) {
     try {
-        const file = req.files.file;
-        await fileController.createNewTable(req.body.name, +req.body.minWaveLength, +req.body.maxWaveLength);
-        const insertId = await fileController.addToMeasurements(req.body.name, req.body.description, req.userId);
-        const new_table_name = getMeasurementName(insertId[0], req.body.name);
-        const file_location = `./uploads/${new_table_name}`;
-        makeDirectory(file_location);
-        file.mv(`${file_location}/${file.name}`);
-        await fileController.renameMeasurementTable(req.body.name, new_table_name);
-        runPythonScript(`${file_location}/${file.name}`, res, file, new_table_name, req.body.minWaveLength, req.body.maxWaveLength, insertId[0].toString());
-    } catch (error) { return res.status(500).send(error);}
+        const file = req.files.file; 
+        const insertId = await fileController.addToMeasurements(req.body.name, req.body.description, req.userId); // add measurement to measurmeent table
+        const tableName = getMeasurementName(insertId[0], req.body.name); // get unique measurement name
+        const fileLocation = `./uploads/${tableName}`; // create foldername
+        makeDirectory(fileLocation); // create folder
+        file.mv(`${fileLocation}/${file.name}`); // move file to folder
+        await fileController.createNewTable(tableName, +req.body.minWaveLength, +req.body.maxWaveLength); // create data table for measurmeent
+        await runPythonScript(`${fileLocation}/${file.name}`, tableName, req.body.minWaveLength, req.body.maxWaveLength); // run file parser
+        return res.send({ id: insertId, message: 'Meting is succesvol opgeslagen!' });
+    } catch (error) { return res.status(500).json("Er heeft zich een probleem voorgedaan met het verwerken van het bestand."); }
 }
 
 /**
@@ -149,22 +149,13 @@ const getMeasurementName = (id, name) => `${id}_${name}`;
  * @param {number} wavelengths 
  * @param {number} insertId 
  */
-function runPythonScript(sourceFile, res, file, tablename, minWaveLength, maxWaveLength, insertId) {
-    const python = spawn('python', ['filereader.py', sourceFile, tablename, minWaveLength, maxWaveLength]);
-
-    python.on('close', (code) => {
-        console.log(`child process close all stdio with code ${code}`);
-        if (code !== 0) return res.status(500).json("Er heeft zich een probleem voorgedaan met het verwerken van het bestand.");
-
-        return res.send({
-            id: insertId,
-            status: true,
-            message: 'Meting is succesvol opgeslagen!',
-            data: {
-                name: file.name,
-                mimetype: file.mimetype,
-                size: file.size
-            }
+function runPythonScript(sourceFile, tablename, minWaveLength, maxWaveLength) {
+    return new Promise(function (resolve, reject) {
+        const python = spawn('python', ['filereader.py', sourceFile, tablename, minWaveLength, maxWaveLength]);
+        python.on('close', (code) => {
+            console.log(`child process close all stdio with code ${code}`);
+            if (code !== 0) reject();
+            resolve();
         });
     });
 }
