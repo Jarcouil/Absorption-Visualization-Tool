@@ -12,7 +12,7 @@ const port = config.port
 const api = require('./api')
 
 var corsOptions = {
-	origin: "http://localhost:3000"
+	origin: "http://localhost:4200"
 };
 
 app.use(fileUpload({
@@ -30,7 +30,7 @@ app.use('/pathfinder', function(req, res, next){
 	next();
   }, pathfinderUI.router);
 
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan('dev'));
