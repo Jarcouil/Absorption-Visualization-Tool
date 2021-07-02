@@ -103,7 +103,7 @@ async function postNewFile(req, res, next) {
         await fileController.createNewTable(tableName, +req.body.minWaveLength, +req.body.maxWaveLength); // create data table for measurmeent
         await runPythonScript(`${fileLocation}/${file.name}`, tableName, req.body.minWaveLength, req.body.maxWaveLength); // run file parser
         return res.send({ id: insertId, message: 'Meting is succesvol opgeslagen!' });
-    } catch (error) { return res.status(500).json("Er heeft zich een probleem voorgedaan met het verwerken van het bestand."); }
+    } catch (error) { return res.status(500).json({message: "Er heeft zich een probleem voorgedaan met het verwerken van het bestand."}) }
 }
 
 /**
