@@ -10,7 +10,8 @@ const checkParameters = (req, res, next) => {
     if (!req.files?.file) {
         return res.status(400).json({ message: "Bestand is verplicht!" });
     }
-    if (path.extname(req.files.file.name) !== '.dad') {
+    console.log(path.extname(req.files.file.name))
+    if (path.extname(req.files.file.name) !== '.dad' && path.extname(req.files.file.name) !== '.DAD') {
         return res.status(400).json({ message: "Bestand moet het .dad extensie hebben!" });
     }
     if (!req.body.name) {

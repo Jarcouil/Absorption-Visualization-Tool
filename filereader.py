@@ -64,13 +64,38 @@ def get_header_size(file_name):
 def get_int_from_byte(byte):
     return int.from_bytes(byte, byteorder='little')
 
-# insert row to database
-def insert_row_to_db(values):
-    mycursor.execute(sql_string, values)
-    mydb.commit()
+# increase max allowed packet size
+def set_max_packet_size():
+    try:
+        sql = 'SET GLOBAL max_allowed_packet=512*1024*1024'
+        mycursor.execute(sql)
+    except mysql.connector.Error as e:
+        print(e)
 
-# Iterate over file and insert absoprtions to the database
-def insert_chromatogram_to_db(source_file):
+# create new connection and insert rows one by one when packet size is too large
+def insert_rows_single(sql_string, records):
+    mydb2 = connect_to_db()
+    mycursor2 = mydb.cursor()
+    try:
+        for row in records:
+            mycursor2.execute(sql_string, row)
+            mydb2.commit()
+    except mysql.connector.Error as e:
+        print(e)
+
+# insert multiple rows to database
+def insert_rows_to_db(sql_string, records):
+    set_max_packet_size()
+    try:
+        mycursor.executemany(sql_string, records)
+        mydb.commit()
+    except mysql.connector.Error as e:
+        print(e)
+        insert_rows_single(sql_string, records)
+        
+# return all values of the file
+def get_chromatogram_records(source_file):
+    records = []
     with open(source_file, "rb") as file:
         byte = file.read(get_header_size(source_file))
         current_wavelength = min_wavelength
@@ -78,24 +103,28 @@ def insert_chromatogram_to_db(source_file):
 
         while byte:
             byte = file.read(3)
-            if len(byte) != 3: # end of the file
+            if len(byte) != 3:  # end of the file
                 break
 
             values += (get_absorption(get_int_from_byte(byte)),)
-            if current_wavelength % (max_wavelength) == 0: # when row is read 
-                insert_row_to_db(values) # insert row to database
-                current_wavelength = min_wavelength # reset values to read next row
+            if current_wavelength % (max_wavelength) == 0:  # when row is read
+                records.append(values)
+                current_wavelength = min_wavelength  # reset values to read next row
                 values = ()
             else:
                 current_wavelength += 1
     file.close()
+    return records
+
 
 mydb = connect_to_db()
 mycursor = mydb.cursor()
+
 table_name = sys.argv[2]
 min_wavelength = int(sys.argv[3])
 max_wavelength = int(sys.argv[4])
 ammount_of_columns = max_wavelength - min_wavelength + 1
-sql_string = return_sql_string(table_name)    
 
-insert_chromatogram_to_db(sys.argv[1])
+records = get_chromatogram_records(sys.argv[1])
+sql = return_sql_string(table_name)
+insert_rows_to_db(sql, records)
