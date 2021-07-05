@@ -75,7 +75,7 @@ def set_max_packet_size():
 # create new connection and insert rows one by one when packet size is too large
 def insert_rows_single(sql_string, records):
     mydb2 = connect_to_db()
-    mycursor2 = mydb.cursor()
+    mycursor2 = mydb2.cursor()
     try:
         for row in records:
             mycursor2.execute(sql_string, row)

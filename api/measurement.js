@@ -121,8 +121,9 @@ function getMeasurement(req, res, next) {
  */
 async function getMeasurementData(req, res, next) {
     try {
-        const data = await measurementController.getMeasurementData(getMeasurementName(res.measurement.id, res.measurement.name));
-        return res.status(200).json(removeIdFromAllData(data));
+        const tableName = getMeasurementName(req.params.id, res.measurement.name);
+        const data = await measurementController.getMeasurementData(tableName, req.query.xMin, req.query.xMax, req.query.yMin, req.query.yMax);
+        return res.status(200).json(data);
     } catch (error) { return res.status(500).send(error);}
 }
 

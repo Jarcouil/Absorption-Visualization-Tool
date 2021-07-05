@@ -61,7 +61,7 @@ function getCustomData(tableName, minWavelength, maxWavelength, minTimestamp, ma
     var columns = ['id'];
     var rows = [];
     for (var i = minWavelength; i <= maxWavelength; i++) columns.push(i.toString()); // add all numbers between min and max wavelength to array
-    for (var j = minTimestamp; j <= maxTimestamp; j++) rows.push(j); // add all numbers between min and max timestamp to array
+    for (var j = minTimestamp; j <= maxTimestamp; j++) rows.push(+j); // add all numbers between min and max timestamp to array
 
     return knex.columns(columns).select()
         .from(tableName)
