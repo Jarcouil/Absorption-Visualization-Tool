@@ -92,6 +92,7 @@ function login(username) {
     return knex.from('users')
         .select('*')
         .where('username', username)
+        .orWhere('email', username)
         .first();
 }
 
