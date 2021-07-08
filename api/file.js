@@ -151,7 +151,7 @@ const getMeasurementName = (id, name) => `${id}_${name}`;
  */
 function runPythonScript(sourceFile, tablename, minWaveLength, maxWaveLength) {
     return new Promise(function (resolve, reject) {
-        const python = spawn('python', ['filereader.py', sourceFile, tablename, minWaveLength, maxWaveLength], {stdio: "inherit"});
+        const python = spawn('python', ['filereader.py', sourceFile, tablename, minWaveLength, maxWaveLength, process.env.NODE_ENV], {stdio: "inherit"});
         python.on('data', function(data){
             process.stdout.write("python script output",data);
         });

@@ -1,5 +1,7 @@
 import sys
 import mysql.connector
+import os
+from dotenv import load_dotenv
 
 # DAD FILE
 # Ieder absorptie-meetpunt = 3 bytes (b1,b2,b3)
@@ -13,10 +15,10 @@ c1 = 0.000000250000000000135
 def connect_to_db():
     try:
         return mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="root",
-            database="chromatogram"
+            host=os.environ.get('HOST'),
+            user=os.environ.get('USER'),
+            password=os.environ.get('PASSWORD'),
+            database=os.environ.get('DB')
         )
     except mysql.connector.Error as e:
         print(e)
@@ -74,6 +76,7 @@ def set_max_packet_size():
 
 # create new connection and insert rows one by one when packet size is too large
 def insert_rows_single(sql_string, records):
+    print('inserting rows in for loop')
     mydb2 = connect_to_db()
     mycursor2 = mydb2.cursor()
     try:
@@ -116,6 +119,8 @@ def get_chromatogram_records(source_file):
     file.close()
     return records
 
+node_env = sys.argv[5]
+load_dotenv(node_env + '.env')
 
 mydb = connect_to_db()
 mycursor = mydb.cursor()
