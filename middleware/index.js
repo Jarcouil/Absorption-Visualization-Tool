@@ -4,6 +4,7 @@ const verifyFile = require("./verifyFile");
 const verifyLogin = require("./verifyLogin");
 const verifyMeasurement = require("./verifyMeasurement");
 const verifyUser = require("./verifyUser");
+const verifyExport = require("./verifyExport");
 
 module.exports = {
   authJwt,
@@ -11,5 +12,6 @@ module.exports = {
   verifyFile,
   verifyMeasurement,
   verifyLogin,
-  verifyUser
+  verifyUser,
+  verifyExport
 };

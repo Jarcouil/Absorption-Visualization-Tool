@@ -7,6 +7,7 @@ const Json2csvParser = require("json2csv").Parser;
 const router = require('express').Router({ mergeParams: true });
 const fileController = require('./../controllers/fileController');
 
+const { verifyExport } = require("../middleware");
 const { verifyFile } = require("../middleware");
 const { verifyMeasurement } = require("../middleware");
 
@@ -27,7 +28,7 @@ router.get(
 );
 router.get(
     '/csv/:id',
-    [verifyMeasurement.ifMeasurement, verifyMeasurement.isAllowed],
+    [verifyMeasurement.ifMeasurement, verifyMeasurement.isAllowed, verifyExport.checkParameters],
     getCSV
 );
 
@@ -53,15 +54,13 @@ function getFileName(req, res, next) {
  * @param {*} res 
  * @param {*} next 
  * @param {*} req.params.id measurement id
- * @param {*} req.query.minWavelength minWavelength
- * @param {*} req.query.maxWavelength maxWavelength
- * @param {*} req.query.minTimestamp minTimestamp
- * @param {*} req.query.maxTimestamp maxTimestamp
+ * @param {*} req.query.wavelengths Wavelengths
+ * @param {*} req.query.timestamps Timestamps
  */
 async function getCSV(req, res, next) {
     try {
         const tableName = getMeasurementName(req.params.id, res.measurement.name);
-        const data = await fileController.getCustomData(tableName, req.query.minWavelength, req.query.maxWavelength, req.query.minTimestamp, req.query.maxTimestamp);
+        const data = await fileController.getCustomData(tableName, res.timestamps, res.wavelengths);
         const jsonData = JSON.parse(JSON.stringify(data));
         const json2csvParser = new Json2csvParser({ header: true });
         const csv = json2csvParser.parse(jsonData);

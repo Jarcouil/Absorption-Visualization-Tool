@@ -51,19 +51,14 @@ function renameMeasurementTable(tableName, newTableName) {
 /**
  * Get the measurement data of the given min and max wavelengths and the given min and max timestamps
  * @param {string} tableName 
- * @param {number} minWavelength 
- * @param {number} maxWavelength 
- * @param {number} minTimestamp 
- * @param {number} maxTimestamp 
+ * @param {number[]} timestamps 
+ * @param {number[]} wavelengths
  * @returns array results
  */
-function getCustomData(tableName, minWavelength, maxWavelength, minTimestamp, maxTimestamp) {
-    var columns = ['id'];
-    var rows = [];
-    for (var i = minWavelength; i <= maxWavelength; i++) columns.push(i.toString()); // add all numbers between min and max wavelength to array
-    for (var j = minTimestamp; j <= maxTimestamp; j++) rows.push(+j); // add all numbers between min and max timestamp to array
+function getCustomData(tableName, timestamps, wavelengths) {
+    wavelengths.unshift('id')
 
-    return knex.columns(columns).select()
+    return knex.columns(wavelengths).select()
         .from(tableName)
-        .whereIn('id', rows);
+        .whereIn('id', timestamps);
 }
