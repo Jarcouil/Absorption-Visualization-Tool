@@ -20,6 +20,7 @@ function createNewTable(tableName, minWaveLength, maxWaveLength) {
         .dropTableIfExists(tableName)
         .createTable(tableName, (table) => {
             table.increments('id');
+            table.decimal('timestamp')
             for (var i = minWaveLength; i < maxWaveLength + 1; i++) {
                 table.specificType(i.toString(), 'float');
             }
@@ -33,9 +34,9 @@ function createNewTable(tableName, minWaveLength, maxWaveLength) {
  * @param number createdBy 
  * @returns insertId
  */
-function addToMeasurements(name, description, createdBy) {
+function addToMeasurements(name, description, createdBy, samplingRate) {
     return knex('measurements')
-        .insert({ name: name, description: description, created_by: createdBy });
+        .insert({ name: name, description: description, created_by: createdBy, sampling_rate: samplingRate });
 }
 
 /**
@@ -56,9 +57,9 @@ function renameMeasurementTable(tableName, newTableName) {
  * @returns array results
  */
 function getCustomData(tableName, timestamps, wavelengths) {
-    wavelengths.unshift('id')
+    wavelengths.unshift('timestamp')
 
     return knex.columns(wavelengths).select()
         .from(tableName)
-        .whereIn('id', timestamps);
+        .whereIn('timestamp', timestamps);
 }

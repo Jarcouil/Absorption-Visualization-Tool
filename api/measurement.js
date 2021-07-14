@@ -167,7 +167,7 @@ async function getTimestampsOfWavelength(req, res, next) {
  async function getWavelengths(req, res, next) {
     try {
         const data = await measurementController.getWavelengthsOfMeasurement(getMeasurementName(res.measurement.id, res.measurement.name));
-        return res.status(200).json(removeIdFromWavelengths(normalizeResultsArray(data).columns));
+        return res.status(200).json(normalizeResultsArray(data).columns);
     } catch (error) { return res.status(500).send(error);}
 }
 
@@ -181,7 +181,7 @@ async function getTimestampsOfWavelength(req, res, next) {
  async function getTimestamps(req, res, next) {
     try {
         const data = await  measurementController.getAllTimestampsOfMeasurement(getMeasurementName(res.measurement.id, res.measurement.name));
-        return res.status(200).json((normalizeResultsArray(data).id));
+        return res.status(200).json((normalizeResultsArray(data).timestamp));
     } catch (error) { return res.status(500).send(error);}
 }
 
@@ -198,29 +198,6 @@ function normalizeResultsArray(results) {
             else r[k] = r[k].concat(e[k]);
         }), r;
     }, {});
-}
-
-/**
- * Remove id from wavelengths
- * @param {Array} columns 
- * @returns data
- */
-function removeIdFromWavelengths(data) {
-    const index = data.indexOf('id');
-    if (index > -1) data.splice(index, 1);
-    return data;
-}
-
-/**
- * Remove id from all data
- * @param {object of objects} result 
- * @returns result
- */
-function removeIdFromAllData(result) {
-    result.map(element => {
-        delete element.id;
-    });
-    return result;
 }
 
 /**

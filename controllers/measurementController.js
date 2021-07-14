@@ -24,7 +24,7 @@ module.exports = {
 function getMeasurements(sort = 'id', order = 'asc', page = 1, perPage = 10) {
     return knex.from('measurements')
         .innerJoin('users', 'measurements.created_by', 'users.id')
-        .select('users.username', 'measurements.id', 'measurements.name', 'measurements.description', 'measurements.created_at AS createdAt', 'measurements.created_by as createdBy',)
+        .select('users.username', 'measurements.id', 'measurements.name', 'measurements.description', 'measurements.sampling_rate AS samplingRate', 'measurements.created_at AS createdAt', 'measurements.created_by as createdBy',)
         .orderBy(sort, order)
         .paginate({
             perPage: perPage,
@@ -43,7 +43,7 @@ function getMeasurements(sort = 'id', order = 'asc', page = 1, perPage = 10) {
 function getMeasurementsOfUser(userId, sort = 'id', order = 'asc', page = 1, perPage = 10) {
     return knex.from('measurements')
         .innerJoin('users', 'measurements.created_by', 'users.id')
-        .select('users.username', 'measurements.id', 'measurements.name', 'measurements.description', 'measurements.created_at AS createdAt', 'measurements.created_by as createdBy',)
+        .select('users.username', 'measurements.id', 'measurements.name', 'measurements.description', 'measurements.sampling_rate AS samplingRate', 'measurements.created_at AS createdAt', 'measurements.created_by as createdBy',)
         .where('users.id', userId)
         .orderBy(sort, order)
         .paginate({
@@ -89,7 +89,7 @@ function deleteMeasurementDataTable(tableName) {
  */
 function getMeasurement(id) {
     return knex.from('measurements')
-        .select('*')
+        .select('id', 'name', 'description', 'sampling_rate AS samplingRate', 'created_at AS createdAt', 'created_by as createdBy',)
         .where('id', id)
         .first();
 }
@@ -114,7 +114,7 @@ function getTimestampsOfWavelength(tableName, wavelength) {
 function getWavelengthsOfTimestamp(tableName, timestamps) {
     return knex.from(tableName)
         .select('*')
-        .whereIn('id', timestamps);
+        .whereIn('timestamp', timestamps);
 }
 
 /**
@@ -125,7 +125,8 @@ function getWavelengthsOfTimestamp(tableName, timestamps) {
 function getWavelengthsOfMeasurement(tableName) {
     return knex.from('information_schema.columns')
         .select('COLUMN_NAME AS columns')
-        .where('table_name', tableName);
+        .where('table_name', tableName)
+        .whereNotIn('COLUMN_NAME', ['timestamp', 'id']);
 }
 
 /**
@@ -135,7 +136,7 @@ function getWavelengthsOfMeasurement(tableName) {
  */
 function getAllTimestampsOfMeasurement(tableName) {
     return knex.from(tableName)
-        .select('id');
+        .select('timestamp');
 }
 
 /**
@@ -145,11 +146,9 @@ function getAllTimestampsOfMeasurement(tableName) {
  */
 function getMeasurementData(tableName, xMin, xMax, yMin, yMax) {
     var columns = [];
-    var rows = [];
     for (var i = xMin; i <= xMax; i++) columns.push(i.toString()); // add all numbers between min and max wavelength to array
-    for (var j = yMin; j <= yMax; j++) rows.push(+j); // add all numbers between min and max timestamp to array
-    
+
     return knex.columns(columns).select()
         .from(tableName)
-        .whereIn('id', rows);
+        .whereBetween('timestamp', [yMin, yMax]);
 }

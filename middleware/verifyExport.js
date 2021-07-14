@@ -8,7 +8,8 @@ const path = require('path');
  */
 const checkParameters = (req, res, next) => {
     let timestamps = [];
-    for (var j = req.query.minTimestamp; j <= req.query.maxTimestamp; j++) timestamps.push(+j); // add all numbers between min an
+    const secondsSamplingrate = res.measurement.samplingRate / 1000;
+    for (var j = req.query.minTimestamp; j <= req.query.maxTimestamp; j = Math.round((j+secondsSamplingrate)*10)/10) timestamps.push(+j); // add all numbers between min an
     res.timestamps = timestamps;
 
     if (!req.query.wavelengths) {

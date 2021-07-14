@@ -25,12 +25,12 @@ def connect_to_db():
 
 # Return SQL string for inserting data
 def return_sql_string(table_name):
-    sql_string = "INSERT INTO `" + table_name + "` ("
+    sql_string = "INSERT INTO `" + table_name + "` (`timestamp`, "
     for i in range(ammount_of_columns):
         sql_string += "`" + str(i+min_wavelength) + "`, "
     sql_string = sql_string[:-2]
     sql_string += ") VALUES ("
-    for i in range(ammount_of_columns):
+    for i in range(ammount_of_columns + 1):
         sql_string += "%s, "
     sql_string = sql_string[:-2] + ")"
 
@@ -102,7 +102,8 @@ def get_chromatogram_records(source_file):
     with open(source_file, "rb") as file:
         byte = file.read(get_header_size(source_file))
         current_wavelength = min_wavelength
-        values = ()
+        i = 0
+        values = (i,)
 
         while byte:
             byte = file.read(3)
@@ -111,15 +112,16 @@ def get_chromatogram_records(source_file):
 
             values += (get_absorption(get_int_from_byte(byte)),)
             if current_wavelength % (max_wavelength) == 0:  # when row is read
+                i += 1
                 records.append(values)
                 current_wavelength = min_wavelength  # reset values to read next row
-                values = ()
+                values = (sampling_rate*i,)
             else:
                 current_wavelength += 1
     file.close()
     return records
 
-node_env = sys.argv[5]
+node_env = sys.argv[6]
 load_dotenv(node_env + '.env')
 
 mydb = connect_to_db()
@@ -128,6 +130,8 @@ mycursor = mydb.cursor()
 table_name = sys.argv[2]
 min_wavelength = int(sys.argv[3])
 max_wavelength = int(sys.argv[4])
+sampling_rate = int(sys.argv[5]) / 1000
+print(sampling_rate)
 ammount_of_columns = max_wavelength - min_wavelength + 1
 
 records = get_chromatogram_records(sys.argv[1])

@@ -94,13 +94,13 @@ function downloadDadFile(req, res, next) {
 async function postNewFile(req, res, next) {
     try {
         const file = req.files.file; 
-        const insertId = await fileController.addToMeasurements(req.body.name, req.body.description, req.userId); // add measurement to measurmeent table
+        const insertId = await fileController.addToMeasurements(req.body.name, req.body.description, req.userId, req.body.samplingRate); // add measurement to measurmeent table
         const tableName = getMeasurementName(insertId[0], req.body.name); // get unique measurement name
         const fileLocation = `./uploads/${tableName}`; // create foldername
         makeDirectory(fileLocation); // create folder
         file.mv(`${fileLocation}/${file.name}`); // move file to folder
         await fileController.createNewTable(tableName, +req.body.minWaveLength, +req.body.maxWaveLength); // create data table for measurmeent
-        await runPythonScript(`${fileLocation}/${file.name}`, tableName, req.body.minWaveLength, req.body.maxWaveLength); // run file parser
+        await runPythonScript(`${fileLocation}/${file.name}`, tableName, req.body.minWaveLength, req.body.maxWaveLength, req.body.samplingRate); // run file parser
         return res.send({ id: insertId, message: 'Meting is succesvol opgeslagen!' });
     } catch (error) { return res.status(500).json({message: "Er heeft zich een probleem voorgedaan met het verwerken van het bestand."}) }
 }
@@ -148,9 +148,9 @@ const getMeasurementName = (id, name) => `${id}_${name}`;
  * @param {number} wavelengths 
  * @param {number} insertId 
  */
-function runPythonScript(sourceFile, tablename, minWaveLength, maxWaveLength) {
+function runPythonScript(sourceFile, tablename, minWaveLength, maxWaveLength, samplingRate) {
     return new Promise(function (resolve, reject) {
-        const python = spawn('python', ['filereader.py', sourceFile, tablename, minWaveLength, maxWaveLength, process.env.NODE_ENV], {stdio: "inherit"});
+        const python = spawn('python', ['filereader.py', sourceFile, tablename, minWaveLength, maxWaveLength, samplingRate, process.env.NODE_ENV], {stdio: "inherit"});
         python.on('data', function(data){
             process.stdout.write("python script output",data);
         });
