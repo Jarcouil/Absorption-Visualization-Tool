@@ -68,7 +68,9 @@ async function getCSV(req, res, next) {
         const tableName = getMeasurementName(req.params.id, res.measurement.name);
         const data = await fileController.getCustomData(tableName, res.timestamps, res.wavelengths);
         const jsonData = JSON.parse(JSON.stringify(data));
-        const json2csvParser = new Json2csvParser({ header: true });
+        var fields = [];
+        res.wavelengths.forEach(wl => fields.push(wl.toString()))
+        const json2csvParser = new Json2csvParser({ header: true, fields: fields });
         const csv = json2csvParser.parse(jsonData);
         return res.send(csv);
     } catch (error) { return res.status(500).send(error); }
