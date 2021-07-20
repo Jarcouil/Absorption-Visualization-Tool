@@ -16,15 +16,19 @@ router.post(
     [verifyFile.checkParameters],
     postNewFile
 );
+router.post(
+    '/meta',
+    postMetaFile
+)
 router.get(
-    '/download-file/:id',
+    '/download-file/:id/:fileName',
     [verifyMeasurement.ifMeasurement, verifyMeasurement.isAllowed],
-    downloadDadFile
+    downloadFile
 );
 router.get(
-    '/file-name/:id',
+    '/file-names/:id',
     [verifyMeasurement.ifMeasurement, verifyMeasurement.isAllowed],
-    getFileName
+    getFileNames
 );
 router.get(
     '/csv/:id',
@@ -39,13 +43,15 @@ router.get(
  * @param {*} next 
  * @param {*} req.params.id measurement id 
  */
-function getFileName(req, res, next) {
+function getFileNames(req, res, next) {
     const fileLocation = `./uploads/${getMeasurementName(req.params.id, res.measurement.name)}`;
-    const file = getFile(fileLocation);
-    if (file == null) {
-        return res.status(404).json({ message: 'Kon het bestand niet vinden' });
+    const files = getFiles(fileLocation);
+    if (files == null) {
+        return res.status(404).json({ message: 'Kon geen bestanden vinden' });
     }
-    return res.status(200).json({ fileName: file });
+    let data = { fileNames: [] };
+    files.forEach(file => data.fileNames.push(file));
+    return res.status(200).json(data);
 }
 
 /**
@@ -74,10 +80,14 @@ async function getCSV(req, res, next) {
  * @param {*} res 
  * @param {*} next 
  * @param {*} req.params.id measurement id
+ * @param {*} req.params.fileName file name
  */
-function downloadDadFile(req, res, next) {
+ function downloadFile(req, res, next) {
     const fileLocation = `./uploads/${getMeasurementName(req.params.id, res.measurement.name)}`;
-    return res.download(`${fileLocation}/${getFile(fileLocation)}`);
+    if (!fileExists(`${fileLocation}/${req.params.fileName}`)){
+        return res.status(404).json({ message: 'Kon het bestand niet vinden!' });
+    }
+    return res.download(`${fileLocation}/${req.params.fileName}`);
 }
 
 /**
@@ -99,10 +109,35 @@ async function postNewFile(req, res, next) {
         const fileLocation = `./uploads/${tableName}`; // create foldername
         makeDirectory(fileLocation); // create folder
         file.mv(`${fileLocation}/${file.name}`); // move file to folder
+        moveMetaFile(fileLocation);
         await fileController.createNewTable(tableName, +req.body.minWaveLength, +req.body.maxWaveLength); // create data table for measurmeent
         await runPythonScript(`${fileLocation}/${file.name}`, tableName, req.body.minWaveLength, req.body.maxWaveLength, req.body.samplingRate); // run file parser
         return res.send({ id: insertId, message: 'Meting is succesvol opgeslagen!' });
     } catch (error) { return res.status(500).json({message: "Er heeft zich een probleem voorgedaan met het verwerken van het bestand."}) }
+}
+
+async function postMetaFile(req, res, next) {
+    try {
+        const file = req.files.file; 
+        const fileLocation = './uploads/temp'; // create foldername
+        file.mv(`${fileLocation}/${file.name}`); // move file to folder
+        const [samplingPeriod, minWaveLength, maxWaveLength] = await runMetaParser(`${fileLocation}/${file.name}`); // run file parser
+        return res.send({ samplingPeriod: samplingPeriod, minWaveLength: minWaveLength, maxWaveLength: maxWaveLength, message: 'De waardes voor minimale en maximale golflengte en sampling period zijn succesvol ingevoerd!'});
+        
+    } catch (error) { 
+        console.log(error)
+        return res.status(500).json({message: "Er heeft zich een probleem voorgedaan met het verwerken van het bestand."}) }
+}
+
+/**
+ * Move file to folder of specific measurement
+ *
+ * @param {string} newPath 
+ */
+function moveMetaFile(newPath) {
+    fs.rename('./uploads/temp/Series.rpt', `${newPath}/Series.rpt`, (err) => {
+        if (err) { return console.error(err); }
+    });
 }
 
 /**
@@ -116,15 +151,31 @@ function makeDirectory(directoryPath) {
 }
 
 /**
+ * Check if file exists of given directory path
+ *
+ * @param {string} directoryPath 
+ * @returns boolean
+ */
+function fileExists(directoryPath) {
+    try {
+        if (fs.existsSync(directoryPath)) return true;
+        return false;
+    } catch (err) {
+        console.log("err", err);
+        return false;
+    }
+}
+
+/**
  * Get the file of given directory path
  * @param {*} directoryPath 
  * @returns File
  */
-function getFile(directoryPath) {
+ function getFiles(directoryPath) {
     try {
         const files = fs.readdirSync(directoryPath);
         if (files.length < 1) return null;
-        return files[0];
+        return files;
     } catch (err) {
         console.log("err", err);
         return null;
@@ -140,6 +191,28 @@ function getFile(directoryPath) {
 const getMeasurementName = (id, name) => `${id}_${name}`;
 
 /**
+ * Run parser for meta parser and return results
+ * @param {file} sourceFile 
+ *
+ * @returns minWavelength, maxWavelength, samplingPeriod
+ */
+function runMetaParser(sourceFile) {
+    return new Promise(function (resolve, reject) {
+        const python = spawn('python', ['series_parser.py', sourceFile]);
+        let result = '';
+        python.stdout.on('data', function(data){
+            result += data.toString().replace(/[|&;$%/\r?\n|\r/@"<>()+,]/g, "");
+        });
+        python.on('close', (code) => {
+            console.log(`child process close all stdio with code ${code}`);
+            if (code !== 0) reject();
+            let results = result.split(" ").map(item => +item)
+            resolve(results);
+        });
+    });
+}
+
+/**
  * Run python script which extracts the data of the .dad file
  * @param {string} sourceFile 
  * @param {*} res 
@@ -152,8 +225,9 @@ function runPythonScript(sourceFile, tablename, minWaveLength, maxWaveLength, sa
     return new Promise(function (resolve, reject) {
         const python = spawn('python', ['filereader.py', sourceFile, tablename, minWaveLength, maxWaveLength, samplingRate, process.env.NODE_ENV], {stdio: "inherit"});
         python.on('data', function(data){
-            process.stdout.write("python script output",data);
-        });
+            process.stdout.write("python script output", data);
+        });  
+
         python.on('close', (code) => {
             console.log(`child process close all stdio with code ${code}`);
             if (code !== 0) reject();
