@@ -5,7 +5,7 @@ exports.up = function (knex) {
             table.string('username').notNullable()
             table.string('email').notNullable()
             table.string('password').notNullable()
-            table.integer('is_admin', 0)
+            table.integer('is_admin').defaultTo(0)
             table.timestamp('created_at').defaultTo(knex.fn.now())
             table.timestamp('updated_at').defaultTo(knex.fn.now())
         })
