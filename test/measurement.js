@@ -40,7 +40,7 @@ function login(username, password) {
 }
 
 function addMeasurement(name, description) {
-    return fileController.addToMeasurements(faker.random.word(), faker.lorem.sentence(), user.id)
+    return fileController.addToMeasurements(faker.random.word(), faker.lorem.sentence(), user.id, faker.datatype.number(3200))
 }
 
 describe('Measurements API', () => {
@@ -133,7 +133,7 @@ describe('Measurements API', () => {
                     measurement1 = res.body.data[0]
                     res.body.data.should.be.an.instanceof(Array);
                     res.body.data.length.should.be.equal(1);
-                    res.body.data[0].should.include.all.keys(['id', 'name', 'description', 'createdAt', 'createdBy', 'username']);
+                    res.body.data[0].should.include.all.keys(['id', 'name', 'description', 'createdAt', 'createdBy', 'username', 'samplingRate']);
                     res.should.have.status(200);
                     done();
                 });
@@ -147,12 +147,12 @@ describe('Measurements API', () => {
                 .get(`/v1/measurement/${measurement1.id}`)
                 .set("x-access-token", user.accessToken)
                 .end((err, res) => {
-                    res.body.should.include.all.keys(['id', 'name', 'description', 'created_at', 'created_by']);
+                    res.body.should.include.all.keys(['id', 'name', 'description', 'createdAt', 'createdBy', 'samplingRate']);
                     res.body.id.should.be.equal(measurement1.id);
                     res.body.name.should.be.equal(measurement1.name);
                     res.body.description.should.be.equal(measurement1.description);
-                    res.body.created_at.should.be.equal(measurement1.createdAt);
-                    res.body.created_by.should.be.equal(measurement1.createdBy);
+                    res.body.createdAt.should.be.equal(measurement1.createdAt);
+                    res.body.createdBy.should.be.equal(measurement1.createdBy);
                     res.should.have.status(200);
                     done();
                 });
@@ -223,12 +223,12 @@ describe('Measurements API', () => {
                 .get(`/v1/measurement/${measurement1.id}`)
                 .set("x-access-token", user2.accessToken)
                 .end((err, res) => {
-                    res.body.should.include.all.keys(['id', 'name', 'description', 'created_at', 'created_by']);
+                    res.body.should.include.all.keys(['id', 'name', 'description', 'createdAt', 'createdBy', 'samplingRate']);
                     res.body.id.should.be.equal(measurement1.id);
                     res.body.name.should.be.equal(measurement1.name);
                     res.body.description.should.be.equal(measurement1.description);
-                    res.body.created_at.should.be.equal(measurement1.createdAt);
-                    res.body.created_by.should.be.equal(measurement1.createdBy);
+                    res.body.createdAt.should.be.equal(measurement1.createdAt);
+                    res.body.createdBy.should.be.equal(measurement1.createdBy);
                     res.should.have.status(200);
                     done();
                 });
