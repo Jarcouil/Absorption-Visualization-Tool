@@ -3,6 +3,7 @@ const _ = require('lodash');
 const fs = require('fs');
 const path = require('path');
 const Json2csvParser = require("json2csv").Parser;
+const config = require("../config/config");
 
 const router = require('express').Router({ mergeParams: true });
 const fileController = require('./../controllers/fileController');
@@ -200,7 +201,7 @@ const getMeasurementName = (id, name) => `${id}_${name}`;
  */
 function runMetaParser(sourceFile) {
     return new Promise(function (resolve, reject) {
-        const python = spawn('python', ['series_parser.py', sourceFile]);
+        const python = spawn(config.python, ['series_parser.py', sourceFile]);
         let result = '';
         python.stdout.on('data', function(data){
             result += data.toString().replace(/[|&;$%/\r?\n|\r/@"<>()+,]/g, "");
@@ -225,7 +226,7 @@ function runMetaParser(sourceFile) {
  */
 function runPythonScript(sourceFile, tablename, minWaveLength, maxWaveLength, samplingRate) {
     return new Promise(function (resolve, reject) {
-        const python = spawn('python', ['filereader.py', sourceFile, tablename, minWaveLength, maxWaveLength, samplingRate, process.env.NODE_ENV], {stdio: "inherit"});
+        const python = spawn(config.python, ['filereader.py', sourceFile, tablename, minWaveLength, maxWaveLength, samplingRate, process.env.NODE_ENV], {stdio: "inherit"});
         python.on('data', function(data){
             process.stdout.write("python script output", data);
         });  

@@ -18,6 +18,7 @@ module.exports = {
       idle: process.env.IDLE,
     },
   },
+  python: process.env.PYTHON,
   secret: process.env.SECRET,
   users: {
     admin: {
