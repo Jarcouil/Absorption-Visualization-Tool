@@ -7,10 +7,26 @@ const crypto = require('crypto');
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const config = require("../config/config");
+const options = require('../knexfile');
+const knex = require("knex")(options);
+const ExpressBrute = require('express-brute');
+const BruteKnex = require('brute-knex');
+
+let store = new BruteKnex({
+    createTable: true,
+    knex: knex
+});
+
+const bruteforce = new ExpressBrute(store, {
+    freeRetries: 5
+});
 
 router.post(
     '/login',
-    verifyLogin.checkParameters,
+    [
+        bruteforce.prevent,
+        verifyLogin.checkParameters,
+    ],
     login
 );
 router.post(
