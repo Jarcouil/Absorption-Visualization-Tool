@@ -1,7 +1,7 @@
 const config = require("./config/config");
 
 const options = {
-    client: 'mysql',
+    client: 'mysql2',
     connection: {
         host: config.database.HOST,
         user: config.database.USER,
@@ -17,7 +17,6 @@ const options = {
         directory: './seeds'
     }
 }
-
 
 module.exports = options;
 

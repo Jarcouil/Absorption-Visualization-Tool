@@ -16,7 +16,7 @@ def connect_to_db():
     try:
         return mysql.connector.connect(
             host=os.environ.get('HOST'),
-            user=os.environ.get('USER'),
+            user=os.environ.get('DBUSER'),
             password=os.environ.get('PASSWORD'),
             database=os.environ.get('DB')
         )
