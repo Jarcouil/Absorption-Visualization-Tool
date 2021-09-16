@@ -83,7 +83,7 @@ function getMail(username, resetToken) {
                                             <p style="color:#455056; font-size:15px;line-height:24px; margin:0;">
                                                Je ontvangt deze mail omdat jij (of iemand anders) heeft aangevraagd om je wachtwoord te wijzigen voor je                  account. We kunnen simpelweg niet je oude wachtwoord opsturen. Daarom staat hieronder een unieke link om je wachtwoord te resetten. Je kan je wachtwoord wijzigen door op de onderstaande link te klikken en de instructies te volgen.
                                             </p>
-                                            <a href="http://localhost:4200/reset/` + resetToken.toString() + `"
+                                            <a href="` + config.frontendUrl + `/` + resetToken.toString() + `"
                                                 style="background:#0069D9;text-decoration:none !important; font-weight:500; margin-top:35px; color:#fff;text-transform:uppercase; font-size:14px;padding:10px 24px;display:inline-block;border-radius:50px;">Reset
                                                 Wachtwoord</a>
                                         </td>
@@ -98,7 +98,7 @@ function getMail(username, resetToken) {
                         </tr>
                         <tr>
                             <td style="text-align:center;">
-                                <p style="font-size:14px; color:rgba(69, 80, 86, 0.7411764705882353); line-height:18px; margin:0 0 0;">&copy; <strong>http://localhost:4200</strong></p>
+                                <p style="font-size:14px; color:rgba(69, 80, 86, 0.7411764705882353); line-height:18px; margin:0 0 0;">&copy; <strong>` + config.frontendUrl + `</strong></p>
                             </td>
                         </tr>
                         <tr>

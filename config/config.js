@@ -5,9 +5,10 @@ module.exports = {
   port: process.env.PORT,
   email_address: process.env.EMAIL_ADDRESS,
   password: process.env.EMAIL_PASSWORD,
+  frontendUrl: process.env.FRONTEND_URL,
   database: {
     HOST: process.env.HOST,
-    USER: process.env.USER,
+    USER: process.env.DBUSER,
     PASSWORD: process.env.PASSWORD,
     DB: process.env.DB,
     dialect: process.env.DIALECT,

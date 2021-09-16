@@ -12,7 +12,7 @@ const port = config.port
 const api = require('./api')
 
 var corsOptions = {
-	origin: "http://localhost:4200"
+	origin: [config.frontendUrl]
 };
 
 app.use(fileUpload({
