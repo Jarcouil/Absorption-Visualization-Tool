@@ -62,12 +62,13 @@ function getFileNames(req, res, next) {
  * @param {*} next 
  * @param {*} req.params.id measurement id
  * @param {*} req.query.wavelengths Wavelengths
- * @param {*} req.query.timestamps Timestamps
+ * @param {*} req.query.minTimestamp Timestamp
+ * @param {*} req.query.maxTimestamp Timestamp
  */
 async function getCSV(req, res, next) {
     try {
         const tableName = getMeasurementName(req.params.id, res.measurement.name);
-        const data = await fileController.getCustomData(tableName, res.timestamps, res.wavelengths);
+        const data = await fileController.getCustomData(tableName, req.query.minTimestamp, req.query.maxTimestamp, res.wavelengths);
         const jsonData = JSON.parse(JSON.stringify(data));
         var fields = [];
         res.wavelengths.forEach(wl => fields.push(wl.toString()))

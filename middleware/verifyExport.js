@@ -7,11 +7,6 @@ const path = require('path');
  * @param {*} next 
  */
 const checkParameters = (req, res, next) => {
-    let timestamps = [];
-    const secondsSamplingrate = res.measurement.samplingRate / 1000;
-    for (var j = +req.query.minTimestamp; j <= +req.query.maxTimestamp; j = Math.round((j+secondsSamplingrate)*10)/10) timestamps.push(+j); // add all numbers between min and max timestamp
-    res.timestamps = timestamps;
-
     if (!req.query.wavelengths) {
         let wavelengths = [];
         for (var i = req.query.minWavelength; i <= req.query.maxWavelength; i++) wavelengths.push(i.toString()); // add all numbers between min and max wavelength to array
