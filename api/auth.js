@@ -24,7 +24,7 @@ const bruteforce = new ExpressBrute(store, {
 router.post(
     '/login',
     [
-        bruteforce.prevent,
+        preventBruteforce,
         verifyLogin.checkParameters,
     ],
     login
@@ -146,6 +146,14 @@ async function requestResetPassword(req, res, next) {
         await authController.requestResetPassword(user.username, user.email, resetToken);
         return res.status(200).json({ message: "Mail is succesvol verzonden." });
     } catch (error) { return res.status(500).send(error);}
+}
+
+function preventBruteforce(req, res, next){
+    if (process.env.NODE_ENV !== 'test') {
+        bruteforce.prevent(req, res, next)
+    } else{
+        next();
+    }
 }
 
 module.exports = router;
