@@ -159,13 +159,17 @@ function getAllTimestampsOfMeasurement(tableName) {
 /**
  * Get all data of given measurement
  * @param {string} tableName 
+ * @param {number} minWavelength 
+ * @param {number} maxWavelength 
+ * @param {number} minTimestamp 
+ * @param {number} maxTimestamp 
  * @returns array of all timestamps and wavelength of given measurement
  */
-function getMeasurementData(tableName, xMin, xMax, yMin, yMax) {
+function getMeasurementData(tableName, minWavelength, maxWavelength, minTimestamp, maxTimestamp) {
     var columns = [];
-    for (var i = xMin; i <= xMax; i++) columns.push(i.toString()); // add all numbers between min and max wavelength to array
+    for (var i = minWavelength; i <= maxWavelength; i++) columns.push(i.toString()); // add all numbers between min and max wavelength to array
 
     return knex.columns(columns).select()
         .from(tableName)
-        .whereBetween('timestamp', [yMin, yMax]);
+        .whereBetween('timestamp', [minTimestamp, maxTimestamp]);
 }
