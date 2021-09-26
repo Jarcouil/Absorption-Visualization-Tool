@@ -14,7 +14,9 @@ module.exports = {
 /**
  * Get all users from database
  * @param {string} sort 
- * @param {string} order 
+ * @param {string} order
+ * @param {number} page
+ * @param {number} perPage 
  * @returns array of users
  */
 function getUsers(sort = 'id', order = 'asc', page = 1, perPage = 10) {

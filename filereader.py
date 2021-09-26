@@ -96,26 +96,26 @@ def insert_rows_to_db(sql_string, records):
         print(e)
         insert_rows_single(sql_string, records)
         
-# return all values of the file
+# return all absorption data of the file
 def get_chromatogram_records(source_file):
     records = []
     with open(source_file, "rb") as file:
-        byte = file.read(get_header_size(source_file))
+        byte = file.read(get_header_size(source_file)) # Read the header
         current_wavelength = min_wavelength
-        i = 0
-        values = (i,)
+        timestamp = 0
+        row = (timestamp,)
 
         while byte:
             byte = file.read(3)
-            if len(byte) != 3:  # end of the file
+            if len(byte) != 3:  # End of the file
                 break
 
-            values += (get_absorption(get_int_from_byte(byte)),)
+            row += (get_absorption(get_int_from_byte(byte)),)
             if current_wavelength % (max_wavelength) == 0:  # when row is read
-                i += 1
-                records.append(values)
-                current_wavelength = min_wavelength  # reset values to read next row
-                values = (sampling_rate*i,)
+                timestamp += 1
+                records.append(row)
+                current_wavelength = min_wavelength  # reset wavevelength to read next row
+                row = (sampling_rate*timestamp,)
             else:
                 current_wavelength += 1
     file.close()
@@ -131,7 +131,6 @@ table_name = sys.argv[2]
 min_wavelength = int(sys.argv[3])
 max_wavelength = int(sys.argv[4])
 sampling_rate = int(sys.argv[5]) / 1000
-print(sampling_rate)
 ammount_of_columns = max_wavelength - min_wavelength + 1
 
 records = get_chromatogram_records(sys.argv[1])

@@ -19,12 +19,21 @@ module.exports = {
  * Get all measurements from the database
  * @param {string} sort 
  * @param {string} order
+ * @param {number} page
+ * @param {number} perPage
  * @returns array of measurements
  */
 function getMeasurements(sort = 'id', order = 'asc', page = 1, perPage = 10) {
     return knex.from('measurements')
         .innerJoin('users', 'measurements.created_by', 'users.id')
-        .select('users.username', 'measurements.id', 'measurements.name', 'measurements.description', 'measurements.sampling_rate AS samplingRate', 'measurements.created_at AS createdAt', 'measurements.created_by as createdBy',)
+        .select(
+            'measurements.id', 
+            'measurements.name', 
+            'measurements.description', 
+            'measurements.sampling_rate AS samplingRate', 
+            'measurements.created_at AS createdAt', 
+            'users.username as createdBy',
+        )
         .orderBy(sort, order)
         .paginate({
             perPage: perPage,
@@ -38,12 +47,20 @@ function getMeasurements(sort = 'id', order = 'asc', page = 1, perPage = 10) {
  * @param {number} userId 
  * @param {string} sort 
  * @param {string} order 
+ * @param {number} page
+ * @param {number} perPage
  * @returns array of measurements
  */
 function getMeasurementsOfUser(userId, sort = 'id', order = 'asc', page = 1, perPage = 10) {
     return knex.from('measurements')
         .innerJoin('users', 'measurements.created_by', 'users.id')
-        .select('users.username', 'measurements.id', 'measurements.name', 'measurements.description', 'measurements.sampling_rate AS samplingRate', 'measurements.created_at AS createdAt', 'measurements.created_by as createdBy',)
+        .select(
+            'measurements.id', 
+            'measurements.name', 
+            'measurements.description', 
+            'measurements.sampling_rate AS samplingRate', 
+            'measurements.created_at AS createdAt', 
+        )
         .where('users.id', userId)
         .orderBy(sort, order)
         .paginate({
