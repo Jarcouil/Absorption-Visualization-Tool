@@ -133,7 +133,7 @@ describe('Measurements API', () => {
                     measurement1 = res.body.data[0]
                     res.body.data.should.be.an.instanceof(Array);
                     res.body.data.length.should.be.equal(1);
-                    res.body.data[0].should.include.all.keys(['id', 'name', 'description', 'createdAt', 'createdBy', 'username', 'samplingRate']);
+                    res.body.data[0].should.include.all.keys(['id', 'name', 'description', 'createdAt', 'samplingRate']);
                     res.should.have.status(200);
                     done();
                 });
@@ -152,7 +152,6 @@ describe('Measurements API', () => {
                     res.body.name.should.be.equal(measurement1.name);
                     res.body.description.should.be.equal(measurement1.description);
                     res.body.createdAt.should.be.equal(measurement1.createdAt);
-                    res.body.createdBy.should.be.equal(measurement1.createdBy);
                     res.should.have.status(200);
                     done();
                 });
@@ -228,7 +227,6 @@ describe('Measurements API', () => {
                     res.body.name.should.be.equal(measurement1.name);
                     res.body.description.should.be.equal(measurement1.description);
                     res.body.createdAt.should.be.equal(measurement1.createdAt);
-                    res.body.createdBy.should.be.equal(measurement1.createdBy);
                     res.should.have.status(200);
                     done();
                 });

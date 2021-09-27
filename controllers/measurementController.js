@@ -53,15 +53,14 @@ function getMeasurements(sort = 'id', order = 'asc', page = 1, perPage = 10) {
  */
 function getMeasurementsOfUser(userId, sort = 'id', order = 'asc', page = 1, perPage = 10) {
     return knex.from('measurements')
-        .innerJoin('users', 'measurements.created_by', 'users.id')
         .select(
-            'measurements.id', 
-            'measurements.name', 
-            'measurements.description', 
-            'measurements.sampling_rate AS samplingRate', 
-            'measurements.created_at AS createdAt', 
+            'id', 
+            'name', 
+            'description', 
+            'sampling_rate AS samplingRate', 
+            'created_at AS createdAt', 
         )
-        .where('users.id', userId)
+        .where('created_by', userId)
         .orderBy(sort, order)
         .paginate({
             perPage: perPage,
