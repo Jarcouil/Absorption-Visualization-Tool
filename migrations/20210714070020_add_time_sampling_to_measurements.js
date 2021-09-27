@@ -7,6 +7,6 @@ exports.up = function(knex) {
 
 exports.down = function(knex) {
     return knex.schema.table('measurements', (table) => {
-        table.dropTable('sampling_rate')
+        table.dropColumn('sampling_rate')
     })
 };
