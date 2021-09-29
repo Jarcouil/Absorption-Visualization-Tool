@@ -38,7 +38,10 @@ def return_sql_string(table_name):
 
 # calculate the absorption
 def get_absorption(long_int):
-    return str(c0 + c1 * long_int)
+    absorption = c0 + c1 * long_int
+    if (absorption < 0):
+        absorption = 0
+    return str(absorption)
 
 # get the content of the file in a list
 def get_listed_file(file_name):
